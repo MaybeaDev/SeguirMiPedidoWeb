@@ -13,7 +13,7 @@ const SeccionGestionDePaquetes = () => {
                 <Tab id="arriboCarga" name={"Arribo de carga"} to="arriboCarga" />
                 <Tab id="despachos" name={"Despachos"} to="despachos" />
                 <Tab id="verRutas" name={"Armado de Rutas"} to="armadoRutas" />
-                <Tab id="verPaquetes" name={"Ver Paquetes"} to="verPaquetes" />
+                <Tab id="verPaquetes" name={"Consultar Paquetes"} to="verPaquetes" />
                 <Tab id="gestionDeRutas" name={"Gestion de Rutas"} to="gestionDeRutas" />
             </NavBarTab>
             <div className={classes.content}>
