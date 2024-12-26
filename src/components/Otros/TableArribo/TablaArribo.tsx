@@ -1,7 +1,7 @@
 import classes from "./TablaArribo.module.css";
 
 const TablaArribo = (props: { data: (string | boolean)[][], headers: string[] }) => {
-    const data = props.data.map((p) => [p[0], p[1], p[2], p[3], p[4]])
+    const data = props.data.map((p) => [p[0], p[1], p[2], p[3], p[4], p[5]])
 
     return (
         <table width="100%" className={classes.table}>
@@ -29,7 +29,7 @@ const TablaArribo = (props: { data: (string | boolean)[][], headers: string[] })
                     </tr>
                 ))}
                 <tr className={classes.tr}>
-                    <td colSpan={5}>...</td>
+                    <td colSpan={6}>...</td>
                 </tr>
             </tbody>
         </table>

@@ -11,6 +11,7 @@ import { db } from "../../../../firebaseConfig";
 interface Paquete {
     codigo: string,
     consultora: string,
+    fechaIngreso:string,
     recibe: string,
     telefono: string,
     direccion: string,
@@ -109,6 +110,7 @@ const ArriboCargaTab = () => {
                 paquetes.push({
                     codigo: paquete.id,
                     consultora: paquete.data().consultora,
+                    fechaIngreso: paquete.data().historial[0].fecha.toDate().toISOString().slice(0, 10).split("-").reverse().join("-"),
                     recibe: paquete.data().receptor,
                     telefono: paquete.data().contacto,
                     direccion: paquete.data().direccion,
@@ -153,6 +155,7 @@ const ArriboCargaTab = () => {
                     <TablaArribo data={data.map((p) => [
                         p.codigo,
                         p.consultora,
+                        p.fechaIngreso,
                         p.recibe,
                         p.telefono,
                         p.direccion,
@@ -160,6 +163,7 @@ const ArriboCargaTab = () => {
                     ]).slice(0, 14)} headers={[
                         "Código",
                         "Consultora",
+                        "Fecha ingreso",
                         "Recibe",
                         "Teléfono",
                         "Dirección"
