@@ -1,0 +1,68 @@
+.table {
+  width: 100%;
+  border-collapse: collapse; /* Para que las celdas estén juntas */
+  margin: 20px 0; /* Espaciado superior e inferior */
+}
+
+.thead {
+  background-color: rgba(0,0,0,0.4);
+}
+.trHeadder {
+  text-align: left;
+  border-bottom: 2px solid #ddd;
+}
+.trHeadder th:first-child {
+  border-top-left-radius: 20px;/* Color de fondo para el primer <th> */
+  border-bottom-left-radius: 20px;/* Color de fondo para el primer <th> */
+}
+.trHeadder th:last-child {
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+.th {
+  padding: 12px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.tbody {
+  position: relative;
+  top: 10px;
+  background-color: rgba(0,0,0,0.2);
+}
+.tbody tr:first-child td:first-child {
+  border-top-left-radius: 20px;
+}
+
+.tbody tr:first-child td:last-child {
+  border-top-right-radius: 20px;
+}
+.tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 20px;
+}
+.tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 20px;
+}
+.tr {
+  &:hover {
+    background-color: rgba(0,0,0,0.3);
+  }
+}
+.td {
+  padding: 10px;
+  padding-block: 2px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+  border-left: 1px solid rgba(0,0,0,0.5);
+  border-right: 1px solid rgba(0,0,0,0.5);
+}
+
+.td:last-child {
+  border-right: none;
+}
+.td:first-child {
+  border-left: none;
+}

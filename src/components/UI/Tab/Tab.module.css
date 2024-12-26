@@ -1,0 +1,22 @@
+.button {
+  padding: 10px;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  border: solid 2px #c77b00;
+  background-color: #a2a2a2;
+  width: 100%;
+  transition: background-color 200ms ease;
+}
+
+.selected {
+  border-bottom: 0;
+  padding-bottom: 12px;
+  padding-top: 9px;
+  background-color: #fff2e0;
+  color: #000;
+}
+
+.link {
+  width: 100%;
+
+}

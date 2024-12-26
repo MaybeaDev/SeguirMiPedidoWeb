@@ -1,0 +1,107 @@
+.buttonDescargar {
+  background-color: #656565;
+  
+  transition: all 100ms ease;
+}
+.loadingOverflow {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  left: 0;
+  z-index: 300;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+.card {
+  background-color: #fff;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  padding: 10px;
+  padding-inline: 30px;
+}
+.content {
+  display:flex;
+  flex-direction: row;
+}
+
+.leftContent {
+  width: 30%;
+  align-self: flex-start;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;   /* Alineación horizontal */
+}
+
+.rightContent {
+  width: 70%;
+}
+
+
+.spinnerContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 20px; /* Agregar espacio entre la tabla y el spinner */
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.input {
+  width: 80%;
+  box-sizing: border-box;
+  padding: 10px;
+  border-radius: 15px;
+  border: 0;
+  transition: all 100ms ease-in-out;
+}
+.input:focus {
+  outline: none;
+  transform:scale(1.01);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+.containerNoEncontrados {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: wrap; 
+  margin-top: 20px;
+}
+.containerNoEncontrados label {
+  background-color: #ababab;
+  margin : 2px;
+  padding: 5px;
+  border-radius: 10px;
+  border:solid 1px #616161
+}
+
+.validInput {
+  border: 2px solid #57951d;
+  background-color: rgba(0, 255, 0, 0.1);
+  box-shadow: 0 0 5px 4px rgba(0, 255, 0, 0.2);
+}
+.readOnlyInput:focus {
+  outline: none;
+  box-shadow: none;
+}
+.invalidInput {
+  border: 2px solid #e74c3c;
+  box-shadow: 0 0 5px 3px rgba(255, 0, 0, 0.1);
+  background-color: rgba(255, 0, 0, 0.2);
+}

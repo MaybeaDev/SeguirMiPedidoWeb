@@ -1,0 +1,32 @@
+.container {
+  width: 100%;
+  height: 70px; /* Ajustamos la altura para que sea un menú de cabecera */
+  flex-direction: row; /* Cambio a una fila */
+  position: fixed; /* Fijar en la parte superior */
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  margin-top: 0px;
+  padding-inline:20px;
+  padding-top: 0px;
+  border-radius: 0;
+  background-color: rgb(255, 149, 0);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3); /* Menos sombra */
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.left {
+  display: flex;
+  justify-content: left;
+}
+
+.right {
+  display: flex;
+  justify-content: right;
+}
+.center {
+  display: flex;
+  justify-content: center;
+}

@@ -1,0 +1,7 @@
+.container {
+  position : fixed;
+  height: calc(100vh - 70px);
+  overflow-y: auto;
+  width: 100%;
+  top: 70px;
+}

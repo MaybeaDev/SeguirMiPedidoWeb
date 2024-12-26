@@ -1,0 +1,30 @@
+
+.inputGroup label {
+  display: inline-block;
+  width: 14%;
+}
+.inputGroup input {
+  display: inline-block;
+  width: 14%;
+  border-radius: 0;
+  box-sizing: border-box;
+  height: 45px;
+}
+.inputGroup input:first-child {
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+}
+.inputGroup input:last-child {
+  width: 9%;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+.spaceAround {
+  display: flex;
+  justify-content: space-around;
+}
+
+.botonAzul {
+  background-color: rgb(0, 132, 255);
+}

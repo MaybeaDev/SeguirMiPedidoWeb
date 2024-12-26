@@ -1,0 +1,234 @@
+.containerTables {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  max-height: 50vh;
+}
+.tableContainer {
+  width: 100%;
+  margin-bottom: 2%;
+  max-height: 40vh; /* Altura máxima para el scroll */
+  overflow-y: auto; /* Scroll vertical */
+  border-radius: 20px; /* Border-radius para el contenedor */
+  border: 1px solid #ddd; /* Borde opcional */
+  box-sizing: border-box;
+}
+.tableContainer::-webkit-scrollbar {
+  width: 8px; /* Ancho del scrollbar */
+  transition: width 0.3s ease; /* Transición suave para el cambio de tamaño */
+}
+.tableContainer::-webkit-scrollbar:hover {
+  width: 16px; /* Ancho del scrollbar cuando el mouse está encima */
+}
+
+.tableContainer::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Color de fondo de la pista */
+  border-radius: 10px; /* Bordes redondeados */
+}
+.tableContainer::-webkit-scrollbar-track:hover {
+  background: #f1f1f1; /* Color de fondo de la pista */
+  border-radius: 10px; /* Bordes redondeados */
+}
+
+.tableContainer::-webkit-scrollbar-thumb {
+  background-color: #888; /* Color del "pulgar" (barra de desplazamiento) */
+  border-radius: 10px; /* Bordes redondeados */
+  border: 2px solid #f1f1f1; /* Espacio entre el pulgar y la pista */
+}
+
+.tableContainer::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Color al pasar el cursor por el pulgar */
+}
+
+.table {
+  width: 100%; /* Esto hace que ambas tablas ocupen el mismo espacio disponible */
+  border-collapse: collapse;
+}
+.table thead,
+.table tbody tr {
+  width: 100%; /* Ajusta el ancho al 100% */
+  table-layout: fixed; /* Opcional: Asegura el ajuste de las columnas */
+}
+
+.thead {
+  background-color: rgba(0, 0, 0, 0.4);
+  width: 100%;
+}
+
+.trHeadder {
+  width: 100%;
+  text-align: left;
+  border-bottom: 2px solid #ddd;
+}
+.trHeadder th:first-child {
+  border-top-left-radius: 20px; /* Color de fondo para el primer <th> */
+  border-bottom-left-radius: 20px; /* Color de fondo para el primer <th> */
+}
+.trHeadder th:last-child {
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+.th {
+  padding: 12px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.tbody {
+  position: relative;
+  top: 10px;
+  max-height: 30vh;
+  overflow-y: auto;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.tbody tr:first-child td:first-child {
+  border-top-left-radius: 20px;
+}
+
+.tbody tr:first-child td:last-child {
+  border-top-right-radius: 20px;
+}
+
+.tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 20px;
+}
+
+.tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 20px;
+}
+
+.tr {
+  height: min-content; /* Esto asegura que las filas ocupen solo la altura mínima */
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+    transition: all 200ms ease;
+  }
+}
+
+.td {
+  width: 30%;
+  height: min-content; /* Ajusta la altura de la celda al contenido */
+  font-size: 14px;
+  padding: 10px;
+  text-align: center;
+  word-wrap: break-word; /* Permite el ajuste del texto largo */
+  white-space: normal; /* Permite el ajuste de texto dentro de las celdas */
+  border-bottom: 1px solid #ddd;
+  border-left: 1px solid rgba(0, 0, 0, 0.5);
+  border-right: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.td:last-child {
+  border-right: none;
+}
+
+.td:first-child {
+  border-left: none;
+}
+
+.selected {
+  background-color: rgba(0, 128, 255, 0.2);
+}
+
+.selected:hover {
+  background-color: rgba(0, 128, 255, 0.464);
+}
+
+.input[type="text"] {
+  width: 100%;
+  height: 100%;
+  padding: 7px 8px;
+  box-sizing: border-box;
+  margin: 0;
+  border: 2px solid rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  font-size: 14px;
+  background-color: rgba(255, 255, 255, 0.8);
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.input[type="text"]:focus {
+  border-color: rgba(0, 128, 255, 0.7);
+  box-shadow: 0 0 10px rgba(0, 128, 255, 0.4);
+}
+
+.button {
+  background-color: rgba(0, 128, 255, 0.2);
+  border: 2px solid rgba(0, 128, 255, 0.4);
+  height: 100%;
+  width: 30%;
+  margin: 0;
+  border-radius: 10px;
+  color: #333;
+  font-size: 14px;
+  padding: 3px 10px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: 0;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.button:hover {
+  background-color: rgba(0, 128, 255, 0.4);
+  border-color: rgba(0, 128, 255, 0.7);
+  color: #fff;
+}
+
+.button:focus {
+  outline: none;
+  box-shadow: 0 0 10px rgba(0, 128, 255, 0.4);
+}
+
+.button:disabled {
+  background-color: rgba(200, 200, 200, 0.5);
+  border-color: rgba(200, 200, 200, 0.7);
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.filtersContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.filterGroup {
+  margin-block: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 49%;
+}
+
+
+.spinnerContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 20px; /* Agregar espacio entre la tabla y el spinner */
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+

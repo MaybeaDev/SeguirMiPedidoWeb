@@ -1,0 +1,19 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "Paquetes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "ruta",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "estado",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
