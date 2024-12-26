@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && npm run deploy --",
     "lint": "eslint .",
     "preview": "vite preview",
-    "postbuild": "git add . && git commit -m \"Actualización después de build\" && git push && firebase deploy --only \"hosting\""
+    "deploy": "node postbuild.js"
   },
   "dependencies": {
     "canvas": "^3.0.0",
