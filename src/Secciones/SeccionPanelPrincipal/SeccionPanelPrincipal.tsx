@@ -7,7 +7,8 @@ import { collection, query, getDocs } from "firebase/firestore";
 
 
 const PanelPrincipal = () => {
-    const [paquetes, setPaquetes] = useState<{ enBodega: number, enProceso: number, entregado: number, total: number }>({
+    const [paquetes, setPaquetes] = useState<{ enBodega: number, enProceso: number, entregado: number, total: number, noArribado:number }>({
+        noArribado:0,
         enBodega: 0,
         enProceso: 0,
         entregado: 0,
@@ -17,6 +18,7 @@ const PanelPrincipal = () => {
         const q = query(collection(db, "Paquetes"));
         const querySnapshot = await getDocs(q);
         const p = {
+            noArribado: 0,
             enBodega: 0,
             enProceso: 0,
             entregado: 0,
@@ -24,7 +26,9 @@ const PanelPrincipal = () => {
         }
         querySnapshot.forEach((doc) => {
             p.total++
-            if (doc.data().estado == 1) {
+            if (doc.data().estado == 0) {
+                p.noArribado++
+            } else if (doc.data().estado == 1) {
                 p.enBodega++
             } else if (doc.data().estado == 3) {
                 p.entregado++
@@ -44,6 +48,7 @@ const PanelPrincipal = () => {
         <div>
             <h2>Panel Principal</h2>
             <div style={{ display: "flex", justifyContent: "space-between", padding: "0 20px" }}>
+                <Card titulo="En bodega" style={{ width: "100%" }}>{paquetes.noArribado}</Card>
                 <Card titulo="En bodega" style={{ width: "100%" }}>{paquetes.enBodega}</Card>
                 <Card titulo="En proceso" style={{ width: "100%" }}>{paquetes.enProceso}</Card>
                 <Card titulo="Entregado" style={{ width: "100%" }}>{paquetes.entregado}</Card>

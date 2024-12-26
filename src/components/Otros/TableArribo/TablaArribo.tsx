@@ -28,9 +28,11 @@ const TablaArribo = (props: { data: (string | boolean)[][], headers: string[] })
                         ))}
                     </tr>
                 ))}
-                <tr className={classes.tr}>
-                    <td colSpan={6}>...</td>
-                </tr>
+                {data.length > 10 && (
+                    <tr className={classes.trPlaceHolder}>
+                        <td colSpan={6}>...</td>
+                    </tr>
+                )}
             </tbody>
         </table>
     );

@@ -1,6 +1,8 @@
+import classes from "./Despachos.module.css"
+
+
 import { useEffect, useRef, useState } from "react";
 import Table from "../../../../components/UI/Table/Table";
-import classes from "./Despachos.module.css"
 import Button from "../../../../components/UI/Button/Button";
 import { doc, getDoc, Timestamp, updateDoc, writeBatch } from "firebase/firestore";
 import { db } from "../../../../firebaseConfig";
@@ -126,6 +128,7 @@ const DespachosTab = () => {
                 contacto: String(row[3]),
                 consultora: "Despacho particular",
                 direccion: row[5],
+                campaña: "Despacho particular",
                 estado: 1,
                 receptor: row[1],
                 ruta: "",

@@ -144,6 +144,7 @@ const ArriboCargaTab = () => {
                     <center>
                         <input type="text" className={classes.input} value={inputValue} onInput={inputHandler} onKeyDown={keyDownHandler} placeholder="buscar fila..." />
                         <Button style={{ width: "60%" }} disabled={data.length ? false : true} onClick={handleConfirmarArribo}>Confirmar Arribo</Button>
+                            <h4>No encontrados:</h4>
                         <div className={classes.containerNoEncontrados}>
                             {noEncontrados.map((c) => (
                                 <label>{c}</label>

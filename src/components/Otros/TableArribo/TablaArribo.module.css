@@ -66,3 +66,7 @@
 .td:first-child {
   border-left: none;
 }
+.trPlaceHolder {
+  height:50px;
+  background-color: rgb(131, 131, 131);
+}

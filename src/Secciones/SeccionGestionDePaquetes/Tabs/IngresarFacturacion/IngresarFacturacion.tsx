@@ -6,7 +6,7 @@ import Button from "../../../../components/UI/Button/Button";
 import * as XLSX from "xlsx";
 import FileDropzone from "../../../../components/UI/DropZone/FileDropZone";
 import Table from "../../../../components/UI/Table/Table";
-import { collection, doc, getDocs, query, Timestamp, where, writeBatch } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, Timestamp, where, writeBatch } from "firebase/firestore";
 import { db } from "../../../../firebaseConfig";
 import { obtenerCoordenadas } from "../../../../mapbox";
 
@@ -17,6 +17,7 @@ interface Paquete {
     direccion: string,
     referencia: string,
     telefono: string,
+    campaña: string
 }
 
 const IngresarFacturacionTab = () => {
@@ -47,20 +48,21 @@ const IngresarFacturacionTab = () => {
                 const worksheet = workbook.Sheets[ultimaFacturacion];
                 const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as string[][];
                 setIsLoading(false);
-                const parsedHeaders = data.map((row) => ([row[0] as string, row[15] as string, row[9] as string, row[10] as string, row[11] as string, row[12] as string]))
+                const parsedHeaders = data.map((row) => ([row[0] as string, row[15] as string, row[9] as string, row[10] as string, row[11] as string, row[12] as string, row[26] as string]))
                 const comienzoTabla = parsedHeaders.findIndex((headers) => {
-                    if (JSON.stringify(headers) === JSON.stringify(["PEDIDO", "CAJAS", "CONSULTORA", "NOMBRE CONSULTORA", "DIRECCION", "TELEFONO"])) {
+                    if (JSON.stringify(headers) === JSON.stringify(["PEDIDO", "CAJAS", "CONSULTORA", "NOMBRE CONSULTORA", "DIRECCION", "TELEFONO", "CAMPAÑA FACTURACION"])) {
                         return true
                     }
                 })
                 if (comienzoTabla >= 0) {
                     const parsedData = data.slice(comienzoTabla + 1).map((row) => ({
-                        codigo: row[0].toString() || "",
+                        codigo: row[0].toString().trim() || "",
                         cajas: row[15] ? parseInt(row[15]) : 0,
-                        consultora: row[9].toString() || "",
-                        nombreConsultora: row[10].toString() || "",
-                        direccion: row[11].toString() || "",
-                        telefono: row[12].toString() || "",
+                        consultora: row[9].toString().trim() || "",
+                        nombreConsultora: row[10].toString().trim() || "",
+                        direccion: row[11].toString().trim() || "",
+                        telefono: row[12].toString().trim() || "",
+                        campaña: row[26].toString().trim() || "",
                     }));
 
                     // Filtrar las filas que tienen un "codigo" vacío o null
@@ -79,7 +81,8 @@ const IngresarFacturacionTab = () => {
                                 nombreConsultora: pedido.nombreConsultora,
                                 direccion: direccion,
                                 referencia: referencia,
-                                telefono: pedido.telefono
+                                telefono: pedido.telefono,
+                                campaña: pedido.campaña,
                             })
                         }
                     })
@@ -98,16 +101,19 @@ const IngresarFacturacionTab = () => {
         const batch = writeBatch(db);
         setTotalCarga(data.length)
         let contador = 0
+        const campanias: Set<string> = new Set();
         for (const item of data) {
             const docRef = doc(db, "Paquetes", String(item.codigo));
             contador++
             const coordenadas = await obtenerCoordenadas(item.direccion);
             setAvanceCarga(contador)
-            const direccion = item.direccion.split("REFERENCIA")[0] ?? item.direccion;
-            const referencia = item.direccion.split("REFERENCIA")[1] ?? "";
+            const direccion = item.direccion.split("REFERENCIA")[0].trim() ?? item.direccion;
+            const referencia = item.direccion.split("REFERENCIA")[1].trim() ?? "";
+            if (!campanias.has(item.campaña)) campanias.add(item.campaña)
             const object = {
                 contacto: String(item.telefono),
                 consultora: item.consultora,
+                campania: item.campaña,
                 direccion: direccion,
                 estado: 0,
                 receptor: item.nombreConsultora,
@@ -124,7 +130,18 @@ const IngresarFacturacionTab = () => {
             };
             batch.set(docRef, object);
         }
-        // 4. Commit del batch
+        const docRef = doc(db, "metadatos/campanias");
+        const campañasMetadata = await getDoc(docRef);
+        const campañasList = new Set(campañasMetadata.data()!.campañas);
+        campanias.forEach((c) => {
+            if (!campañasList.has(c)) {
+                campañasList.add(c);
+            }
+        });
+        // Convertir de nuevo a array si necesitas un array:
+        const nuevoArrayCampañas = Array.from(campañasList);
+
+        batch.set(docRef, { campañas: nuevoArrayCampañas })
         await batch.commit();
         setData([])
         window.location.reload()
@@ -206,21 +223,21 @@ const IngresarFacturacionTab = () => {
                         searchTerms={inputValue.split(";")}
                         data={data.map((p) => (
                             [
+                                p.campaña,
                                 p.codigo,
                                 p.consultora,
                                 p.nombreConsultora,
                                 p.telefono,
                                 p.direccion,
-                                p.referencia
                             ]
                         ))} headers={
                             [
+                                "Campaña",
                                 "Codigo",
                                 "Consultora",
                                 "Nombre Cons.",
                                 "Telefono",
                                 "Direccion",
-                                "Referencia",
                             ]
                         }></Table>
 

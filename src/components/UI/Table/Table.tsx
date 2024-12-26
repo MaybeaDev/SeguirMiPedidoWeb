@@ -56,7 +56,7 @@ const Table = (props: { data: string[][], headers: string[], searchTerms?: strin
                 {filteredData.map((row, rowIndex) => (
                     <tr
                         key={rowIndex}
-                        className={classes.tr}
+                        className={`${classes.tr} ${props.redirect !== undefined && classes.clickeable}`}
                         onClick={() => {
                             if (props.redirect !== undefined) {
                                 navigate("/" + row.at(props.redirect ?? 0));
