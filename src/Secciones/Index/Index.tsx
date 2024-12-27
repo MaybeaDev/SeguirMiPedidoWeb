@@ -6,9 +6,10 @@ import classes from "./Index.module.css"
 import Card from '../../components/UI/Card/Card';
 import { db } from '../../firebaseConfig';
 import EstadoPaquete from '../../components/UI/EstadoPaquete/EstadoPaquete';
-import { doc, getDoc, Timestamp } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, Timestamp, where } from 'firebase/firestore';
 import Button from '../../components/UI/Button/Button';
 import { useNavigate, useParams } from 'react-router-dom';
+import Table from '../../components/UI/Table/Table';
 
 interface Paquete {
     codigo?: string,
@@ -19,6 +20,10 @@ interface Paquete {
         detalles: string
     }[]
 }
+interface PaqueteExtended extends Paquete {
+    campaña:string,
+    consultora:string
+}
 
 
 const Index = () => {
@@ -28,7 +33,7 @@ const Index = () => {
     const [orderCode, setOrderCode] = useState('');
     const [consCode, setConsCode] = useState('');
     const [searchResult, setSearchResult] = useState<Paquete>({});
-    const [searchResultCons, setSearchResultCons] = useState<Paquete[]>([]);
+    const [searchResultCons, setSearchResultCons] = useState<PaqueteExtended[]>([]);
 
     useEffect(() => {
         console.log(id)
@@ -64,22 +69,6 @@ const Index = () => {
         const docRef = doc(db, "Paquetes", code ?? orderCode)
         const paquete = await getDoc(docRef)
         if (paquete.exists()) {
-            // const datos = paquete.data().historial.map((d: { estado: number, fecha: Timestamp, detalles: string }) => ({
-            //     estado: verEstado(d.estado),
-            //     fecha: d.fecha.toDate().toLocaleString(),
-            //     detalles: d.detalles.toString()
-            // }))
-            // setSearchResultCons({ codigo: paquete.id, ultimaModif: datos[datos.length - 1].fecha, historial: datos.reverse() })
-        } else {
-            setSearchResultCons([])
-            console.log(searchResultCons)
-        }
-    }
-
-    const searchOrderCons = async (code?: string) => {
-        const docRef = doc(db, "Paquetes", code ?? orderCode)
-        const paquete = await getDoc(docRef)
-        if (paquete.exists()) {
             const datos = paquete.data().historial.map((d: { estado: number, fecha: Timestamp, detalles: string }) => ({
                 estado: verEstado(d.estado),
                 fecha: d.fecha.toDate().toLocaleString(),
@@ -88,7 +77,33 @@ const Index = () => {
             setSearchResult({ codigo: paquete.id, ultimaModif: datos[datos.length - 1].fecha, historial: datos.reverse() })
         } else {
             setSearchResult({})
+            console.log(searchResultCons)
         }
+    }
+
+    const searchOrderCons = async (cons?: string) => {
+        console.log(cons)
+        setSearchResultCons([])
+        const q = query(collection(db, "Paquetes"), where("consultora", "==", consCode))
+        const paquetes = await getDocs(q)
+        const result: PaqueteExtended[] = []
+        paquetes.forEach((p) => {
+            const datos = p.data().historial.map((d: { estado: number, fecha: Timestamp, detalles: string }) => ({
+                estado: verEstado(d.estado),
+                fecha: d.fecha.toDate().toLocaleString(),
+                detalles: d.detalles.toString()
+            }))
+
+            // "Campaña",
+            // "Codigo",
+            // "Consultora",
+            // "Estado",
+            // "Ultima modificacion"
+
+            result.push({ campaña:p.data().campania, codigo: p.id, consultora:p.data().consultora, ultimaModif: datos[datos.length - 1].fecha, historial: datos.reverse() })
+        })
+        console.log(result)
+        setSearchResultCons(result)
     }
 
     // Función para manejar el cambio en el campo de texto
@@ -159,10 +174,35 @@ const Index = () => {
                             <>
                                 <EstadoPaquete historial={searchResult.historial}></EstadoPaquete>
                             </>
-                        ) :
-                            <p>Pedido no encontrado :c</p>
+                        ) : searchResultCons.length >= 0 && (
+                            <p>Introduce un codigo de paquete</p>
+                        )
                         }
                     </div>
+                    {searchResultCons.length >= 0 ? (
+                        <div>
+                            <Table data={searchResultCons.map((p) => {
+                                return [
+                                    p.campaña,
+                                    p.codigo ?? "",
+                                    p.consultora,
+                                    p.historial![p.historial!.length - 1].estado ?? "",
+                                    p.historial![p.historial!.length - 1].fecha ?? "",
+                                ]
+                            })} headers={[
+                                "Campaña",
+                                "Codigo",
+                                "Consultora",
+                                "Estado",
+                                "Ultima modificacion"
+                            ]}>
+                            </Table>
+                        </div>
+                    ) : (
+                        <div>
+                            <p>No se encontraron resultados para la consulta.</p>
+                        </div>
+                    )}
                 </Card>
             </center>
         </div>

@@ -252,7 +252,7 @@ const DespachosTab = () => {
                                         },
                                         children: [
                                             new TextRun({
-                                                text: row[4],
+                                                text: `${row[5]}, ${row[4]}`,
                                                 font: "calibri",
                                                 size: 52,
                                             })
