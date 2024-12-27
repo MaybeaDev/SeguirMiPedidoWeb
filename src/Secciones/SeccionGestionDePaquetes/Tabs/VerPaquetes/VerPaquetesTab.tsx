@@ -15,11 +15,23 @@ function formatDate(date: Date) {
     // Formato dd/mm/yyyy hh:mm
     return `${day}/${month}/${year} ${hours}:${minutes}`;
 }
-
+function parseDate(dateString: string): Date {
+    const [day, month, yearAndTime] = dateString.split("/");
+    const [year, time] = yearAndTime.split(" ");
+    const [hours, minutes] = time.split(":");
+    return new Date(
+        Number(year),
+        Number(month) - 1, // Los meses en JavaScript van de 0 a 11
+        Number(day),
+        Number(hours),
+        Number(minutes)
+    );
+}
 interface Ruta {
     id: string;
     alias: string,
     transportista: string,
+    transportistaNombre: string,
 }
 interface Transportista {
     nombre: string,
@@ -45,8 +57,6 @@ const VerPaquetesTab = () => {
         getTransportistas()
     }, [])
     useEffect(() => {
-        console.log("UseEffect 2")
-        console.log(rutas, transportistas, paquetes)
         if (Object.keys(rutas).length != 0 && Object.keys(transportistas).length != 0 && paquetes.length == 0) {
             getPaquetes()
         }
@@ -62,10 +72,10 @@ const VerPaquetesTab = () => {
                     id: doc.id,
                     alias: doc.data().alias,
                     transportista: doc.data().transportista,
+                    transportistaNombre: doc.data().transportistaNombre,
                 }
                 rutas[ruta.id] = ruta
             })
-            console.log("Rutas actualizadas")
             setRutas(rutas)
         })
     }
@@ -80,7 +90,6 @@ const VerPaquetesTab = () => {
                 }
                 transportistas[transportista.id] = transportista
             })
-            console.log("transportistas actualizados")
             setTransportistas(transportistas)
         })
     }
@@ -91,6 +100,8 @@ const VerPaquetesTab = () => {
             querySnapshot.forEach((doc) => {
                 paquetes.push(buscarRutaYTransportista(doc))
             })
+            paquetes.sort((a, b) => b[1].localeCompare(a[1]));
+            paquetes.sort((a, b) => parseDate(b[4]).getTime() - parseDate(a[4]).getTime());
             setIsLoading(false);
             setPaquetes(paquetes);
             setTableData(paquetes);
@@ -103,7 +114,6 @@ const VerPaquetesTab = () => {
                 doc.data()!.campania ?? "",
                 doc.id,
                 doc.data()!.consultora,
-                formatDate(doc.data()!.historial[0].fecha.toDate()),
                 (() => {
                     const estado = doc.data()!.historial[doc.data()!.historial.length - 1].estado;
                     switch (estado) {
@@ -121,21 +131,21 @@ const VerPaquetesTab = () => {
                             return "En Proceso";
                     }
                 })(),
+                formatDate(doc.data()!.historial[doc.data()!.historial.length - 1].fecha.toDate()),
                 doc.data()!.receptor,
                 doc.data()!.contacto,
                 doc.data()!.direccion,
-                doc.data()!.referencia ?? "",
+                doc.data()!.referencia ?? doc.data()!.ciudad ?? "",
             ];
 
             if (doc.data()!.ruta) {
-                console.log(rutas, doc.data()!.ruta)
                 paquete.push(rutas[doc.data()!.ruta].alias);
                 if (doc.data()!.transportista) {
-                    paquete.push(transportistas[doc.data()!.transportista].nombre);
+                    console.log(doc.data()!.transportista)
+                    paquete.push(transportistas[doc.data()!.transportista] ? transportistas[doc.data()!.transportista].nombre : doc.data()!.transportista);
                 } else {
                     if (rutas[doc.data()!.ruta].transportista) {
-                        const transportista = transportistas[rutas[doc.data()!.ruta].transportista]
-                        paquete.push(transportista.nombre);
+                        paquete.push(rutas[doc.data()!.ruta].transportistaNombre);
                     } else {
                         paquete.push("")
                     }
@@ -143,7 +153,11 @@ const VerPaquetesTab = () => {
             }
             else {
                 paquete.push("")
-                paquete.push("")
+                if (doc.data()!.transportistaNombre) {
+                    paquete.push(doc.data()!.transportistaNombre);
+                } else {
+                    paquete.push("")
+                }
             }
 
 
@@ -212,8 +226,8 @@ const VerPaquetesTab = () => {
                         "Campaña",
                         "Codigo",
                         "Codigo consu.",
-                        "Fecha arribo",
                         "Estado",
+                        "Fecha",
                         "Consultora",
                         "Telefono",
                         "Direccion",
@@ -222,7 +236,7 @@ const VerPaquetesTab = () => {
                         "Transportista",
                     ]}
                     data={tableData}
-                    searchTerms={searchQuery.split(";").map((term) => normalizeString(term))} // Normaliza y divide términos
+                    searchTerms={searchQuery.split(";").map((term) => normalizeString(term))}
                 />
             )}
         </>

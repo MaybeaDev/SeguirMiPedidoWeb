@@ -16,6 +16,7 @@ import ListadoTab from './Secciones/SeccionEmpleados/Tabs/Listado/ListadoTab'
 import CrearTrabajador from './Secciones/SeccionEmpleados/Tabs/CrearTrabajador/CrearTrabajadorTab'
 import IngresarFacturacionTab from './Secciones/SeccionGestionDePaquetes/Tabs/IngresarFacturacion/IngresarFacturacion'
 import DespachosTab from './Secciones/SeccionGestionDePaquetes/Tabs/Despachos/Despachos'
+import EditarRutaTab from './Secciones/SeccionGestionDePaquetes/Tabs/EditarRuta/EditarRuta'
 
 function App() {
 
@@ -42,6 +43,8 @@ function App() {
               <Route path="armadoRutas" element={<ArmadoRutasTab />} />
               <Route path="verPaquetes" element={<VerPaquetesTab />} />
               <Route path="gestionDeRutas" element={<GestionRutas />} />
+              <Route path="editarRutas/:rutaID" element={<EditarRutaTab />} />
+              <Route path="editarRutas" element={<Navigate to="/SeccionEmpresa/GestionDePaquetes/gestionDeRutas" />} />
             </Route>
           </Route>
 

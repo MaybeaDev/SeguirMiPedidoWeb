@@ -4,6 +4,7 @@ import { db } from "../../../firebaseConfig";
 
 import classes from "./TableRutas.module.css";
 import Button from "../../UI/Button/Button";
+import { useNavigate } from "react-router-dom";
 interface Data {
     id: string,
     alias: string,
@@ -21,16 +22,18 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
     const [isLoading, setIsLoading] = useState(false);
     const [isSaved, setIsSaved] = useState(false)
 
+    const navigate = useNavigate()
+
     useEffect(() => {
         if (props.initData && props.initData.length > 0) {
-                setIsLoading(true);
-                setIsSaved(true);
-                setNeedSaveDataEstado(false);
-                setNeedSaveDataTransportista(false);
-                setData(props.initData);
-                setDataFiltered(props.initData);
-                setIsLoading(false);
-                setTimeout(() => {setIsSaved(false)}, 600)
+            setIsLoading(true);
+            setIsSaved(true);
+            setNeedSaveDataEstado(false);
+            setNeedSaveDataTransportista(false);
+            setData(props.initData);
+            setDataFiltered(props.initData);
+            setIsLoading(false);
+            setTimeout(() => { setIsSaved(false) }, 600)
         }
     }, [props.initData])
 
@@ -44,16 +47,16 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
             if (i === index) {
                 const newVal = {
                     ...data,
-                    transportista : value
+                    transportista: value
                 }
                 return newVal
             } else return data
-        })        
+        })
         setData(newData);
         const transportistasAntes = props.initData.map(it => it.transportista)
         const transportistasDespues = newData.map(it => it.transportista)
         let sonIguales = true
-        
+
         console.log(transportistasAntes, transportistasDespues)
         transportistasAntes.forEach((it, index) => {
             const after = transportistasDespues[index]
@@ -73,22 +76,22 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
             if (i === index) {
                 const newVal = {
                     ...data,
-                    estado : value
+                    estado: value
                 }
                 return newVal
             } else return data
-        })   
+        })
         setData(newData);
         const estadosAntes = props.initData.map(it => it.estado)
         const estadosDespues = newData.map(it => it.estado)
         let sonIguales = true
         console.log(estadosAntes, estadosDespues)
-    
+
         estadosAntes.forEach((it, index) => {
             const after = estadosDespues[index]
             if (it != after) {
                 sonIguales = false
-                
+
             }
         })
         if (sonIguales) {
@@ -99,7 +102,7 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
         handleFiltrar()
     };
 
-    
+
     const handleFiltrar = () => {
         const query = filtro;
         const searchTerms = query
@@ -122,7 +125,7 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
             .trim() // Elimina espacios al inicio y final
             .toLowerCase(); // Convierte a minúsculas
     };
-    
+
 
 
     const saveChanges = async () => {
@@ -153,6 +156,7 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
             const docRef = doc(db, "Rutas", key)
             const data: {
                 transportista?: string,
+                transportistaNombre?: string,
                 activa?: boolean,
                 cargado?: boolean,
                 en_reparto?: boolean,
@@ -160,6 +164,7 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
             } = {}
             if (cambios[key].transportista != undefined) {
                 data.transportista = cambios[key].transportista
+                data.transportistaNombre = props.trabajadores.find((t) => t.id == cambios[key].transportista)?.nombre
             }
             if (cambios[key].estado != undefined) {
                 if (cambios[key].estado === 0) {   //Desactivada
@@ -203,15 +208,15 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
         }
 
         const escapedTerms = terms
-        .map((term) => term.trim())
-        .filter((term) => term.length > 0)
-        .map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+            .map((term) => term.trim())
+            .filter((term) => term.length > 0)
+            .map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
 
-    if (escapedTerms.length === 0) {
-        return text;
-    }    
+        if (escapedTerms.length === 0) {
+            return text;
+        }
         const regex = new RegExp(`(${escapedTerms.join("|")})`, "gi");
-            return text.replace(regex, (match) => `<span class="highlight">${match}</span>`);
+        return text.replace(regex, (match) => `<span class="highlight">${match}</span>`);
     };
 
 
@@ -243,21 +248,28 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
                                         : ruta.alias,
                                 }}
                             ></td>
-                            <td className={classes.td}>{ruta.paquetes}</td>
+                            <td className={classes.td}>
+                                {parseInt(ruta.paquetes) ? (
+                                    <Button
+                                    onClick={()=>{navigate(`/SeccionEmpresa/GestionDePaquetes/editarRutas/${ruta.id}`)}}>
+                                        {ruta.paquetes}
+                                    </Button>
+                                ) : (<p>{ruta.paquetes}</p>)}
+                            </td>
                             <td className={classes.td}>
                                 {ruta.estado != "3" ? (
 
-                                <select
-                                    style={{ margin: 0, padding: "5px" }}
-                                    value={ruta.estado}
-                                    onChange={(e) => handleChangeEstado(e.target.value, index)}
-                                >
-                                    <option value="0">Inactiva</option>
-                                    <option value="1">Activa</option>
-                                    <option value="2">Cargada</option>
-                                    <option value="3">En reparto</option>
-                                    <option value="4">Completada</option>
-                                </select>
+                                    <select
+                                        style={{ margin: 0, padding: "5px" }}
+                                        value={ruta.estado}
+                                        onChange={(e) => handleChangeEstado(e.target.value, index)}
+                                    >
+                                        <option value="0">Inactiva</option>
+                                        <option value="1">Activa</option>
+                                        <option value="2">Cargada</option>
+                                        <option value="3">En reparto</option>
+                                        <option value="4">Completada</option>
+                                    </select>
                                 ) : (
                                     <label>En reparto</label>
                                 )}
@@ -265,23 +277,23 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
                             <td className={classes.td}>
                                 {(ruta.estado != "3") ? (
 
-                                <select
-                                    style={{ margin: 0, padding: "5px" }}
-                                    value={ruta.transportista}
-                                    onChange={(e) => handleChangeTransportista(e.target.value, index)}
-                                >
-                                    <option value="">No asignado</option>
-                                    {props.trabajadores.map((trabajador, index) => (
-                                        
-                                        <option
-                                            key={index}
-                                            value={trabajador.id}
-                                        >
-                                            {trabajador.nombre}
-                                        </option>))}
-                                </select>
+                                    <select
+                                        style={{ margin: 0, padding: "5px" }}
+                                        value={ruta.transportista}
+                                        onChange={(e) => handleChangeTransportista(e.target.value, index)}
+                                    >
+                                        <option value="">No asignado</option>
+                                        {props.trabajadores.map((trabajador, index) => (
+
+                                            <option
+                                                key={index}
+                                                value={trabajador.id}
+                                            >
+                                                {trabajador.nombre}
+                                            </option>))}
+                                    </select>
                                 ) : (<>
-                                <label>{props.trabajadores.find((it) => it.id == ruta.transportista)?.nombre}</label>
+                                    <label>{props.trabajadores.find((it) => it.id == ruta.transportista)?.nombre}</label>
                                 </>)}
                             </td>
                         </tr>

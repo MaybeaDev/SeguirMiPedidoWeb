@@ -232,3 +232,18 @@
   100% { transform: rotate(360deg); }
 }
 
+.containerNoEncontrados {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: wrap; 
+  margin-top: 20px;
+}
+.containerNoEncontrados label {
+  background-color: #ababab;
+  margin : 2px;
+  padding: 5px;
+  border-radius: 10px;
+  border:solid 1px #616161
+}

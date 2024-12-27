@@ -17,6 +17,8 @@ type Paquete = {
 const ArmadoRutasTab: React.FC = () => {
     const [paquetesNoAsignados, setPaquetesNoAsignados] = useState<Paquete[]>([]);
     const [paquetesParaAsignar, setPaquetesParaAsignar] = useState<Paquete[]>([]);
+    const [noEncontrados, setNoEncontrados] = useState<string[]>([])
+
     const [filtroIzquierda, setFiltroIzquierda] = useState<string>("");
     const [filtroDerecha, setFiltroDerecha] = useState<string>("");
     const [tablaIzquierdaBouncing, setTablaIzquierdaBouncing] = useState(false)
@@ -88,71 +90,43 @@ const ArmadoRutasTab: React.FC = () => {
     const handleOnKeyDownIzquierda = (e: React.KeyboardEvent<HTMLInputElement>): void => {
         if (e.key === "Enter") {
             const paquetesMover = paquetesNoAsignados.filter((p) => filtroIzquierda == p.codigo);
+            const paquetesOtraLista = paquetesParaAsignar.filter((p) => filtroIzquierda == p.codigo);
+            if (paquetesMover.length == 0 && paquetesOtraLista.length == 0) {
+                const noEncontradosCopy = [...noEncontrados]
+                noEncontradosCopy.push(filtroIzquierda)
+                setNoEncontrados(noEncontradosCopy)
+            }
             setPaquetesNoAsignados(paquetesNoAsignados.filter((p) => filtroIzquierda != p.codigo));
             setPaquetesParaAsignar([...paquetesParaAsignar, ...paquetesMover]);
             if (paquetesMover.length) {
-                setFiltroIzquierda("")
                 setTablaDerechaBouncing(true)
-                setTimeout( () => {
+                setTimeout(() => {
                     setTablaDerechaBouncing(false)
                 }, 300)
             }
+            setFiltroIzquierda("")
         }
     };
-    const handleOnChangeIzquierda = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (filtroIzquierda.length == 0 && e.target.value.length == 13) {
-            const paquetesMover = paquetesNoAsignados.filter((p) => e.target.value == p.codigo);
-            console.log(paquetesMover)
-            setPaquetesNoAsignados(paquetesNoAsignados.filter((p) => e.target.value != p.codigo));
-            setPaquetesParaAsignar([...paquetesParaAsignar, ...paquetesMover]);
-            if (paquetesMover.length) {
-                setFiltroIzquierda("")
-                setTablaDerechaBouncing(true)
-                setTimeout( () => {
-                    setTablaDerechaBouncing(false)
-                }, 300)
-            } else {
-                setFiltroIzquierda(e.target.value)
-            }
-        } else {
-            setFiltroIzquierda(e.target.value);
-        }
-    }
-
-
-
     const handleOnKeyDownDerecha = (e: React.KeyboardEvent<HTMLInputElement>): void => {
         if (e.key === "Enter") {
-            const paquetesMover = paquetesNoAsignados.filter((p) => filtroDerecha == p.codigo);
-            setPaquetesNoAsignados(paquetesNoAsignados.filter((p) => filtroDerecha != p.codigo));
-            setPaquetesParaAsignar([...paquetesParaAsignar, ...paquetesMover]);
-            if (paquetesMover.length) {
-                setFiltroDerecha("")
-                setTablaIzquierdaBouncing(true)
-                setTimeout( () => {
-                    setTablaIzquierdaBouncing(false)
-                }, 300)
-            }
-        }
-    };
-    const handleOnChangeDerecha = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (filtroDerecha.length == 0 && e.target.value.length == 13) {
-            const paquetesMover = paquetesParaAsignar.filter((p) => e.target.value == p.codigo);
-            console.log(paquetesMover)
-            setPaquetesParaAsignar(paquetesParaAsignar.filter((p) => e.target.value != p.codigo));
+            const paquetesMover = paquetesParaAsignar.filter((p) => filtroDerecha == p.codigo);
+            setPaquetesParaAsignar(paquetesParaAsignar.filter((p) => filtroDerecha != p.codigo));
             setPaquetesNoAsignados([...paquetesNoAsignados, ...paquetesMover]);
             if (paquetesMover.length) {
-                setFiltroDerecha("")
                 setTablaIzquierdaBouncing(true)
-                setTimeout( () => {
+                setTimeout(() => {
                     setTablaIzquierdaBouncing(false)
                 }, 300)
-            } else {
-                setFiltroDerecha(e.target.value)
             }
-        } else {
-            setFiltroDerecha(e.target.value);
+            setFiltroDerecha("")
         }
+    };
+
+    const handleOnChangeIzquierda = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFiltroIzquierda(e.target.value.toUpperCase());
+    }
+    const handleOnChangeDerecha = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFiltroDerecha(e.target.value.toUpperCase());
     }
 
     return (
@@ -164,6 +138,11 @@ const ArmadoRutasTab: React.FC = () => {
                 onConfirm={guardarRuta}
             />
             <h2>Armado de rutas</h2>
+                    <div className={classes.containerNoEncontrados}>
+                        {noEncontrados.map((c) => (
+                            <label>{c}</label>
+                        ))}
+                    </div>
             <div className={classes.filtersContainer}>
                 <div className={classes.filterGroup}>
                     <input className={classes.input}
@@ -179,7 +158,7 @@ const ArmadoRutasTab: React.FC = () => {
                     <input className={classes.input}
                         type="text"
                         placeholder="Buscar..."
-                        value={filtroDerecha}                        
+                        value={filtroDerecha}
                         onChange={handleOnChangeDerecha}
                         onKeyDown={handleOnKeyDownDerecha}
                     />
