@@ -1,10 +1,9 @@
 import classes from "./VerPaquetesTab.module.css"
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Table from "../../../../components/UI/Table/Table";
 import { db } from "../../../../firebaseConfig";
-import { collection, DocumentData, DocumentSnapshot, getDocs, limit, onSnapshot, query, QueryDocumentSnapshot, where } from "firebase/firestore";
-import Button from "../../../../components/UI/Button/Button";
+import { collection, DocumentData, DocumentSnapshot, onSnapshot, query, QueryDocumentSnapshot, where } from "firebase/firestore";
 function formatDate(date: Date) {
     const day = String(date.getDate()).padStart(2, '0'); // Asegura que el día tiene 2 dígitos
     const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses van de 0 (enero) a 11 (diciembre), por eso sumamos 1
@@ -31,22 +30,32 @@ const VerPaquetesTab = () => {
     const [rutas, setRutas] = useState<Record<string, Ruta>>({});
     const [transportistas, setTransportistas] = useState<Record<string, Transportista>>({});
     const [tableData, setTableData] = useState<string[][]>([]);
+    const [isLoading, setIsLoading] = useState(true)
+    const [mensajeCargando, setMensajeCargando] = useState("Obteniendo Paquetes...")
     const [searchQuery, setSearchQuery] = useState<string>("");
-    const codigoRef = useRef<HTMLInputElement>(null)
-    const campañaRef = useRef<HTMLInputElement>(null)
-    const codConsultoraRef = useRef<HTMLInputElement>(null)
-    const rutaRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
+        setTimeout(() => {
+            setMensajeCargando("Está tomando mas tiempo de lo esperado debido a la conexión a internet...")
+            setTimeout(()=>{
+                setMensajeCargando("Deberías considerar revisar tu conexion a internet...")
+            }, 5000)
+        }, 2000)
         getRutas()
         getTransportistas()
-        getPaquetes()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+    useEffect(() => {
+        console.log("UseEffect 2")
+        console.log(rutas, transportistas, paquetes)
+        if (Object.keys(rutas).length != 0 && Object.keys(transportistas).length != 0 && paquetes.length == 0) {
+            getPaquetes()
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [rutas, transportistas])
 
     const getRutas = () => {
         const q = query(collection(db, "Rutas"));
-        onSnapshot(q, async (querySnapshot) => {
+        onSnapshot(q, (querySnapshot) => {
             const rutas: { [key: string]: Ruta } = {}
             querySnapshot.forEach((doc) => {
                 const ruta: Ruta = {
@@ -56,12 +65,13 @@ const VerPaquetesTab = () => {
                 }
                 rutas[ruta.id] = ruta
             })
+            console.log("Rutas actualizadas")
             setRutas(rutas)
         })
     }
     const getTransportistas = () => {
         const q = query(collection(db, "Usuarios"), where("tipo", "==", 0));
-        onSnapshot(q, async (querySnapshot) => {
+        onSnapshot(q, (querySnapshot) => {
             const transportistas: { [key: string]: Transportista } = {}
             querySnapshot.forEach((doc) => {
                 const transportista: Transportista = {
@@ -70,60 +80,21 @@ const VerPaquetesTab = () => {
                 }
                 transportistas[transportista.id] = transportista
             })
+            console.log("transportistas actualizados")
             setTransportistas(transportistas)
         })
     }
-
-    const buscarPaquetesPor = async (filtro: string, valor: string) => {
-        console.log(filtro, valor)
-        const q = query(
-            collection(db, "Paquetes"),
-            where(filtro, ">=", valor),
-            where(filtro, "<=", valor + "\uf8ff")
-        );
-        const querySnapshot = await getDocs(q);
-        const paquetes: string[][] = [];
-        querySnapshot.forEach((doc) => {
-            paquetes.push(buscarRutaYTransportista(doc))
+    const getPaquetes = () => {
+        const q = query(collection(db, "Paquetes"));
+        onSnapshot(q, async (querySnapshot) => {
+            const paquetes: string[][] = [];
+            querySnapshot.forEach((doc) => {
+                paquetes.push(buscarRutaYTransportista(doc))
+            })
+            setIsLoading(false);
+            setPaquetes(paquetes);
+            setTableData(paquetes);
         })
-        setPaquetes(paquetes);
-        setTableData(paquetes);
-    }
-    const getPaquetesFiltrados = async () => {
-        const codigo = codigoRef.current!.value
-        const campaña = campañaRef.current!.value
-        const codConsultora = codConsultoraRef.current!.value
-        const ruta = rutaRef.current!.value
-        let q = query(collection(db, "Paquetes")); // Iniciar la query base
-        if (codigo !== "") {
-            q = query(q, where("__name__", "==", codigo));
-        }
-        if (campaña !== "") {
-            q = query(q, where("campania", "==", campaña));
-        }
-        if (codConsultora !== "") {
-            q = query(q, where("consultora", "==", codConsultora));
-        }
-        if (codConsultora !== "") {
-            q = query(q, where("ruta", "==", ruta));
-        }
-        const querySnapshot = await getDocs(q);
-        const paquetes: string[][] = [];
-        querySnapshot.forEach((doc) => {
-            paquetes.push(buscarRutaYTransportista(doc))
-        })
-        setPaquetes(paquetes);
-        setTableData(paquetes);
-    }
-    const getPaquetes = async () => {
-        const q = query(collection(db, "Paquetes"), limit(20));
-        const querySnapshot = await getDocs(q);
-        const paquetes: string[][] = [];
-        querySnapshot.forEach((doc) => {
-            paquetes.push(buscarRutaYTransportista(doc))
-        })
-        setPaquetes(paquetes);
-        setTableData(paquetes);
     };
     const buscarRutaYTransportista = (doc: QueryDocumentSnapshot<DocumentData, DocumentData> | DocumentSnapshot<DocumentData, DocumentData>) => {
 
@@ -157,6 +128,7 @@ const VerPaquetesTab = () => {
             ];
 
             if (doc.data()!.ruta) {
+                console.log(rutas, doc.data()!.ruta)
                 paquete.push(rutas[doc.data()!.ruta].alias);
                 if (doc.data()!.transportista) {
                     paquete.push(transportistas[doc.data()!.transportista].nombre);
@@ -219,34 +191,6 @@ const VerPaquetesTab = () => {
         <>
             <h2>Ver Paquetes</h2>
             <div>
-                <center>
-                    <div className={classes.spaceAround} style={{ width: "80%" }}>
-                        <label style={{ width: "20%", borderRadius: "50px" }}>Codigo</label>
-                        <label style={{ width: "20%", borderRadius: "50px" }}>Campaña</label>
-                        <label style={{ width: "20%", borderRadius: "50px" }}>Cod. Consultora</label>
-                        <label style={{ width: "20%", borderRadius: "50px" }}>Ruta</label>
-                        <label style={{ width: "20%", visibility: "hidden" }}>Borrar filtros</label>
-                    </div>
-                </center>
-                <div className={classes.inputGroup}>
-                    <input onKeyDown={(e) => {if (e.key =="Enter") buscarPaquetesPor("__name__", codigoRef.current!.value) }} ref={codigoRef} autoComplete="off" name="Codigo" type="text" placeholder="Codigo" />
-                    <input onKeyDown={(e) => {if (e.key =="Enter") buscarPaquetesPor("campania", campañaRef.current!.value) }} ref={campañaRef} autoComplete="off" name="Campaña" type="text" placeholder="Campaña" />
-                    <input onKeyDown={(e) => {if (e.key =="Enter") buscarPaquetesPor("consultora", codConsultoraRef.current!.value) }} ref={codConsultoraRef} autoComplete="off" name="CodConsultora" type="text" placeholder="Cod. Consultora" />
-                    <input onKeyDown={(e) => {if (e.key =="Enter") buscarPaquetesPor("ruta", rutaRef.current!.value) }} ref={rutaRef} autoComplete="off" name="Ruta" type="text" placeholder="Ruta" />
-                    <input className={classes.inputButton} type="button" value="Aplicar filtros" onClick={() => { getPaquetesFiltrados() }} />
-                </div>
-                <center>
-                    <div className={classes.spaceAround} style={{ width: "80%" }}>
-                        <Button style={{ width: "10%", borderRadius: "50px" }} onClick={() => { buscarPaquetesPor("__name__", codigoRef.current!.value) }}>Buscar</Button>
-                        <Button style={{ width: "10%", borderRadius: "50px" }} onClick={() => { buscarPaquetesPor("campania", campañaRef.current!.value) }}>Buscar</Button>
-                        <Button style={{ width: "10%", borderRadius: "50px" }} onClick={() => { buscarPaquetesPor("consultora", codConsultoraRef.current!.value) }}>Buscar</Button>
-                        <Button style={{ width: "10%", borderRadius: "50px" }} onClick={() => { buscarPaquetesPor("ruta", rutaRef.current!.value) }}>Buscar</Button>
-                        <Button style={{ width: "10%" }} onClick={() => { getPaquetes() }}>Borrar filtros</Button>
-                    </div>
-                    <br />
-                    <div className={classes.spaceAround} style={{ width: "30%" }}>
-                    </div>
-                </center>
                 <input
                     type="text"
                     placeholder="Buscar en los resultados..."
@@ -254,23 +198,33 @@ const VerPaquetesTab = () => {
                     onChange={handleSearch}
                 />
             </div>
-            <Table
-                headers={[
-                    "Campaña",
-                    "Codigo",
-                    "Codigo consu.",
-                    "Fecha arribo",
-                    "Estado",
-                    "Consultora",
-                    "Telefono",
-                    "Direccion",
-                    "Referencia",
-                    "Ruta",
-                    "Transportista",
-                ]}
-                data={tableData}
-                searchTerms={searchQuery.split(";").map((term) => normalizeString(term))} // Normaliza y divide términos
-            />
+
+            {isLoading ? (
+                <div className={classes.spinnerContainer}>
+                    <div className={classes.spinner}></div>
+                    <p>{mensajeCargando}</p>
+                </div>
+            ) : (
+
+                <Table
+                    max={200}
+                    headers={[
+                        "Campaña",
+                        "Codigo",
+                        "Codigo consu.",
+                        "Fecha arribo",
+                        "Estado",
+                        "Consultora",
+                        "Telefono",
+                        "Direccion",
+                        "Referencia",
+                        "Ruta",
+                        "Transportista",
+                    ]}
+                    data={tableData}
+                    searchTerms={searchQuery.split(";").map((term) => normalizeString(term))} // Normaliza y divide términos
+                />
+            )}
         </>
     );
 };

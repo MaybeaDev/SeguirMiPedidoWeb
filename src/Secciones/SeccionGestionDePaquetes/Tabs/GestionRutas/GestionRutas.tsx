@@ -36,8 +36,7 @@ const GestionRutas = () => {
                 if (doc.data().cargado) estado = "2";
                 if (doc.data().en_reparto) estado = "3";
                 if (doc.data().completado) estado = "4";
-    
-                const q = query(collection(db, "Paquetes"), where("ruta", "==", doc.id), where("estado", "in", [1, 4, 5]));
+                const q = query(collection(db, "Paquetes"), where("ruta", "==", doc.id), where("estado", "in", [1, 2, 4]));
                 const rutaPromise = getDocs(q).then((querySnapshot) => {
                     const paquetes = querySnapshot.size;
                     return {
@@ -48,10 +47,8 @@ const GestionRutas = () => {
                         transportista: doc.data().transportista,
                     };
                 });
-    
                 rutasPromises.push(rutaPromise);
             });
-    
             // Esperar a que todas las promesas se resuelvan
             Promise.all(rutasPromises).then((rutas) => {
                 setData(rutas);
@@ -72,7 +69,6 @@ const GestionRutas = () => {
             setTrabajadores(trabajadores)
         })
     }
-    console.log("reRender")
 
 
     return (

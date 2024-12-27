@@ -2,8 +2,9 @@ import { useNavigate } from "react-router-dom";
 import classes from "./Table.module.css";
 import { ReactNode } from "react";
 
-const Table = (props: { data: string[][], headers: string[], searchTerms?: string[], redirect?: number, children? : (rowIndex: number) => ReactNode }) => {
+const Table = (props: { data: string[][], headers: string[], searchTerms?: string[], redirect?: number, max?:number, children? : (rowIndex: number) => ReactNode }) => {
     const navigate = useNavigate();
+    const data = props.data.slice(0, props.max ?? props.data.length)
 
     const highlightMatches = (texto: string, terms: string[]): { highlightedText: string, hasMatch: boolean } => {
         const text = texto.toString();
@@ -36,7 +37,7 @@ const Table = (props: { data: string[][], headers: string[], searchTerms?: strin
     };
 
     // Filtrar las filas que contienen coincidencias
-    const filteredData = props.data.filter((row) =>
+    const filteredData = data.filter((row) =>
         row.some((value) => {
             const { hasMatch } = highlightMatches(value, props.searchTerms || []);
             return hasMatch;

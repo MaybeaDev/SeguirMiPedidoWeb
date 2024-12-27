@@ -94,13 +94,6 @@ const Index = () => {
                 fecha: d.fecha.toDate().toLocaleString(),
                 detalles: d.detalles.toString()
             }))
-
-            // "Campaña",
-            // "Codigo",
-            // "Consultora",
-            // "Estado",
-            // "Ultima modificacion"
-
             result.push({ campaña:p.data().campania, codigo: p.id, consultora:p.data().consultora, ultimaModif: datos[datos.length - 1].fecha, historial: datos })
         })
         console.log(result)
