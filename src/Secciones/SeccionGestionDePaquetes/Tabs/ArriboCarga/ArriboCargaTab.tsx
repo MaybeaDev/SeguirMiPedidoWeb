@@ -51,11 +51,13 @@ const ArriboCargaTab = () => {
     };
     const keyDownHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key == "Enter") {
-            console.log(inputValue)
+            console.log(inputValue, "Enter")
             validarCodigo(inputValue)
+            setInputValue("");
         }
     }
     const inputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+        console.log("input")
         setInputValue(event.target.value)
         if (event.target.value.split(" ").length >= 2) {
             console.log(event.target.value.split(" "))
@@ -65,8 +67,8 @@ const ArriboCargaTab = () => {
             setInputValue("");
         } else if (event.target.value.length - inputValue.length >= 2) {
             console.log(event.target.value)
-            enqueueCodigo(event.target.value.trim())
             setInputValue("");
+            enqueueCodigo(event.target.value.trim())
         }
     }
     const validarCodigo = async (codigo: string) => {
@@ -142,7 +144,7 @@ const ArriboCargaTab = () => {
                         } style={{ width: "50%" }} readOnly></input>
                     </center>
                     <center>
-                        <input type="text" className={classes.input} value={inputValue} onInput={inputHandler} onKeyDown={keyDownHandler} placeholder="buscar fila..." />
+                        <input type="text" className={classes.input} value={inputValue} onChange={inputHandler} onKeyDown={keyDownHandler} placeholder="buscar fila..." />
                         <Button style={{ width: "60%" }} disabled={data.length ? false : true} onClick={handleConfirmarArribo}>Confirmar Arribo</Button>
                             <h4>No encontrados:</h4>
                         <div className={classes.containerNoEncontrados}>
