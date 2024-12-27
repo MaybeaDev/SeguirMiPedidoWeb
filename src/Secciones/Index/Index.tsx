@@ -52,7 +52,7 @@ const Index = () => {
             case 0:
                 return 'Enviado desde el almacén';
             case 1:
-                return 'Recepcionado por empresa transportista';
+                return 'Recibido en Bodega';
             case 2:
                 return 'En reparto';
             case 3:
@@ -66,6 +66,7 @@ const Index = () => {
         }
     }
     const searchOrder = async (code?: string) => {
+        console.log(code, orderCode)
         const docRef = doc(db, "Paquetes", code ?? orderCode)
         const paquete = await getDoc(docRef)
         if (paquete.exists()) {
@@ -84,7 +85,7 @@ const Index = () => {
     const searchOrderCons = async (cons?: string) => {
         console.log(cons)
         setSearchResultCons([])
-        const q = query(collection(db, "Paquetes"), where("consultora", "==", consCode))
+        const q = query(collection(db, "Paquetes"), where("consultora", "==", cons ?? consCode))
         const paquetes = await getDocs(q)
         const result: PaqueteExtended[] = []
         paquetes.forEach((p) => {
@@ -100,7 +101,7 @@ const Index = () => {
             // "Estado",
             // "Ultima modificacion"
 
-            result.push({ campaña:p.data().campania, codigo: p.id, consultora:p.data().consultora, ultimaModif: datos[datos.length - 1].fecha, historial: datos.reverse() })
+            result.push({ campaña:p.data().campania, codigo: p.id, consultora:p.data().consultora, ultimaModif: datos[datos.length - 1].fecha, historial: datos })
         })
         console.log(result)
         setSearchResultCons(result)
@@ -145,7 +146,7 @@ const Index = () => {
                                     onKeyDown={handleKeyPress}
                                     placeholder="Introduce el código del paquete"
                                 />
-                                <Button onClick={searchOrder}>Buscar</Button>
+                                <Button onClick={()=>{searchOrder()}}>Buscar</Button>
                             </div>
                         </Card>
 
@@ -160,7 +161,7 @@ const Index = () => {
                                     onKeyDown={handleKeyPressCons}
                                     placeholder="Introduce el código de consultora"
                                 />
-                                <Button onClick={searchOrderCons}>Buscar</Button>
+                                <Button onClick={()=>{searchOrderCons()}}>Buscar</Button>
                             </div>
                         </Card>
                     </div>
