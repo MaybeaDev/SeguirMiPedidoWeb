@@ -107,17 +107,17 @@ const IngresarFacturacionTab = () => {
             contador++
             const coordenadas = await obtenerCoordenadas(item.direccion);
             setAvanceCarga(contador)
-            const direccion = item.direccion.split("REFERENCIA")[0].trim() ?? item.direccion;
-            const referencia = item.direccion.split("REFERENCIA")[1].trim() ?? "";
+            const direccion = item.direccion.split("REFERENCIA")[0] ?? item.direccion;
+            const referencia = item.direccion.split("REFERENCIA")[1] ?? "";
             if (!campanias.has(item.campaña)) campanias.add(item.campaña)
             const object = {
                 contacto: String(item.telefono),
                 consultora: item.consultora,
                 campania: item.campaña,
-                direccion: direccion,
+                direccion: direccion.trim(),
                 estado: 0,
                 receptor: item.nombreConsultora,
-                referencia: referencia,
+                referencia: referencia.trim(),
                 ruta: "",
                 coordenadas: coordenadas,
                 historial: [
