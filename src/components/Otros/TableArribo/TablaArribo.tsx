@@ -8,12 +8,19 @@ const TablaArribo = (props: { data: (string | boolean)[][], headers: string[] })
             <thead className={classes.thead}>
                 <tr className={classes.trHeadder}>
                     {props.headers.map((name, index) => (
-                        <th key={index} className={classes.th}>{name}</th>
+                        <th key={index} className={classes.th}>{name}
+                            {
+                                index === 0 && (
+                                    <>
+                                        <br />{`total: ${data.length}`}
+                                    </>
+                                )
+                            }</th>
                     ))}
                 </tr>
             </thead>
             <tbody className={classes.tbody}>
-                {data.map((row, rowIndex) => (
+                {data.slice(0, 10).map((row, rowIndex) => (
                     <tr
                         key={rowIndex}
                         className={classes.tr}
@@ -30,7 +37,7 @@ const TablaArribo = (props: { data: (string | boolean)[][], headers: string[] })
                 ))}
                 {data.length > 10 && (
                     <tr className={classes.trPlaceHolder}>
-                        <td colSpan={6}>...</td>
+                        <td colSpan={6}>{`${data.length - 10} más...`}</td>
                     </tr>
                 )}
             </tbody>

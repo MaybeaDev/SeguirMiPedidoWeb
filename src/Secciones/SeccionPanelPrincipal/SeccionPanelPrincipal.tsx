@@ -48,7 +48,7 @@ const PanelPrincipal = () => {
         <div>
             <h2>Panel Principal</h2>
             <div style={{ display: "flex", justifyContent: "space-between", padding: "0 20px" }}>
-                <Card titulo="En bodega" style={{ width: "100%" }}>{paquetes.noArribado}</Card>
+                <Card titulo="No arribados" style={{ width: "100%" }}>{paquetes.noArribado}</Card>
                 <Card titulo="En bodega" style={{ width: "100%" }}>{paquetes.enBodega}</Card>
                 <Card titulo="En proceso" style={{ width: "100%" }}>{paquetes.enProceso}</Card>
                 <Card titulo="Entregado" style={{ width: "100%" }}>{paquetes.entregado}</Card>

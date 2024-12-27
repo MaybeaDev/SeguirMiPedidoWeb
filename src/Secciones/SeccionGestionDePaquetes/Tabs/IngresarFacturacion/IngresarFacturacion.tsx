@@ -14,6 +14,7 @@ interface Paquete {
     codigo: string,
     consultora: string,
     nombreConsultora: string,
+    facturacion:string,
     direccion: string,
     referencia: string,
     telefono: string,
@@ -60,6 +61,7 @@ const IngresarFacturacionTab = () => {
                         cajas: row[15] ? parseInt(row[15]) : 0,
                         consultora: row[9].toString().trim() || "",
                         nombreConsultora: row[10].toString().trim() || "",
+                        facturacion:ultimaFacturacion + "-" + new Date().getFullYear().toString(),
                         direccion: row[11].toString().trim() || "",
                         telefono: row[12].toString().trim() || "",
                         campaña: row[26].toString().trim() || "",
@@ -80,12 +82,14 @@ const IngresarFacturacionTab = () => {
                                 consultora: pedido.consultora,
                                 nombreConsultora: pedido.nombreConsultora,
                                 direccion: direccion,
+                                facturacion:"",
                                 referencia: referencia,
                                 telefono: pedido.telefono,
                                 campaña: pedido.campaña,
                             })
                         }
                     })
+                    console.log(fullData.map((p) => p.codigo))
                     ingresarData(fullData);
                 } else {
                     setErrorFile("La plantilla no es la correcta. Descarga la plantilla con el botón superior");

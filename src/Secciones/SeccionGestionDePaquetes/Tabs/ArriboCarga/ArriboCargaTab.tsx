@@ -11,7 +11,8 @@ import { db } from "../../../../firebaseConfig";
 interface Paquete {
     codigo: string,
     consultora: string,
-    fechaIngreso:string,
+    campaña: string,
+    fechaIngreso: string,
     recibe: string,
     telefono: string,
     direccion: string,
@@ -21,7 +22,7 @@ interface Paquete {
 const ArriboCargaTab = () => {
 
     const [isLoading, setIsLoading] = useState(false)
-    const [data, setData] = useState<Paquete[]>([]);
+    const [data, setData] = useState<Record<string, Paquete[]>>({});
     const [arribados, setArribados] = useState<string[]>([])
     const [noEncontrados, setNoEncontrados] = useState<string[]>([])
     const [inputValue, setInputValue] = useState("")
@@ -52,24 +53,19 @@ const ArriboCargaTab = () => {
     const keyDownHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key == "Enter") {
             console.log(inputValue, "Enter")
-            validarCodigo(inputValue)
-            setInputValue("");
+            if (inputValue.trim().split(" ").length >= 2) {
+                console.log(inputValue.split(" "))
+                inputValue.split(" ").forEach((c) => {
+                    enqueueCodigo(c.trim())
+                })
+                setInputValue("");
+            } else {
+                enqueueCodigo(inputValue.trim())
+            }
         }
     }
     const inputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-        console.log("input")
         setInputValue(event.target.value)
-        if (event.target.value.split(" ").length >= 2) {
-            console.log(event.target.value.split(" "))
-            event.target.value.split(" ").forEach((c) => {
-                enqueueCodigo(c.trim())
-            })
-            setInputValue("");
-        } else if (event.target.value.length - inputValue.length >= 2) {
-            console.log(event.target.value)
-            setInputValue("");
-            enqueueCodigo(event.target.value.trim())
-        }
     }
     const validarCodigo = async (codigo: string) => {
         const docRef = doc(db, "Paquetes", codigo)
@@ -107,12 +103,17 @@ const ArriboCargaTab = () => {
         const q = query(collection(db, "Paquetes"), where("estado", "==", 0))
         onSnapshot(q, (snapshot) => {
             setIsLoading(true)
-            const paquetes: Paquete[] = []
+            const paquetes: Record<string, Paquete[]> = {}
             snapshot.forEach((paquete) => {
-                paquetes.push({
+                if (!paquetes[paquete.data().facturacion ?? ""]) {
+                    paquetes[paquete.data().facturacion ?? ""] = []
+                }
+                paquetes[paquete.data().facturacion ?? ""]
+                .push({
                     codigo: paquete.id,
                     consultora: paquete.data().consultora,
-                    fechaIngreso: paquete.data().historial[0].fecha.toDate().toISOString().slice(0, 10).split("-").reverse().join("-"),
+                    campaña: paquete.data().campania,
+                    fechaIngreso: paquete.data().facturacion ?? "",
                     recibe: paquete.data().receptor,
                     telefono: paquete.data().contacto,
                     direccion: paquete.data().direccion,
@@ -136,17 +137,17 @@ const ArriboCargaTab = () => {
                     <label>Ultimo escaneado: </label>
                     <center>
                         <input ref={inputRef} className={`${classes.readOnlyInput} ${codigoValido == undefined
-                                ? ""
-                                : codigoValido 
-                                    ? classes.validInput
-                                    : classes.invalidInput}
+                            ? ""
+                            : codigoValido
+                                ? classes.validInput
+                                : classes.invalidInput}
                         `
                         } style={{ width: "50%" }} readOnly></input>
                     </center>
                     <center>
                         <input type="text" className={classes.input} value={inputValue} onChange={inputHandler} onKeyDown={keyDownHandler} placeholder="buscar fila..." />
                         <Button style={{ width: "60%" }} disabled={data.length ? false : true} onClick={handleConfirmarArribo}>Confirmar Arribo</Button>
-                            <h4>No encontrados:</h4>
+                        <h4>No encontrados:</h4>
                         <div className={classes.containerNoEncontrados}>
                             {noEncontrados.map((c) => (
                                 <label>{c}</label>
@@ -155,22 +156,29 @@ const ArriboCargaTab = () => {
                     </center>
                 </div>
                 <div className={classes.rightContent}>
-                    <TablaArribo data={data.map((p) => [
-                        p.codigo,
-                        p.consultora,
-                        p.fechaIngreso,
-                        p.recibe,
-                        p.telefono,
-                        p.direccion,
-                        p.arribado
-                    ]).slice(0, 14)} headers={[
-                        "Código",
-                        "Consultora",
-                        "Fecha ingreso",
-                        "Recibe",
-                        "Teléfono",
-                        "Dirección"
-                    ]} />
+                    {Object.values(data).reverse().map((value, ) => {
+                            return (
+                                <TablaArribo data={
+                                    value.map((p) => [
+                                        p.codigo,
+                                        p.consultora,
+                                        p.campaña,
+                                        p.fechaIngreso,
+                                        p.recibe,
+                                        p.telefono,
+                                        p.arribado
+                                    ])
+                                } headers={[
+                                    "Código",
+                                    "Consultora",
+                                    "Campaña",
+                                    "Fecha facturacion",
+                                    "Recibe",
+                                    "Teléfono",
+                                ]} />
+                            )
+                        })}
+                    
 
                     <center>
                         {isLoading && (
