@@ -4,8 +4,10 @@ import classes from "./ArriboCargaTab.module.css"
 import Button from "../../../../components/UI/Button/Button";
 import { useEffect, useRef, useState } from "react";
 import TablaArribo from "../../../../components/Otros/TableArribo/TablaArribo";
-import { collection, doc, getDoc, onSnapshot, query, updateDoc, where } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../../../firebaseConfig";
+import { useOutletContext } from "react-router-dom";
+import { PaqueteContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
 
 
 interface Paquete {
@@ -20,7 +22,7 @@ interface Paquete {
 }
 
 const ArriboCargaTab = () => {
-
+    const { paquetesContext } = useOutletContext<{ paquetesContext: PaqueteContext[] | [] }>();
     const [isLoading, setIsLoading] = useState(false)
     const [data, setData] = useState<Record<string, Paquete[]>>({});
     const [arribados, setArribados] = useState<string[]>([])
@@ -34,7 +36,6 @@ const ArriboCargaTab = () => {
         obtenerPaquetesNoArribados()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
-
 
     const processQueue = async () => {
         console.log("Processing queue...", isProcessing.current);
@@ -100,29 +101,36 @@ const ArriboCargaTab = () => {
     }
 
     const obtenerPaquetesNoArribados = () => {
-        const q = query(collection(db, "Paquetes"), where("estado", "==", 0))
-        onSnapshot(q, (snapshot) => {
-            setIsLoading(true)
-            const paquetes: Record<string, Paquete[]> = {}
-            snapshot.forEach((paquete) => {
-                if (!paquetes[paquete.data().facturacion ?? ""]) {
-                    paquetes[paquete.data().facturacion ?? ""] = []
-                }
-                paquetes[paquete.data().facturacion ?? ""]
+        const paquetes: Record<string, Paquete[]> = {}
+        const filtrados = paquetesContext.filter((p) => p.estado == 0)
+        const filtradosOrdenados = filtrados.sort((a, b) => {
+            const [diaA, mesA, añoA] = a.facturacion.split("-").map(Number);
+            const [diaB, mesB, añoB] = b.facturacion.split("-").map(Number);
+        
+            const dateA = new Date(añoA, mesA - 1, diaA); // Crear objeto Date
+            const dateB = new Date(añoB, mesB - 1, diaB);
+        
+            return dateB.getTime() - dateA.getTime(); // Ordenar de más reciente a más antigua
+        });
+        filtradosOrdenados.forEach((paquete) => {
+            if (!paquetes[paquete.facturacion]) {
+                paquetes[paquete.facturacion] = []
+            }
+            paquetes[paquete.facturacion]
                 .push({
                     codigo: paquete.id,
-                    consultora: paquete.data().consultora,
-                    campaña: paquete.data().campania,
-                    fechaIngreso: paquete.data().facturacion ?? "",
-                    recibe: paquete.data().receptor,
-                    telefono: paquete.data().contacto,
-                    direccion: paquete.data().direccion,
+                    consultora: paquete.consultora,
+                    campaña: paquete.campaña,
+                    fechaIngreso: paquete.facturacion,
+                    recibe: paquete.receptor,
+                    telefono: paquete.contacto,
+                    direccion: paquete.direccion,
                     arribado: arribados.find((p) => p == paquete.id) == undefined ? false : true
                 })
-            })
-            setIsLoading(false)
-            setData(paquetes)
         })
+        
+        setIsLoading(false)
+        setData(paquetes)
     }
 
     const handleConfirmarArribo = () => { }
@@ -156,29 +164,29 @@ const ArriboCargaTab = () => {
                     </center>
                 </div>
                 <div className={classes.rightContent}>
-                    {Object.values(data).reverse().map((value, ) => {
-                            return (
-                                <TablaArribo data={
-                                    value.map((p) => [
-                                        p.codigo,
-                                        p.consultora,
-                                        p.campaña,
-                                        p.fechaIngreso,
-                                        p.recibe,
-                                        p.telefono,
-                                        p.arribado
-                                    ])
-                                } headers={[
-                                    "Código",
-                                    "Consultora",
-                                    "Campaña",
-                                    "Fecha facturacion",
-                                    "Recibe",
-                                    "Teléfono",
-                                ]} />
-                            )
-                        })}
-                    
+                    {Object.values(data).map((value,) => {
+                        return (
+                            <TablaArribo data={
+                                value.map((p) => [
+                                    p.codigo,
+                                    p.consultora,
+                                    p.campaña,
+                                    p.fechaIngreso,
+                                    p.recibe,
+                                    p.telefono,
+                                    p.arribado
+                                ])
+                            } headers={[
+                                "Código",
+                                "Consultora",
+                                "Campaña",
+                                "Fecha facturacion",
+                                "Recibe",
+                                "Teléfono",
+                            ]} />
+                        )
+                    })}
+
 
                     <center>
                         {isLoading && (

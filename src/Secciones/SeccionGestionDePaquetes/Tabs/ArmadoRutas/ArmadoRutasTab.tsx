@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { collection, query, getDocs, where, QueryDocumentSnapshot, writeBatch, doc, addDoc, getDoc } from "firebase/firestore";
+import { collection, writeBatch, doc, addDoc, getDoc } from "firebase/firestore";
 import { db } from "../../../../firebaseConfig";
 import Button from "../../../../components/UI/Button/Button";
 import ModalRutas from "../../../../components/Layout/ModalRutas/ModalRutas";
@@ -7,6 +7,8 @@ import ModalRutas from "../../../../components/Layout/ModalRutas/ModalRutas";
 
 
 import classes from "./ArmadoRutasTab.module.css";
+import { useOutletContext } from "react-router-dom";
+import { PaqueteContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
 type Paquete = {
     codigo: string;
     direccion: string;
@@ -15,6 +17,7 @@ type Paquete = {
 
 
 const ArmadoRutasTab: React.FC = () => {
+    const { paquetesContext } = useOutletContext<{ paquetesContext: PaqueteContext[] | [] }>();
     const [paquetesNoAsignados, setPaquetesNoAsignados] = useState<Paquete[]>([]);
     const [paquetesParaAsignar, setPaquetesParaAsignar] = useState<Paquete[]>([]);
     const [noEncontrados, setNoEncontrados] = useState<string[]>([])
@@ -26,27 +29,22 @@ const ArmadoRutasTab: React.FC = () => {
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
     const [isLoading, setIsLoading] = useState<boolean>(true)
 
-    const getPaquetes = async (): Promise<void> => {
+    useEffect(() => {
         setPaquetesNoAsignados([])
         setPaquetesParaAsignar([]);
         setIsLoading(true);
-        const q = query(collection(db, "Paquetes"), where("ruta", "==", ""), where("estado", "!=", 0));
-        const querySnapshot = await getDocs(q);
         const paquetes: Paquete[] = [];
-        querySnapshot.forEach((doc: QueryDocumentSnapshot) => {
+        const filtrados = paquetesContext.filter((p) => (p.ruta == "" && p.estado != 0))
+        filtrados.forEach((paquete) => {
             paquetes.push({
-                codigo: doc.id,
-                direccion: doc.data().direccion,
-                consultora: doc.data().consultora,
+                codigo: paquete.id,
+                direccion: paquete.direccion,
+                consultora: paquete.consultora,
             });
-        });
+        })
         setIsLoading(false);
         setPaquetesNoAsignados(paquetes);
-    };
-
-    useEffect(() => {
-        getPaquetes();
-    }, []);
+    }, [paquetesContext]);
 
     const filtrarPaquetes = (paquetes: Paquete[], filtro: string): Paquete[] => {
         return paquetes.filter((p) =>
@@ -63,7 +61,7 @@ const ArmadoRutasTab: React.FC = () => {
             if (ruta.data()?.completado == true) {
                 batch.update(rutaRef, { "activa": true, "cargado": true, "completado": false })
             } else {
-                batch.update(rutaRef, { "activa": true, "cargado":true })
+                batch.update(rutaRef, { "activa": true, "cargado": true })
             }
             paquetesParaAsignar.forEach(paquete => {
                 const sfRef = doc(db, "Paquetes", paquete.codigo);
@@ -84,7 +82,6 @@ const ArmadoRutasTab: React.FC = () => {
 
             await guardarRuta({ rutaId: nuevaRutaRef.id, alias: rutaObjetivo.alias });
         }
-        getPaquetes()
     }
 
     const handleOnKeyDownIzquierda = (e: React.KeyboardEvent<HTMLInputElement>): void => {
