@@ -103,7 +103,7 @@ const CrearTrabajador = () => {
     };
     return (
         <div className={classes.container}>
-            <h2>Crear Trabajador</h2>
+            <h2>Crear Transportista</h2>
             <Card>
                 <form onSubmit={handleSubmit}>
                     <center>

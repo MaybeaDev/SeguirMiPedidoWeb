@@ -12,8 +12,8 @@ const SeccionEmpleados = () => {
     return (
         <div className={classes.container}>
             <NavBarTab group="gestionDeEmpleados">
-                <Tab id="listado" name={"Listado de empleados"} to="listado" />
-                <Tab id="crearTrabajador" name={"Ingresar trabajador"} to="crearTrabajador" />
+                <Tab id="listado" name={"Listado de usuarios"} to="listado" />
+                <Tab id="crearTrabajador" name={"Ingresar transportista"} to="crearTrabajador" />
             </NavBarTab>
             <div className={classes.content}>
                 <Card style={{ overflowX: "auto", marginTop: "0px", borderTopLeftRadius: 0, borderTopRightRadius: 0, marginInline: 20, border: "solid 2px #c77b00", borderTop: "none" }}>

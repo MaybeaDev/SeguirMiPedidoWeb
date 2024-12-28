@@ -3,7 +3,7 @@ import classes from "./EditarRuta.module.css"
 
 
 import { useParams } from "react-router-dom";
-import { collection, doc, getDoc, onSnapshot, query, where } from "firebase/firestore";
+import { arrayUnion, collection, doc, getDoc, onSnapshot, query, updateDoc, where } from "firebase/firestore";
 import { db } from "../../../../firebaseConfig";
 import { useEffect, useState } from "react";
 import Table from "../../../../components/UI/Table/Table";
@@ -59,12 +59,20 @@ const EditarRutaTab = () => {
     }
 
     const devolverABodega = async (index: number) => {
-        alert("Aun no se desarrolla esta función")
         console.log("devolverABodega",paquetes[index])
         setPaquetes(paquetes.filter(p => p[1] != paquetes[index][0]))
         const docRef = doc(db, "Paquetes", paquetes[index][0])
         const docSnap = await getDoc(docRef)
         if (docSnap.exists()) {
+            if (docSnap.data().estado == 1) {
+                updateDoc(docRef, { ruta: ""})
+            } else {
+                updateDoc(docRef, { estado: 1 , historial:arrayUnion( {
+                    estado: 1,
+                    fecha: new Date(),
+                    detalles: "Devuelto a Bodega"
+                })})
+            }
             console.log(docSnap.data().historial)
         } else {
             console.log("No such document!");

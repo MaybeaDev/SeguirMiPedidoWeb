@@ -32,7 +32,7 @@ function App() {
 
           <Route element={<PrivateRoute />}>
             <Route path="/SeccionEmpresa" element={<SeccionPanelPrincipal />} />
-            <Route path="/SeccionEmpresa/Empleados" element={<SeccionEmpleados />} >
+            <Route path="/SeccionEmpresa/Usuarios" element={<SeccionEmpleados />} >
               <Route path="listado" element={<ListadoTab />} />
               <Route path="crearTrabajador" element={<CrearTrabajador />} />
             </Route>

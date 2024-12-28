@@ -61,7 +61,7 @@ const ArmadoRutasTab: React.FC = () => {
             const rutaRef = doc(db, "Rutas", rutaObjetivo.rutaId)
             const ruta = await getDoc(rutaRef)
             if (ruta.data()?.completado == true) {
-                batch.update(rutaRef, { "activa": true, "completado": false })
+                batch.update(rutaRef, { "activa": true, "cargado": true, "completado": false })
             } else {
                 batch.update(rutaRef, { "activa": true })
             }
@@ -138,11 +138,11 @@ const ArmadoRutasTab: React.FC = () => {
                 onConfirm={guardarRuta}
             />
             <h2>Armado de rutas</h2>
-                    <div className={classes.containerNoEncontrados}>
-                        {noEncontrados.map((c) => (
-                            <label>{c}</label>
-                        ))}
-                    </div>
+            <div className={classes.containerNoEncontrados}>
+                {noEncontrados.map((c) => (
+                    <label>{c}</label>
+                ))}
+            </div>
             <div className={classes.filtersContainer}>
                 <div className={classes.filterGroup}>
                     <input className={classes.input}

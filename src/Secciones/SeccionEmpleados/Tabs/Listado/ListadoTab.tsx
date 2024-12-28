@@ -63,9 +63,9 @@ const ListadoTab = () => {
     };
     return (
         <>
-            <h2>ListadoTab</h2>
+            <h2>Listado de usuarios</h2>
             <input type="text" placeholder="Buscar..." value={searchQuery} onChange={handleSearch} />
-            <Table data={tableData} headers={["Empleado", "Tipo", "Rut", "Correo", "Telefono", "Ultima conexión"]} 
+            <Table data={tableData} headers={["Nombre", "Tipo", "Rut", "Correo", "Telefono", "Ultima conexión"]} 
             searchTerms={searchQuery.split(";").map((term) => normalizeString(term))} // Normaliza y divide términos
             ></Table>
         </>

@@ -183,7 +183,7 @@ const Navbar = () => {
                     <>
                         <LinkButton direccion="/SeccionEmpresa" nombre="Panel principal" />
                         <LinkButton direccion="/SeccionEmpresa/GestionDePaquetes/ingresarFacturacion" nombre="Gestion de Paquetes" />
-                        <LinkButton direccion="/SeccionEmpresa/Empleados/listado" nombre="Gestion de empleados" />
+                        <LinkButton direccion="/SeccionEmpresa/Usuarios/listado" nombre="Gestion de transportistas" />
                     </>
                 ) : (
                     <LinkButton direccion="/login" nombre="Iniciar sesión" />
