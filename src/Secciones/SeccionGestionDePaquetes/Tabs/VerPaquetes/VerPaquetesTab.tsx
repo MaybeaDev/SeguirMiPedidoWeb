@@ -49,7 +49,7 @@ const VerPaquetesTab = () => {
     useEffect(() => {
         setTimeout(() => {
             setMensajeCargando("Está tomando mas tiempo de lo esperado debido a la conexión a internet...")
-            setTimeout(()=>{
+            setTimeout(() => {
                 setMensajeCargando("Deberías considerar revisar tu conexion a internet...")
             }, 5000)
         }, 2000)
@@ -204,14 +204,18 @@ const VerPaquetesTab = () => {
     return (
         <>
             <h2>Ver Paquetes</h2>
-            <div>
-                <input
-                    type="text"
-                    placeholder="Buscar en los resultados..."
-                    value={searchQuery}
-                    onChange={handleSearch}
-                />
-            </div>
+            <input
+                type="text"
+                placeholder="Buscar en los resultados..."
+                value={searchQuery}
+                onChange={handleSearch}
+            />
+            {tableData.length > 300 ? (
+                <h3>{`Mostrando los primeros 300 de ${tableData.length} resultados`}</h3>
+
+            ) : (
+                <h3>{`Mostrando ${tableData.length} resultados`}</h3>
+            )}
 
             {isLoading ? (
                 <div className={classes.spinnerContainer}>
