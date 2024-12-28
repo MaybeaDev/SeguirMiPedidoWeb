@@ -141,7 +141,6 @@ const VerPaquetesTab = () => {
             if (doc.data()!.ruta) {
                 paquete.push(rutas[doc.data()!.ruta].alias);
                 if (doc.data()!.transportista) {
-                    console.log(doc.data()!.transportista)
                     paquete.push(transportistas[doc.data()!.transportista] ? transportistas[doc.data()!.transportista].nombre : doc.data()!.transportista);
                 } else {
                     if (rutas[doc.data()!.ruta].transportista) {

@@ -57,16 +57,9 @@ const CrearTrabajador = () => {
                 telefono: formData.telefono,
                 tipo: 0
             };
-            console.log("Datos del trabajador:", trabajador);
             await createUser(trabajador).then(() => {
                 setFormData({ nombre: "", rut: "", email: "", telefono: "", })
                 sendPasswordResetEmail(auth, normalizeString(data.email))
-                    .then(() => {
-                        console.log("Correo enviado a", normalizeString(data.email))
-                    })
-                    .catch((error) => {
-                        console.error("Error al enviar el correo de restablecimiento:", error);
-                    });
             }).then(() => {
             })
         }

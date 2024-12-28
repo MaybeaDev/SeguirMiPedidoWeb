@@ -63,7 +63,7 @@ const ArmadoRutasTab: React.FC = () => {
             if (ruta.data()?.completado == true) {
                 batch.update(rutaRef, { "activa": true, "cargado": true, "completado": false })
             } else {
-                batch.update(rutaRef, { "activa": true })
+                batch.update(rutaRef, { "activa": true, "cargado":true })
             }
             paquetesParaAsignar.forEach(paquete => {
                 const sfRef = doc(db, "Paquetes", paquete.codigo);

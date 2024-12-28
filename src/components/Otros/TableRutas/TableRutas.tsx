@@ -57,7 +57,6 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
         const transportistasDespues = newData.map(it => it.transportista)
         let sonIguales = true
 
-        console.log(transportistasAntes, transportistasDespues)
         transportistasAntes.forEach((it, index) => {
             const after = transportistasDespues[index]
             if (it != after) {
@@ -85,7 +84,6 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
         const estadosAntes = props.initData.map(it => it.estado)
         const estadosDespues = newData.map(it => it.estado)
         let sonIguales = true
-        console.log(estadosAntes, estadosDespues)
 
         estadosAntes.forEach((it, index) => {
             const after = estadosDespues[index]

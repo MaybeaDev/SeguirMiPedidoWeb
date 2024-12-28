@@ -59,32 +59,50 @@ const EditarRutaTab = () => {
     }
 
     const devolverABodega = async (index: number) => {
-        console.log("devolverABodega",paquetes[index])
-        setPaquetes(paquetes.filter(p => p[1] != paquetes[index][0]))
         const docRef = doc(db, "Paquetes", paquetes[index][0])
         const docSnap = await getDoc(docRef)
         if (docSnap.exists()) {
             if (docSnap.data().estado == 1) {
-                updateDoc(docRef, { ruta: ""})
+                updateDoc(docRef, { ruta: "" })
             } else {
-                updateDoc(docRef, { estado: 1 , historial:arrayUnion( {
-                    estado: 1,
-                    fecha: new Date(),
-                    detalles: "Devuelto a Bodega"
-                })})
+                await updateDoc(docRef, {
+                    ruta:"",
+                    estado: 1, historial: arrayUnion({
+                        estado: 1,
+                        fecha: new Date(),
+                        detalles: "Devuelto a Bodega"
+                    })
+                })
             }
-            console.log(docSnap.data().historial)
-        } else {
-            console.log("No such document!");
         }
     }
-    const marcarEntregado = (index: number) => {
-        alert("Aun no se desarrolla esta función")
-        console.log("marcarEntregado",paquetes[index])
+    const marcarEntregado = async (index: number) => {
+        const docRef = doc(db, "Paquetes", paquetes[index][0])
+        const docSnap = await getDoc(docRef)
+        if (docSnap.exists()) {
+            await updateDoc(docRef, {
+                estado: 3, historial: arrayUnion({
+                    estado: 3,
+                    fecha: new Date(),
+                    detalles: "Pedido entregado"
+                })
+            })
+            setPaquetes(paquetes.filter(p => p[0] != paquetes[index][0]))
+        }
     }
-    const marcarNoEntregado = (index: number) => {
-        alert("Aun no se desarrolla esta función")
-        console.log("marcarNoEntregado",paquetes[index])
+    const marcarNoEntregado = async (index: number) => {
+        const docRef = doc(db, "Paquetes", paquetes[index][0])
+        const docSnap = await getDoc(docRef)
+        if (docSnap.exists()) {
+            await updateDoc(docRef, {
+                estado: 4, historial: arrayUnion({
+                    estado: 4,
+                    fecha: new Date(),
+                    detalles: "Pedido no entregado"
+                })
+            })
+            setPaquetes(paquetes.filter(p => p[0] != paquetes[index][0]))
+        }
     }
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         const query = event.target.value.toString();
