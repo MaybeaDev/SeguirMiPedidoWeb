@@ -4,7 +4,7 @@ import classes from "./GestionRutas.module.css"
 
 import { useEffect, useRef, useState } from "react";
 import TableRutas from "../../../../components/Otros/TableRutas/TableRutas";
-import { PaqueteContext, RutaContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
+import { PaqueteContext, RutaContext, TransportistaContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
 import { useOutletContext } from "react-router-dom";
 interface Data {
     id: string,
@@ -14,7 +14,7 @@ interface Data {
     transportista: string
 }
 const GestionRutas = () => {
-    const { paquetesContext, rutasContext } = useOutletContext<{ paquetesContext: PaqueteContext[] | [], rutasContext: Record<string, RutaContext> }>();
+    const { paquetesContext, rutasContext, transportistasContext } = useOutletContext<{ paquetesContext: PaqueteContext[] | [], rutasContext: Record<string, RutaContext>, transportistasContext: Record<string, TransportistaContext> }>();
     const [data, setData] = useState<Data[]>([]);
     const [trabajadores, setTrabajadores] = useState<{ id: string, nombre: string }[]>([])
     const [isLoading, setIsLoading] = useState(true)
@@ -32,39 +32,25 @@ const GestionRutas = () => {
     const getData = () => {
         const dat: Data[] = []
         const trab: { id: string, nombre: string }[] = []
-        Object.keys(rutasContext).forEach((k) => {
-            const r = rutasContext[k]
+        Object.values(transportistasContext).forEach((t) => {
+            trab.push({id: t.id, nombre: t.nombre})
+        })
+        Object.values(rutasContext).forEach((k) => {
             let estado = "0";
-            if (r.activa) estado = "1";
-            if (r.cargado) estado = "2";
-            if (r.enReparto) estado = "3";
-            if (r.completado) estado = "4";
+            if (k.activa) estado = "1";
+            if (k.cargado) estado = "2";
+            if (k.enReparto) estado = "3";
+            if (k.completado) estado = "4";
             dat.push({
-                id: r.id,
-                alias: r.alias,
+                id: k.id,
+                alias: k.alias,
                 paquetes: paquetesContext.filter((p) => {
-                    return p.ruta == r.id && [1, 2, 4].includes(p.estado)
+                    return p.ruta == k.id && [1, 2, 4].includes(p.estado)
                 }).length.toString(),
                 estado: estado,
-                transportista: r.transportistaNombre
+                transportista: k.transportista
             })
         })
-        dat.forEach((r) => {
-            const ruta = rutasContext[r.id]
-            console.log(ruta, r.id)
-            let estado = "0";
-            if (ruta.activa) estado = "1";
-            if (ruta.cargado) estado = "2";
-            if (ruta.enReparto) estado = "3";
-            if (ruta.completado) estado = "4";
-            r.estado = estado;
-            r.transportista = ruta.transportista
-            trab.push({
-                id: ruta.transportista,
-                nombre: ruta.transportistaNombre
-            })
-        })
-        console.log(dat)
         setData(dat)
         setTrabajadores(trab)
     }

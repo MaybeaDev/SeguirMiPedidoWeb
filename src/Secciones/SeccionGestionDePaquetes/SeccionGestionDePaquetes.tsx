@@ -6,9 +6,9 @@ import Card from "../../components/UI/Card/Card";
 import classes from "./SeccionGestionDePaquetes.module.css"
 import Tab from "../../components/UI/Tab/Tab";
 import NavBarTab from "../../components/Layout/NavBar/NavBarTab"
-import { PaqueteContext, RutaContext } from "../../components/Otros/PrivateRoutes/PrivateRoutes";
+import { PaqueteContext, RutaContext, TransportistaContext } from "../../components/Otros/PrivateRoutes/PrivateRoutes";
 const SeccionGestionDePaquetes = () => {
-    const { paquetesContext, rutasContext } = useOutletContext<{ paquetesContext: PaqueteContext[] | [], rutasContext:Record<string, RutaContext> }>();
+    const { paquetesContext, rutasContext, transportistasContext } = useOutletContext<{ paquetesContext: PaqueteContext[] | [], rutasContext:Record<string, RutaContext>, transportistasContext:Record<string, TransportistaContext> }>();
     return (
         <div className={classes.container}>
             <NavBarTab group="gestionDeRutas">
@@ -22,7 +22,7 @@ const SeccionGestionDePaquetes = () => {
             <div className={classes.content}>
                 <Card style={{ overflowX: "auto", marginTop: "0px", borderTopLeftRadius: 0, borderTopRightRadius: 0, marginInline: 20, border: "solid 2px #c77b00", borderTop: "none" }}>
                     <div style={{ minWidth: "700px" }}>
-                        <Outlet context={{paquetesContext, rutasContext}} />
+                        <Outlet context={{paquetesContext, rutasContext, transportistasContext}} />
                     </div>
                 </Card>
             </div>

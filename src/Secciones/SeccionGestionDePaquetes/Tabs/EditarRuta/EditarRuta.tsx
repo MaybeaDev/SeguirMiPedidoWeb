@@ -2,60 +2,57 @@ import classes from "./EditarRuta.module.css"
 
 
 
-import { useParams } from "react-router-dom";
-import { arrayUnion, collection, doc, getDoc, onSnapshot, query, updateDoc, where } from "firebase/firestore";
+import { useOutletContext, useParams } from "react-router-dom";
+import { arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../../../firebaseConfig";
 import { useEffect, useState } from "react";
 import Table from "../../../../components/UI/Table/Table";
+import { PaqueteContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
 
 
 const EditarRutaTab = () => {
+    const { paquetesContext } = useOutletContext<{ paquetesContext: PaqueteContext[] | [] }>();
     const [paquetes, setPaquetes] = useState<string[][]>([])
     const [ruta, setRuta] = useState("")
     const [searchQuery, setSearchQuery] = useState<string>("");
     const { rutaID } = useParams()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => { getRuta() }, [])
+    useEffect(() => { getPaquetes(rutaID!) }, [])
 
-    const getPaquetes = async (id: string, transportista: string) => {
-        const q = query(collection(db, "Paquetes"), where("ruta", "==", id), where("estado", "not-in", [0, 3]))
-        onSnapshot(q, (snap) => {
-            const paq: string[][] = []
-            snap.forEach((p) => {
-                paq.push(
-                    [
-                        p.id,
-                        p.data().consultora,
-                        p.data().contacto,
-                        (() => {
-                            switch (p.data().estado) {
-                                case 0:
-                                    return "Enviado desde Santiago"
-                                case 1:
-                                    return "En Bodega";
-                                case 2:
-                                    return "En Reparto";
-                                case 3:
-                                    return "Entregado";
-                                case 4:
-                                    return "Entrega fallida";
-                                default:
-                                    return "En Proceso";
-                            }
-                        })(),
-                        transportista
-                    ]
-                )
-            })
-            setPaquetes(paq)
+    const getPaquetes = async (id: string) => {
+        const filtrados = paquetesContext.filter((p) => {
+            return p.ruta == id && ![0, 3].includes(p.estado)
         })
-    }
-    const getRuta = async () => {
-        const docRef = doc(db, `Rutas/${rutaID}`)
-        const ruta = await getDoc(docRef)
-        setRuta(ruta.data()!.alias)
-        getPaquetes(ruta.id, ruta.data()!.transportistaNombre)
+        const paq: string[][] = []
+        setRuta(filtrados[0].rutaAlias)
+        filtrados.forEach((p) => {
+            paq.push(
+                [
+                    p.id,
+                    p.consultora,
+                    p.contacto,
+                    (() => {
+                        switch (p.estado) {
+                            case 0:
+                                return "Enviado desde Santiago"
+                            case 1:
+                                return "En Bodega";
+                            case 2:
+                                return "En Reparto";
+                            case 3:
+                                return "Entregado";
+                            case 4:
+                                return "Entrega fallida";
+                            default:
+                                return "En Proceso";
+                        }
+                    })(),
+                    p.transportistaNombre
+                ]
+            )
+        })
+        setPaquetes(paq)        
     }
 
     const devolverABodega = async (index: number) => {
@@ -66,7 +63,7 @@ const EditarRutaTab = () => {
                 updateDoc(docRef, { ruta: "" })
             } else {
                 await updateDoc(docRef, {
-                    ruta:"",
+                    ruta: "",
                     estado: 1, historial: arrayUnion({
                         estado: 1,
                         fecha: new Date(),

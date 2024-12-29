@@ -37,7 +37,7 @@ const VerPaquetesTab = () => {
             }, 5000)
         }, 2000)
         getPaquetes()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [paquetesContext])
 
     const getPaquetes = () => {
@@ -76,31 +76,36 @@ const VerPaquetesTab = () => {
         ])
         setIsLoading(false);
         setPaquetes(paquetesMapeados);
-        setTableData(paquetesMapeados);
+        filtrarTabla(searchQuery, paquetesMapeados)
     };
 
 
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const query = event.target.value.toString();
+        const query = event.target.value.toString()
         setSearchQuery(query);
-
-        // Divide el query en términos usando ';' y normaliza cada término
+        filtrarTabla(query)
+    };
+    const filtrarTabla = (query : string, paq?:string[][]) => {
         const searchTerms = query
             .split(";") // Divide por punto y coma
             .map((term) => normalizeString(term)) // Normaliza cada término
             .filter((term) => term.length > 0); // Elimina términos vacíos
-
-        const filteredData = paquetes.filter((paquete) =>
-            // Cada término debe coincidir en al menos un campo del paquete
+        
+        const filteredData = paq ? paq.filter((paquete) =>
             searchTerms.every((term) =>
                 paquete.some((field) =>
                     normalizeString((field ?? "").toString()).includes(term)
                 )
             )
-        );
-
+        ) : paquetes.filter((paquete) =>
+            searchTerms.every((term) =>
+                paquete.some((field) =>
+                    normalizeString((field ?? "").toString()).includes(term)
+                )
+            )
+        )
         setTableData(filteredData);
-    };
+    }
 
     const normalizeString = (str: string): string => {
         return str

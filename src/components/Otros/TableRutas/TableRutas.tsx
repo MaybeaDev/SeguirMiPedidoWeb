@@ -255,7 +255,7 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
                                 ) : (<p>{ruta.paquetes}</p>)}
                             </td>
                             <td className={classes.td}>
-                                {ruta.estado != "3" ? (
+                                {ruta.estado != "" ? (
 
                                     <select
                                         style={{ margin: 0, padding: "5px" }}

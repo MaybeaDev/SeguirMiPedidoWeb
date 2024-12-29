@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { collection, writeBatch, doc, addDoc, getDoc } from "firebase/firestore";
+import { collection, writeBatch, doc, addDoc } from "firebase/firestore";
 import { db } from "../../../../firebaseConfig";
 import Button from "../../../../components/UI/Button/Button";
 import ModalRutas from "../../../../components/Layout/ModalRutas/ModalRutas";
@@ -35,8 +35,6 @@ const ArmadoRutasTab: React.FC = () => {
             isFirstRender.current = false;
             return;
         }
-        setPaquetesNoAsignados([])
-        setPaquetesParaAsignar([]);
         setIsLoading(true);
         const paquetes: Paquete[] = [];
         const filtrados = paquetesContext.filter((p) => (p.ruta == "" && p.estado != 0))
@@ -48,7 +46,7 @@ const ArmadoRutasTab: React.FC = () => {
             });
         })
         setIsLoading(false);
-        setPaquetesNoAsignados(paquetes);
+        setPaquetesNoAsignados(paquetes.filter((p) => !paquetesParaAsignar.includes(p)));
     }, [paquetesContext]);
 
     const filtrarPaquetes = (paquetes: Paquete[], filtro: string): Paquete[] => {
@@ -62,17 +60,13 @@ const ArmadoRutasTab: React.FC = () => {
         if (rutaObjetivo.rutaId) {
             const batch = writeBatch(db);
             const rutaRef = doc(db, "Rutas", rutaObjetivo.rutaId)
-            const ruta = await getDoc(rutaRef)
-            if (ruta.data()?.completado == true) {
-                batch.update(rutaRef, { "activa": true, "cargado": true, "completado": false })
-            } else {
-                batch.update(rutaRef, { "activa": true, "cargado": true })
-            }
+            batch.update(rutaRef, { "activa": true, "cargado": true, "completado": false , "en_reparto":false})
             paquetesParaAsignar.forEach(paquete => {
                 const sfRef = doc(db, "Paquetes", paquete.codigo);
                 batch.update(sfRef, { "ruta": rutaObjetivo.rutaId });
             })
             batch.commit();
+            console.log("Guardada")
         } else {
             const nuevaRutaRef = await addDoc(collection(db, "Rutas"), {
                 activa: false,
@@ -83,8 +77,7 @@ const ArmadoRutasTab: React.FC = () => {
                 no_entregado: [],
                 transportista: "",
             });
-            localStorage.setItem(nuevaRutaRef.id, JSON.stringify({ id: nuevaRutaRef.id, alias: rutaObjetivo.alias, transportista: "" }))
-
+            console.log("Creada")
             await guardarRuta({ rutaId: nuevaRutaRef.id, alias: rutaObjetivo.alias });
         }
     }

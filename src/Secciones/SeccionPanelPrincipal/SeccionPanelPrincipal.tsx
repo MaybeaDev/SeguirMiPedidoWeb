@@ -38,7 +38,7 @@ const PanelPrincipal = () => {
             p.total++
             if (paquete.estado == 0) {
                 p.noArribado++
-            } else if (paquete.estado == 1) {
+            } else if (paquete.estado == 1 || paquete.estado == 4) {
                 p.enBodega++
             } else if (paquete.estado == 3) {
                 p.entregado++
@@ -57,7 +57,7 @@ const PanelPrincipal = () => {
                 <div style={{ display: "flex", justifyContent: "space-between", padding: "0 20px" }}>
                     <Card titulo="No arribados" style={{ width: "100%" }}><div className={classes.spinnerContainer}><div className={classes.spinner}></div></div></Card>
                     <Card titulo="En bodega" style={{ width: "100%" }}><div className={classes.spinnerContainer}><div className={classes.spinner}></div></div></Card>
-                    <Card titulo="En proceso" style={{ width: "100%" }}><div className={classes.spinnerContainer}><div className={classes.spinner}></div></div></Card>
+                    <Card titulo="En reparto" style={{ width: "100%" }}><div className={classes.spinnerContainer}><div className={classes.spinner}></div></div></Card>
                     <Card titulo="Entregado" style={{ width: "100%" }}><div className={classes.spinnerContainer}><div className={classes.spinner}></div></div></Card>
                     <Card titulo="Total" style={{ width: "100%" }}><div className={classes.spinnerContainer}><div className={classes.spinner}></div></div></Card>
                 </div>
@@ -65,7 +65,7 @@ const PanelPrincipal = () => {
                 <div style={{ display: "flex", justifyContent: "space-between", padding: "0 20px" }}>
                     <Card titulo="No arribados" style={{ width: "100%" }}>{paq.noArribado}</Card>
                     <Card titulo="En bodega" style={{ width: "100%" }}>{paq.enBodega}</Card>
-                    <Card titulo="En proceso" style={{ width: "100%" }}>{paq.enProceso}</Card>
+                    <Card titulo="En reparto" style={{ width: "100%" }}>{paq.enProceso}</Card>
                     <Card titulo="Entregado" style={{ width: "100%" }}>{paq.entregado}</Card>
                     <Card titulo="Total" style={{ width: "100%" }}>{paq.total}</Card>
                 </div>
