@@ -65,10 +65,11 @@ const ArriboCargaTab = () => {
                 inputValue.split(" ").forEach((c) => {
                     enqueueCodigo(c.trim())
                 })
-                setInputValue("");
             } else {
                 enqueueCodigo(inputValue.trim())
             }
+            console.log("Limpiado")
+            setInputValue("");
         }
     }
     const inputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
