@@ -18,7 +18,7 @@ const EditarRutaTab = () => {
     const { rutaID } = useParams()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => { getPaquetes(rutaID!) }, [])
+    useEffect(() => { getPaquetes(rutaID!) }, [paquetesContext])
 
     const getPaquetes = async (id: string) => {
         const filtrados = paquetesContext.filter((p) => {
@@ -55,8 +55,9 @@ const EditarRutaTab = () => {
         setPaquetes(paq)        
     }
 
-    const devolverABodega = async (index: number) => {
-        const docRef = doc(db, "Paquetes", paquetes[index][0])
+    const devolverABodega = async (key: string) => {
+        const paquete = paquetes.find((p) => p[0] == key)
+        const docRef = doc(db, "Paquetes", paquete![0])
         const docSnap = await getDoc(docRef)
         if (docSnap.exists()) {
             if (docSnap.data().estado == 1) {
@@ -73,8 +74,9 @@ const EditarRutaTab = () => {
             }
         }
     }
-    const marcarEntregado = async (index: number) => {
-        const docRef = doc(db, "Paquetes", paquetes[index][0])
+    const marcarEntregado = async (key: string) => {
+        const paquete = paquetes.find((p) => p[0] == key)
+        const docRef = doc(db, "Paquetes", paquete![0])
         const docSnap = await getDoc(docRef)
         if (docSnap.exists()) {
             await updateDoc(docRef, {
@@ -84,11 +86,11 @@ const EditarRutaTab = () => {
                     detalles: "Pedido entregado"
                 })
             })
-            setPaquetes(paquetes.filter(p => p[0] != paquetes[index][0]))
         }
     }
-    const marcarNoEntregado = async (index: number) => {
-        const docRef = doc(db, "Paquetes", paquetes[index][0])
+    const marcarNoEntregado = async (key: string) => {
+        const paquete = paquetes.find((p) => p[0] == key)
+        const docRef = doc(db, "Paquetes", paquete![0])
         const docSnap = await getDoc(docRef)
         if (docSnap.exists()) {
             await updateDoc(docRef, {
@@ -98,7 +100,6 @@ const EditarRutaTab = () => {
                     detalles: "Pedido no entregado"
                 })
             })
-            setPaquetes(paquetes.filter(p => p[0] != paquetes[index][0]))
         }
     }
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,18 +134,18 @@ const EditarRutaTab = () => {
             ]}
                 searchTerms={searchQuery.split(";").map((term) => normalizeString(term))}
             >
-                {(rowIndex: number) => (
+                {(key: string) => (
                     <>
                         <button className={classes.button + " " + classes.buttonBodega}
-                            onDoubleClick={() => { devolverABodega(rowIndex); }}>
+                            onDoubleClick={() => { devolverABodega(key); }}>
                             Devolver a bodega
                         </button>
                         <button className={classes.button + " " + classes.buttonEntregado}
-                            onDoubleClick={() => { marcarEntregado(rowIndex); }}>
+                            onDoubleClick={() => { marcarEntregado(key); }}>
                             Marcar entregado
                         </button>
                         <button className={classes.button + " " + classes.buttonNoEntregado}
-                            onDoubleClick={() => { marcarNoEntregado(rowIndex); }}>
+                            onDoubleClick={() => { marcarNoEntregado(key); }}>
                             Marcar no entregado
                         </button>
                     </>

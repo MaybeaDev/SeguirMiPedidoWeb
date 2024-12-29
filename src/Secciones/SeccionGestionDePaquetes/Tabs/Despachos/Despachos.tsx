@@ -170,8 +170,8 @@ const DespachosTab = () => {
         })
         setData([])
     }
-    const handleEliminarData = (fila: number) => {
-        setData((prevData) => prevData.filter((_, index) => index !== fila));
+    const handleEliminarData = (fila: string) => {
+        setData((prevData) => prevData.filter((row) => row[0] != fila));
     }
     const generateBarcode = (text: string): string => {
         const canvas = document.createElement("canvas");
@@ -360,7 +360,7 @@ const DespachosTab = () => {
                 ]
             }
             >
-                {(rowIndex: number) => (
+                {(rowIndex: string) => (
                     <input
                         onClick={(e) => {
                             e.stopPropagation(); // Evita que se dispare el evento de la fila
