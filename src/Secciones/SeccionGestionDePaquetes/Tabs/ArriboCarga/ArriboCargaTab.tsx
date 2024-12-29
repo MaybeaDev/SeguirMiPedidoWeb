@@ -23,7 +23,7 @@ interface Paquete {
 
 const ArriboCargaTab = () => {
     const { paquetesContext } = useOutletContext<{ paquetesContext: PaqueteContext[] | [] }>();
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
     const [data, setData] = useState<Record<string, Paquete[]>>({});
     const [arribados, setArribados] = useState<string[]>([])
     const [noEncontrados, setNoEncontrados] = useState<string[]>([])
@@ -32,10 +32,16 @@ const ArriboCargaTab = () => {
     const codigoQueue = useRef<string[]>([]); // Cola de códigos pendientes
     const isProcessing = useRef(false);
     const inputRef = useRef<HTMLInputElement>(null)
+    const isFirstRender = useRef(true);
     useEffect(() => {
+        if (isFirstRender.current && paquetesContext.length == 0) {
+        isFirstRender.current = false;
+        return;
+    }
         obtenerPaquetesNoArribados()
+        setIsLoading(false)
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [paquetesContext])
 
     const processQueue = async () => {
         console.log("Processing queue...", isProcessing.current);
@@ -128,8 +134,6 @@ const ArriboCargaTab = () => {
                     arribado: arribados.find((p) => p == paquete.id) == undefined ? false : true
                 })
         })
-        
-        setIsLoading(false)
         setData(paquetes)
     }
 
@@ -192,7 +196,7 @@ const ArriboCargaTab = () => {
                         {isLoading && (
                             <div className={classes.spinnerContainer}>
                                 <div className={classes.spinner}></div>
-                                <p>Procesando archivo...</p>
+                                <p>Obteniendo paquetes no arribados...</p>
                             </div>
                         )}
                     </center>

@@ -13,7 +13,6 @@ import { PaqueteContext } from "../../components/Otros/PrivateRoutes/PrivateRout
 const PanelPrincipal = () => {
     const [isLoading, setIsLoading] = useState(true)
     const { paquetesContext } = useOutletContext<{ paquetesContext: PaqueteContext[] | [] }>();
-    const isFirstRender = useRef(true);
     const [paq, setPaq] = useState({
         noArribado: 0,
         enBodega: 0,
@@ -21,8 +20,8 @@ const PanelPrincipal = () => {
         entregado: 0,
         total: 0
     })
+    const isFirstRender = useRef(true);
     useEffect(() => {
-        console.log(isFirstRender.current)
         if (isFirstRender.current && paquetesContext.length == 0) {
             isFirstRender.current = false;
             return;

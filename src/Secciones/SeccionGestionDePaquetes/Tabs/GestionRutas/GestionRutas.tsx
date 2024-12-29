@@ -1,11 +1,9 @@
-
-
-
-
-
-import { useEffect, useState } from "react";
-import TableRutas from "../../../../components/Otros/TableRutas/TableRutas";
 import classes from "./GestionRutas.module.css"
+
+
+
+import { useEffect, useRef, useState } from "react";
+import TableRutas from "../../../../components/Otros/TableRutas/TableRutas";
 import { PaqueteContext, RutaContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
 import { useOutletContext } from "react-router-dom";
 interface Data {
@@ -19,14 +17,21 @@ const GestionRutas = () => {
     const { paquetesContext, rutasContext } = useOutletContext<{ paquetesContext: PaqueteContext[] | [], rutasContext: Record<string, RutaContext> }>();
     const [data, setData] = useState<Data[]>([]);
     const [trabajadores, setTrabajadores] = useState<{ id: string, nombre: string }[]>([])
+    const [isLoading, setIsLoading] = useState(true)
+    const isFirstRender = useRef(true);
     useEffect(() => {
+        if (isFirstRender.current && paquetesContext.length == 0) {
+            isFirstRender.current = false;
+            return;
+        }
         getData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+        setIsLoading(false)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [paquetesContext])
 
     const getData = () => {
-        const dat:Data[] = []
-        const trab:{ id: string, nombre: string }[] = []
+        const dat: Data[] = []
+        const trab: { id: string, nombre: string }[] = []
         Object.keys(rutasContext).forEach((k) => {
             const r = rutasContext[k]
             let estado = "0";
@@ -38,7 +43,7 @@ const GestionRutas = () => {
                 id: r.id,
                 alias: r.alias,
                 paquetes: paquetesContext.filter((p) => {
-                    return p.ruta == r.id && [1, 2, 4].includes(p.estado) 
+                    return p.ruta == r.id && [1, 2, 4].includes(p.estado)
                 }).length.toString(),
                 estado: estado,
                 transportista: r.transportistaNombre
@@ -55,7 +60,7 @@ const GestionRutas = () => {
             r.estado = estado;
             r.transportista = ruta.transportista
             trab.push({
-                id:ruta.transportista,
+                id: ruta.transportista,
                 nombre: ruta.transportistaNombre
             })
         })
@@ -70,9 +75,16 @@ const GestionRutas = () => {
             <h2>Gestionar Rutas</h2>
             <center>
                 <div style={{ width: "90%" }}>
-                    {data.length > 0 && (
-                        <TableRutas initData={data} trabajadores={trabajadores} />
-                    )}
+                    {isLoading ? (
+                        <div className={classes.spinnerContainer}>
+                            <div className={classes.spinner}></div>
+                            <p>Obteniendo datos sobre las rutas...</p>
+                        </div>
+                    ) :
+                        data.length > 0 && (
+                            <TableRutas initData={data} trabajadores={trabajadores} />
+                        )
+                    }
                 </div>
             </center>
         </div>

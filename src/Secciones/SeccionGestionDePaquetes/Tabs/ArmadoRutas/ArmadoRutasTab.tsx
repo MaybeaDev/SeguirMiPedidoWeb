@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { collection, writeBatch, doc, addDoc, getDoc } from "firebase/firestore";
 import { db } from "../../../../firebaseConfig";
 import Button from "../../../../components/UI/Button/Button";
@@ -26,10 +26,15 @@ const ArmadoRutasTab: React.FC = () => {
     const [filtroDerecha, setFiltroDerecha] = useState<string>("");
     const [tablaIzquierdaBouncing, setTablaIzquierdaBouncing] = useState(false)
     const [tablaDerechaBouncing, setTablaDerechaBouncing] = useState(false)
-    const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
-    const [isLoading, setIsLoading] = useState<boolean>(true)
+    const [isOpenModal, setIsOpenModal] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
+    const isFirstRender = useRef(true);
 
     useEffect(() => {
+        if (isFirstRender.current && paquetesContext.length == 0) {
+            isFirstRender.current = false;
+            return;
+        }
         setPaquetesNoAsignados([])
         setPaquetesParaAsignar([]);
         setIsLoading(true);
