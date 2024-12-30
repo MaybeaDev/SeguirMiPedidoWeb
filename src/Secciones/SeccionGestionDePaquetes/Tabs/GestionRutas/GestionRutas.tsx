@@ -2,7 +2,7 @@ import classes from "./GestionRutas.module.css"
 
 
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import TableRutas from "../../../../components/Otros/TableRutas/TableRutas";
 import { PaqueteContext, RutaContext, TransportistaContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
 import { useOutletContext } from "react-router-dom";
@@ -18,16 +18,14 @@ const GestionRutas = () => {
     const [data, setData] = useState<Data[]>([]);
     const [trabajadores, setTrabajadores] = useState<{ id: string, nombre: string }[]>([])
     const [isLoading, setIsLoading] = useState(true)
-    const isFirstRender = useRef(true);
     useEffect(() => {
-        if (isFirstRender.current && paquetesContext.length == 0) {
-            isFirstRender.current = false;
+        if (paquetesContext.length == 0) {
             return;
         }
         getData()
         setIsLoading(false)
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [paquetesContext])
+    }, [paquetesContext, rutasContext, transportistasContext])
 
     const getData = () => {
         const dat: Data[] = []

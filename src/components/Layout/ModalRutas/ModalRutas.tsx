@@ -1,16 +1,14 @@
-import { collection, query, getDocs, QueryDocumentSnapshot } from "firebase/firestore";
-import { db } from "../../../firebaseConfig";
-
-
-
-
 import classes from "./ModalRutas.module.css"
+
+
 import { useEffect, useState } from "react";
+import { RutaContext } from "../../Otros/PrivateRoutes/PrivateRoutes";
 const ModalRutas = (props: {
     isOpen: boolean;
     onClose: () => void;
     paquetes: { codigo: string }[];
     onConfirm: (ruta: { rutaId: string | null, alias: string | null }) => void;
+    rutas : Record<string, RutaContext>
 }) => {
     const [rutas, setRutas] = useState<{ id: string, alias: string }[]>([])
     const [isNuevaRuta, setNuevaRuta] = useState<boolean>(true)
@@ -18,20 +16,20 @@ const ModalRutas = (props: {
     const [validInput, setValidInput] = useState(false)
     const [ruta, setRuta] = useState<{ rutaId: string | null, alias: string | null }>({ rutaId: null, alias: null })
 
-
     const getRutas = async (): Promise<void> => {
-        const q = query(collection(db, "Rutas"));
-        const querySnapshot = await getDocs(q);
-        const rutas: { id: string, alias: string }[] = [];
-        querySnapshot.forEach((doc: QueryDocumentSnapshot) => {
-            rutas.push({ id: doc.id, alias: doc.data().alias });
-        });
+        const rutas = Object.values(props.rutas).map((r) => {
+            return {
+                id:r.id,
+                alias:r.alias
+            }
+        })
         setRutas(rutas);
     };
 
     useEffect(() => {
         getRutas();
-    }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [props.rutas]);
 
 
     const handleConfirmar = () => {

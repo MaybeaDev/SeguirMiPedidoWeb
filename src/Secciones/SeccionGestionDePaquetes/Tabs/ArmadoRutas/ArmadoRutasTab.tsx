@@ -8,7 +8,7 @@ import ModalRutas from "../../../../components/Layout/ModalRutas/ModalRutas";
 
 import classes from "./ArmadoRutasTab.module.css";
 import { useOutletContext } from "react-router-dom";
-import { PaqueteContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
+import { PaqueteContext, RutaContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
 type Paquete = {
     codigo: string;
     direccion: string;
@@ -17,17 +17,17 @@ type Paquete = {
 
 
 const ArmadoRutasTab: React.FC = () => {
-    const { paquetesContext } = useOutletContext<{ paquetesContext: PaqueteContext[] | [] }>();
+    const { paquetesContext, rutasContext } = useOutletContext<{ paquetesContext: PaqueteContext[], rutasContext: Record<string, RutaContext> }>();
     const [paquetesNoAsignados, setPaquetesNoAsignados] = useState<Paquete[]>([]);
     const [paquetesParaAsignar, setPaquetesParaAsignar] = useState<Paquete[]>([]);
     const [noEncontrados, setNoEncontrados] = useState<string[]>([])
-
     const [filtroIzquierda, setFiltroIzquierda] = useState<string>("");
     const [filtroDerecha, setFiltroDerecha] = useState<string>("");
     const [tablaIzquierdaBouncing, setTablaIzquierdaBouncing] = useState(false)
     const [tablaDerechaBouncing, setTablaDerechaBouncing] = useState(false)
     const [isOpenModal, setIsOpenModal] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
+    const [cRuta, setCRuta] = useState({ creando: false, id: "", alias:"" }) 
     const isFirstRender = useRef(true);
 
     useEffect(() => {
@@ -46,8 +46,20 @@ const ArmadoRutasTab: React.FC = () => {
             });
         })
         setIsLoading(false);
-        setPaquetesNoAsignados(paquetes.filter((p) => !paquetesParaAsignar.includes(p)));
-    }, [paquetesContext]);
+        setPaquetesNoAsignados(paquetes.filter((p) => !paquetesParaAsignar.map((ppa) => ppa.codigo).includes(p.codigo)));
+        setPaquetesParaAsignar(paquetesParaAsignar.filter((ppa) => paquetes.map((p) => p.codigo).includes(ppa.codigo)))
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [paquetesContext, rutasContext]);
+    useEffect(() => {
+        if (cRuta.creando) {
+            if (rutasContext[cRuta.id]) {
+                const r = rutasContext[cRuta.id]
+                guardarRuta({rutaId:r.id, alias:r.alias})
+                setCRuta({ creando: false, id: "", alias:"" })
+            }
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [rutasContext, cRuta])
 
     const filtrarPaquetes = (paquetes: Paquete[], filtro: string): Paquete[] => {
         return paquetes.filter((p) =>
@@ -56,29 +68,29 @@ const ArmadoRutasTab: React.FC = () => {
             p.consultora.toString().toLowerCase().includes(filtro.toLowerCase())
         );
     };
-    const guardarRuta = async (rutaObjetivo: { rutaId: string | null, alias: string | null }): Promise<void> => {
-        if (rutaObjetivo.rutaId) {
+    const guardarRuta = async (rutaObjetivo: { rutaId: string | null, alias: string | null }) => {
+        if (!rutaObjetivo.rutaId) {
+            const a = rutaObjetivo.alias!.trim()
+            addDoc(collection(db, "Rutas"), {
+                activa: false,
+                alias: a.charAt(0).toUpperCase() + a.slice(1).toLowerCase(),
+                cargado: false,
+                completado: false,
+                en_reparto: false,
+                transportista: "",
+            }).then((r) => {
+                setCRuta({ creando: true, id: r.id, alias: a.charAt(0).toUpperCase() + a.slice(1).toLowerCase()})
+            })
+        } else {
             const batch = writeBatch(db);
             const rutaRef = doc(db, "Rutas", rutaObjetivo.rutaId)
-            batch.update(rutaRef, { "activa": true, "cargado": true, "completado": false , "en_reparto":false})
+            batch.update(rutaRef, { "activa": true, "cargado": true, "completado": false, "en_reparto": false })
             paquetesParaAsignar.forEach(paquete => {
                 const sfRef = doc(db, "Paquetes", paquete.codigo);
                 batch.update(sfRef, { "ruta": rutaObjetivo.rutaId });
             })
             batch.commit();
-            console.log("Guardada")
-        } else {
-            const nuevaRutaRef = await addDoc(collection(db, "Rutas"), {
-                activa: false,
-                alias: rutaObjetivo.alias,
-                cargado: false,
-                completado: false,
-                en_reparto: false,
-                no_entregado: [],
-                transportista: "",
-            });
-            console.log("Creada")
-            await guardarRuta({ rutaId: nuevaRutaRef.id, alias: rutaObjetivo.alias });
+            setPaquetesParaAsignar([])
         }
     }
 
@@ -130,6 +142,7 @@ const ArmadoRutasTab: React.FC = () => {
                 isOpen={isOpenModal}
                 onClose={() => { setIsOpenModal(false) }}
                 paquetes={[]}
+                rutas={rutasContext}
                 onConfirm={guardarRuta}
             />
             <h2>Armado de rutas</h2>

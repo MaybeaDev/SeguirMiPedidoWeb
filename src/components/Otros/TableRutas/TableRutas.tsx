@@ -161,8 +161,9 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
                 completado?: boolean,
             } = {}
             if (cambios[key].transportista != undefined) {
-                data.transportista = cambios[key].transportista
-                data.transportistaNombre = props.trabajadores.find((t) => t.id == cambios[key].transportista)?.nombre
+                data.transportista = cambios[key].transportista ?? ""
+                const transportistaNombre = props.trabajadores.find((t) => t.id == cambios[key].transportista)
+                data.transportistaNombre = transportistaNombre ? transportistaNombre.nombre : ""
             }
             if (cambios[key].estado != undefined) {
                 if (cambios[key].estado === 0) {   //Desactivada
@@ -249,10 +250,10 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
                             <td className={classes.td}>
                                 {parseInt(ruta.paquetes) ? (
                                     <Button
-                                    onClick={()=>{navigate(`/SeccionEmpresa/GestionDePaquetes/editarRutas/${ruta.id}`)}}>
+                                        onClick={() => { navigate(`/SeccionEmpresa/GestionDePaquetes/editarRutas/${ruta.id}`) }}>
                                         {ruta.paquetes}
                                     </Button>
-                                ) : (<p>{ruta.paquetes}</p>)}
+                                ) : (<p className={classes.p}>{ruta.paquetes}</p>)}
                             </td>
                             <td className={classes.td}>
                                 {ruta.estado != "" ? (

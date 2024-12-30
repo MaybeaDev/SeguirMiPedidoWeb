@@ -7,25 +7,25 @@ import { arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../../../firebaseConfig";
 import { useEffect, useState } from "react";
 import Table from "../../../../components/UI/Table/Table";
-import { PaqueteContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
+import { PaqueteContext, RutaContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
 
 
 const EditarRutaTab = () => {
-    const { paquetesContext } = useOutletContext<{ paquetesContext: PaqueteContext[] | [] }>();
+    const { paquetesContext, rutasContext } = useOutletContext<{ paquetesContext: PaqueteContext[], rutasContext : Record<string, RutaContext> }>();
     const [paquetes, setPaquetes] = useState<string[][]>([])
     const [ruta, setRuta] = useState("")
     const [searchQuery, setSearchQuery] = useState<string>("");
     const { rutaID } = useParams()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => { getPaquetes(rutaID!) }, [paquetesContext])
+    useEffect(() => { getPaquetes(rutaID!);console.log("datos actualizados") }, [paquetesContext])
 
-    const getPaquetes = async (id: string) => {
+    const getPaquetes = (id: string) => {
         const filtrados = paquetesContext.filter((p) => {
             return p.ruta == id && ![0, 3].includes(p.estado)
         })
         const paq: string[][] = []
-        setRuta(filtrados[0].rutaAlias)
+        setRuta(rutasContext[rutaID!] ? rutasContext[rutaID!].alias : "Ruta no encontrada")
         filtrados.forEach((p) => {
             paq.push(
                 [
