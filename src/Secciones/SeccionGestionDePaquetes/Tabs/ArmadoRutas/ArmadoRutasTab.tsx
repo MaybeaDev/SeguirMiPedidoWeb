@@ -27,7 +27,6 @@ const ArmadoRutasTab: React.FC = () => {
     const [tablaDerechaBouncing, setTablaDerechaBouncing] = useState(false)
     const [isOpenModal, setIsOpenModal] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
-    const [cRuta, setCRuta] = useState({ creando: false, id: "", alias:"" }) 
     const isFirstRender = useRef(true);
 
     useEffect(() => {
@@ -49,17 +48,7 @@ const ArmadoRutasTab: React.FC = () => {
         setPaquetesNoAsignados(paquetes.filter((p) => !paquetesParaAsignar.map((ppa) => ppa.codigo).includes(p.codigo)));
         setPaquetesParaAsignar(paquetesParaAsignar.filter((ppa) => paquetes.map((p) => p.codigo).includes(ppa.codigo)))
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [paquetesContext, rutasContext]);
-    useEffect(() => {
-        if (cRuta.creando) {
-            if (rutasContext[cRuta.id]) {
-                const r = rutasContext[cRuta.id]
-                guardarRuta({rutaId:r.id, alias:r.alias})
-                setCRuta({ creando: false, id: "", alias:"" })
-            }
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [rutasContext, cRuta])
+    }, [paquetesContext]);
 
     const filtrarPaquetes = (paquetes: Paquete[], filtro: string): Paquete[] => {
         return paquetes.filter((p) =>
@@ -79,7 +68,7 @@ const ArmadoRutasTab: React.FC = () => {
                 en_reparto: false,
                 transportista: "",
             }).then((r) => {
-                setCRuta({ creando: true, id: r.id, alias: a.charAt(0).toUpperCase() + a.slice(1).toLowerCase()})
+                guardarRuta({rutaId: r.id, alias: a.charAt(0).toUpperCase() + a.slice(1).toLowerCase()})
             })
         } else {
             const batch = writeBatch(db);
@@ -90,7 +79,6 @@ const ArmadoRutasTab: React.FC = () => {
                 batch.update(sfRef, { "ruta": rutaObjetivo.rutaId });
             })
             batch.commit();
-            setPaquetesParaAsignar([])
         }
     }
 

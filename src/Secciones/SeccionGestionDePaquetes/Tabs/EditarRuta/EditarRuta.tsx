@@ -34,21 +34,17 @@ const EditarRutaTab = () => {
                     p.contacto,
                     (() => {
                         switch (p.estado) {
-                            case 0:
-                                return "Enviado desde Santiago"
                             case 1:
                                 return "En Bodega";
                             case 2:
                                 return "En Reparto";
-                            case 3:
-                                return "Entregado";
                             case 4:
                                 return "Entrega fallida";
                             default:
                                 return "En Proceso";
                         }
                     })(),
-                    p.transportistaNombre
+                    p.direccion
                 ]
             )
         })
@@ -117,7 +113,8 @@ const EditarRutaTab = () => {
     };
     return (
         <div className={classes.root}>
-            <h1>{ruta}</h1>
+            <h1>{ruta == "" ? "Identificando ruta..." : ruta}</h1>
+            <h3>{rutasContext[rutaID!]?.transportistaNombre}</h3>
             <input
                 type="text"
                 placeholder="Buscar en los resultados..."
@@ -129,7 +126,7 @@ const EditarRutaTab = () => {
                 "Consultora",
                 "Telefono",
                 "Estado",
-                "Transportista",
+                "Direccion",
                 "Opciones"
             ]}
                 searchTerms={searchQuery.split(";").map((term) => normalizeString(term))}

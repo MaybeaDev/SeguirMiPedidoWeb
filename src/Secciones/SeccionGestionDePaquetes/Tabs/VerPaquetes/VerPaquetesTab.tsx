@@ -3,7 +3,7 @@ import classes from "./VerPaquetesTab.module.css"
 import { useEffect, useRef, useState } from "react";
 import Table from "../../../../components/UI/Table/Table";
 import { useOutletContext } from "react-router-dom";
-import { PaqueteContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
+import { PaqueteContext, RutaContext, TransportistaContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
 function formatDate(date: Date) {
     const day = String(date.getDate()).padStart(2, '0'); // Asegura que el día tiene 2 dígitos
     const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses van de 0 (enero) a 11 (diciembre), por eso sumamos 1
@@ -17,7 +17,7 @@ function formatDate(date: Date) {
 }
 
 const VerPaquetesTab = () => {
-    const { paquetesContext } = useOutletContext<{ paquetesContext: PaqueteContext[] | [] }>();
+    const { paquetesContext, rutasContext, transportistasContext } = useOutletContext<{ paquetesContext: PaqueteContext[], rutasContext: Record<string, RutaContext>, transportistasContext: Record<string, TransportistaContext> }>();
     const [paquetes, setPaquetes] = useState<string[][]>([]);
     const [tableData, setTableData] = useState<string[][]>([]);
     const [isLoading, setIsLoading] = useState(true)
@@ -38,42 +38,48 @@ const VerPaquetesTab = () => {
         }, 2000)
         getPaquetes()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [paquetesContext])
+    }, [paquetesContext, rutasContext, transportistasContext])
 
     const getPaquetes = () => {
-        console.log(paquetesContext[1])
         const paq = [...paquetesContext]
         paq.sort((a, b) => b.id.localeCompare(a.id));
         paq.sort((a, b) => b.historial[b.historial.length - 1].fecha.toDate().getTime() - a.historial[a.historial.length - 1].fecha.toDate().getTime());
-        const paquetesMapeados = paq.map((p) => [
-            p.campaña,
-            p.id,
-            p.consultora,
-            (() => {
-                switch (p.estado) {
-                    case 0:
-                        return "Enviado desde Santiago"
-                    case 1:
-                        return "En Bodega";
-                    case 2:
-                        return "En Reparto";
-                    case 3:
-                        return "Entregado";
-                    case 4:
-                        return "Entrega fallida";
-                    default:
-                        return "En Proceso";
-                }
-            })(),
-            formatDate(p.historial[p.historial.length - 1].fecha.toDate()),
-            p.receptor,
-            p.contacto,
-            p.direccion,
-            p.referencia,
-            p.rutaAlias,
-            p.transportistaNombre
+        const paquetesMapeados = paq.map((p) => {
+            const ruta = rutasContext[p.ruta]
+            const r = p.rutaAlias
+            const t = p.transportistaNombre
+            const paquete = [
+                p.campaña ?? "No disponible",
+                p.id,
+                p.consultora,
+                (() => {
+                    switch (p.estado) {
+                        case 0:
+                            return "Enviado desde Santiago"
+                        case 1:
+                            return "En Bodega";
+                        case 2:
+                            return "En Reparto";
+                        case 3:
+                            return "Entregado";
+                        case 4:
+                            return "Entrega fallida";
+                        default:
+                            return "En Proceso";
+                    }
+                })(),
+                formatDate(p.historial[p.historial.length - 1].fecha.toDate()),
+                p.receptor,
+                p.contacto ?? "No disponible",
+                p.direccion,
+                p.referencia ?? "No disponible",
+                r ? r : (ruta != undefined ? ruta.alias : ""),
+                t ? t : (ruta != undefined ? ruta.transportistaNombre : "")
 
-        ])
+            ]
+            console.log(paquete)
+            return paquete
+        })
         setIsLoading(false);
         setPaquetes(paquetesMapeados);
         filtrarTabla(searchQuery, paquetesMapeados)
@@ -85,12 +91,12 @@ const VerPaquetesTab = () => {
         setSearchQuery(query);
         filtrarTabla(query)
     };
-    const filtrarTabla = (query : string, paq?:string[][]) => {
+    const filtrarTabla = (query: string, paq?: string[][]) => {
         const searchTerms = query
             .split(";") // Divide por punto y coma
             .map((term) => normalizeString(term)) // Normaliza cada término
             .filter((term) => term.length > 0); // Elimina términos vacíos
-        
+
         const filteredData = paq ? paq.filter((paquete) =>
             searchTerms.every((term) =>
                 paquete.some((field) =>

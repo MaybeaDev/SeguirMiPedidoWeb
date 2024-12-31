@@ -6,9 +6,11 @@ import Button from "../../../../components/UI/Button/Button";
 import * as XLSX from "xlsx";
 import FileDropzone from "../../../../components/UI/DropZone/FileDropZone";
 import Table from "../../../../components/UI/Table/Table";
-import { collection, doc, getDoc, getDocs, query, Timestamp, where, writeBatch } from "firebase/firestore";
+import { doc, getDoc, Timestamp, writeBatch } from "firebase/firestore";
 import { db } from "../../../../firebaseConfig";
 import { obtenerCoordenadas } from "../../../../mapbox";
+import { PaqueteContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
+import { useOutletContext } from "react-router-dom";
 
 interface Paquete {
     codigo: string,
@@ -22,6 +24,7 @@ interface Paquete {
 }
 
 const IngresarFacturacionTab = () => {
+    const { paquetesContext } = useOutletContext<{ paquetesContext: PaqueteContext[] }>();
 
     const [errorFile, setErrorFile] = useState<string | null>(null)
     const [data, setData] = useState<Paquete[]>([]);
@@ -155,36 +158,20 @@ const IngresarFacturacionTab = () => {
     const handleConfirmarCarga = async () => {
         setLoadingState(true)
         const idsToCheck = data.map((item) => String(item.codigo));
-        obtenerDocumentosExistentes(idsToCheck).then((existingIds) => {
-            if (idsToCheck.length == existingIds.size) {
-                alert("Los codigos de la ultima facturación ya han sido ingresados, se abortará la operacion")
-                return
-            } else if (existingIds.size > 0) {
-                alert(`Los siguientes códigos ya existen en la base de datos por lo que se abortará la operación: ${[...existingIds].join(", ")}`);
-                setLoadingState(false)
-                return;
-            }
-            guardarEnFirebase(data).finally(() => setLoadingState(false))
-        });
+        const encontrados = obtenerDocumentosExistentes(idsToCheck)
+        if (idsToCheck.length == encontrados.length) {
+            alert("Los codigos de la ultima facturación ya han sido ingresados, se abortará la operacion")
+        } else if (encontrados.length > 0) {
+            alert(`Los siguientes códigos ya existen en la base de datos por lo que se abortará la operación: ${[...encontrados].join(", ")}`);
+        } else {
+            // console.log("Ahora se guardaría")
+            await guardarEnFirebase(data)
+        }
+        setLoadingState(false)
     }
-    const obtenerDocumentosExistentes = async (ids: string[]): Promise<Set<string>> => {
-        const chunks = dividirEnChunks(ids, 30); // Firestore permite hasta 10 valores en 'whereIn'
-        const existingIds = new Set<string>();
-        for (const chunk of chunks) {
-            const q = query(collection(db, "Paquetes"), where("__name__", "in", chunk));
-            const snapshot = await getDocs(q);
-            snapshot.forEach((doc) => {
-                existingIds.add(doc.id);
-            });
-        }
-        return existingIds;
-    };
-    const dividirEnChunks = (array: string[], size: number): string[][] => {
-        const chunks = [];
-        for (let i = 0; i < array.length; i += size) {
-            chunks.push(array.slice(i, i + size));
-        }
-        return chunks;
+    const obtenerDocumentosExistentes = (ids: string[]): string[] => {
+        const encontrados = paquetesContext.filter(p => ids.includes(p.id))
+        return encontrados.map(p => p.id)
     };
     const ingresarData = (data: Paquete[]) => {
         if (data.length > 0) {
@@ -218,7 +205,7 @@ const IngresarFacturacionTab = () => {
                         {errorFile ? <FileDropzone onFileSelect={handleFileSelect} errorString={`${errorFile}`} />
                             : <FileDropzone onFileSelect={handleFileSelect} />}
                         <br />
-                        <Button style={{ width: "60%" }} disabled={data.length ? false : true} onClick={handleConfirmarCarga}>Confirmar carga</Button>
+                        <Button style={{ width: "60%" }} disabled={data.length ?  (paquetesContext.length ? false : true) : true} onClick={handleConfirmarCarga}>Confirmar carga</Button>
                     </center>
                 </div>
                 <div className={classes.rightContent}>

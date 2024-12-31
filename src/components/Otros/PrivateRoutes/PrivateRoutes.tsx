@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
-import { collection, DocumentData, onSnapshot, query, QueryDocumentSnapshot, Timestamp, where } from 'firebase/firestore';
+import { collection, onSnapshot, query, Timestamp, where } from 'firebase/firestore';
 import { db } from '../../../firebaseConfig';
 export interface RutaContext {
     id: string;
@@ -37,7 +37,6 @@ export interface PaqueteContext {
     referencia: string;
     ruta: string;
     rutaAlias: string;
-    transportista: string
     transportistaNombre: string
 }
 const PrivateRoute: React.FC = () => {
@@ -54,29 +53,33 @@ const PrivateRoute: React.FC = () => {
             setLoading(false);
         });
         getTransportistas()
+        getRutas()
+        getPaquetes()
         return () => unsubscribe();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => { getRutas() }, [transportistasContext])
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => { if (Object.keys(rutasContext).length != 0 && paquetesContext.length == 0) { getPaquetes() } }, [rutasContext])
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => { setPaquetes(paquetesContext.map(p => buscarTransportista(p))); console.log("Cambios en transportistasContext") }, [transportistasContext])
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => { setPaquetes(paquetesContext.map(p => buscarRuta(p))); console.log("Cambios en rutasContext") }, [rutasContext])
-
 
     const getPaquetes = () => {
         const q = query(collection(db, "Paquetes"));
         onSnapshot(q, async (querySnapshot) => {
             const paq: PaqueteContext[] = [];
             querySnapshot.forEach((doc) => {
-                const paquete = buscarRutaYTransportista(doc)
-                if (paquete != undefined) {
-                    paq.push(paquete)
+                const paquete:PaqueteContext = {
+                    id: doc.id,
+                    campaña: doc.data().campania ?? null,
+                    consultora: doc.data().consultora ?? null,
+                    contacto: doc.data().contacto ?? null,
+                    direccion: doc.data().direccion ?? null,
+                    estado: doc.data().estado ?? null,
+                    facturacion: doc.data().facturacion ?? null,
+                    historial: doc.data().historial ?? null,
+                    receptor: doc.data().receptor ?? null,
+                    referencia: doc.data().referencia ?? null,
+                    ruta: doc.data().ruta ?? null,
+                    rutaAlias: doc.data().rutaAlias ?? null,
+                    transportistaNombre: doc.data().transportistaNombre ?? null
                 }
+                paq.push(paquete)
             })
             console.log("Paquetes cambiados")
             paq.sort((a, b) => b.id.localeCompare(a.id));
@@ -132,80 +135,6 @@ const PrivateRoute: React.FC = () => {
             })
             setTransportistas(transportistas)
         })
-    }
-
-    const buscarTransportista = (paquete: PaqueteContext) => {
-        paquete.transportistaNombre = capitalize(paquete.transportistaNombre)
-        const transportista = transportistasContext[paquete.transportista]
-        if (transportista) {
-            if (paquete.transportistaNombre == "") {
-                paquete.transportistaNombre = capitalize(transportista.nombre)
-            }
-        }
-        return paquete;
-    }
-    const buscarRuta = (paquete: PaqueteContext) => {
-        if (paquete.ruta != "") {
-            const r = rutasContext[paquete.ruta]
-            if (r) {
-                if (paquete.rutaAlias == "") {
-                    const alias = r.alias.trim()
-                    paquete.rutaAlias = alias.charAt(0).toUpperCase() + alias.slice(1).toLowerCase()
-                } else {
-                    paquete.rutaAlias = paquete.rutaAlias.charAt(0).toUpperCase() + paquete.rutaAlias.slice(1).toLowerCase()
-                }
-                if (paquete.transportista == "") {
-                    paquete.transportista = r.transportista
-                    paquete.transportistaNombre = capitalize(r.transportistaNombre)
-                }
-            }
-        }
-        return paquete;
-    }
-    const buscarRutaYTransportista = (doc: QueryDocumentSnapshot<DocumentData, DocumentData>): PaqueteContext | undefined => {
-        if (doc.data() !== undefined) {
-            const paquete: PaqueteContext = {
-                id: doc.id,
-                campaña: doc.data().campania ?? "",
-                consultora: doc.data().consultora ?? "",
-                contacto: doc.data().contacto ?? "",
-                direccion: doc.data().direccion ?? "",
-                estado: doc.data().estado,
-                facturacion: doc.data().facturacion ?? "",
-                historial: doc.data().historial ?? [],
-                receptor: doc.data().receptor ?? "",
-                referencia: doc.data()!.referencia ?? doc.data()!.ciudad ?? "",
-
-                ruta: doc.data().ruta ?? "",
-                rutaAlias: doc.data().rutaAlias ?? "",
-                transportista: doc.data().transportista ?? "",
-                transportistaNombre: doc.data().transportistaNombre ?? ""
-            }
-            if (paquete.transportistaNombre != "") paquete.transportistaNombre = capitalize(paquete.transportistaNombre)
-
-            if (paquete.transportista != "" && paquete.transportistaNombre == "") {
-                const transportista = transportistasContext[paquete.transportista] ?? null
-                if (transportista != null) {
-                    paquete.transportistaNombre = capitalize(transportista.nombre)
-                } else {
-                    paquete.transportistaNombre = capitalize(paquete.transportista)
-                }
-            }
-            if (paquete.ruta != "") {
-                const r = rutasContext[paquete.ruta]
-                if (paquete.rutaAlias == "" && r) {
-                    const alias = r.alias.trim()
-                    paquete.rutaAlias = alias.charAt(0).toUpperCase() + alias.slice(1).toLowerCase()
-                } else {
-                    paquete.rutaAlias = paquete.rutaAlias.charAt(0).toUpperCase() + paquete.rutaAlias.slice(1).toLowerCase()
-                }
-                if (paquete.transportista == "" && r) {
-                    paquete.transportista = r.transportista
-                    paquete.transportistaNombre = capitalize(r.transportistaNombre)
-                }
-            }
-            return paquete
-        }
     }
     function capitalize(str: string): string {
         return str
