@@ -68,20 +68,22 @@ const ArmadoRutasTab: React.FC = () => {
                 en_reparto: false,
                 transportista: "",
             }).then((r) => {
-                guardarRuta({rutaId: r.id, alias: a.charAt(0).toUpperCase() + a.slice(1).toLowerCase()})
+                guardarRuta({ rutaId: r.id, alias: a.charAt(0).toUpperCase() + a.slice(1).toLowerCase() })
             })
         } else {
             const batch = writeBatch(db);
             const rutaRef = doc(db, "Rutas", rutaObjetivo.rutaId)
-            batch.update(rutaRef, { "activa": true, "cargado": true, "completado": false})
-            if (rutasContext[rutaObjetivo.rutaId]?.enReparto){
+            batch.update(rutaRef, { "activa": true, "cargado": true, "completado": false })
+            if (rutasContext[rutaObjetivo.rutaId]?.enReparto) {
                 paquetesParaAsignar.forEach(paquete => {
                     const sfRef = doc(db, "Paquetes", paquete.codigo);
-                    batch.update(sfRef, { "ruta": rutaObjetivo.rutaId, "estado":3, historial:arrayUnion({
-                        fecha: new Date(),
-                        estado: 3,
-                        detalles: "Tu pedido está en reparto"
-                    }) });
+                    batch.update(sfRef, {
+                        "ruta": rutaObjetivo.rutaId, "estado": 2, historial: arrayUnion({
+                            fecha: new Date(),
+                            estado: 2,
+                            detalles: "Tu pedido está en reparto"
+                        })
+                    });
                 })
             } else {
                 paquetesParaAsignar.forEach(paquete => {
