@@ -124,8 +124,8 @@ const VerPaquetesTab = () => {
     };
     const handleVerCodigosDeBarra = () => {
         const codes = [...tableData.slice(0,500).map(d => d[1])];
-        const encodedCodes = encodeURIComponent(JSON.stringify(codes));
-        window.open(`/barcode-page/${encodedCodes}`, "_blank");
+        sessionStorage.setItem("codesBarcodes", JSON.stringify(codes))
+        window.open(`/barcode-page`, "_blank");
     };
 
     return (

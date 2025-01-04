@@ -1,9 +1,8 @@
 import JsBarcode from 'jsbarcode';
-import { useParams } from 'react-router-dom';
 import Table from '../../components/UI/Table/Table';
 
 const BarcodePage = () => {
-  const { codes } = useParams()
+  const codes = sessionStorage.getItem("codesBarcodes")
   const generateBarcode = (text: string): string => {
     const canvas = document.createElement("canvas");
     JsBarcode(canvas, text, { format: "CODE128" });

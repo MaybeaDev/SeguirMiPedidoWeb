@@ -27,7 +27,7 @@ function App() {
       <Navbar />
       <Content>
         <Routes>
-          <Route path="/barcode-page/:codes" element={<BarcodePage />} />
+          <Route path="/barcode-page" element={<BarcodePage />} />
           <Route path="/login" element={<SeccionLogin />} />
           <Route path="/:id" element={<Index />} /> 
           <Route path="/" element={<Index />} /> 
