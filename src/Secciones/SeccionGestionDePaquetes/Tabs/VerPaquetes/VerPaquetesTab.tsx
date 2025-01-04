@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Table from "../../../../components/UI/Table/Table";
 import { useOutletContext } from "react-router-dom";
 import { PaqueteContext, RutaContext, TransportistaContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
+import Button from "../../../../components/UI/Button/Button";
 function formatDate(date: Date) {
     const day = String(date.getDate()).padStart(2, '0'); // Asegura que el día tiene 2 dígitos
     const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses van de 0 (enero) a 11 (diciembre), por eso sumamos 1
@@ -77,7 +78,6 @@ const VerPaquetesTab = () => {
                 t ? t : (ruta != undefined ? ruta.transportistaNombre : "")
 
             ]
-            console.log(paquete)
             return paquete
         })
         setIsLoading(false);
@@ -122,6 +122,11 @@ const VerPaquetesTab = () => {
             .trim() // Elimina espacios al inicio y final
             .toLowerCase(); // Convierte a minúsculas
     };
+    const handleVerCodigosDeBarra = () => {
+        const codes = [...tableData.slice(0,500).map(d => d[1])];
+        const encodedCodes = encodeURIComponent(JSON.stringify(codes));
+        window.open(`/barcode-page/${encodedCodes}`, "_blank");
+    };
 
     return (
         <>
@@ -133,10 +138,15 @@ const VerPaquetesTab = () => {
                 onChange={handleSearch}
             />
             {tableData.length > 300 ? (
-                <h3>{`Mostrando los primeros 300 de ${tableData.length} resultados`}</h3>
-
+                <div style={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "center" }}>
+                    <h3 style={{ marginRight: "10px" }}>{`Mostrando los primeros 300 de ${tableData.length} resultados`}</h3>
+                    <Button onClick={handleVerCodigosDeBarra}>Ver codigos de barra (Maximo 500)</Button>
+                </div>
             ) : (
-                <h3>{`Mostrando ${tableData.length} resultados`}</h3>
+                <div style={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "center" }}>
+                    <h3>{`Mostrando ${tableData.length} resultados`}</h3>
+                    <Button onClick={handleVerCodigosDeBarra}>Ver codigos de barra (Maximo 500)</Button>
+                </div>
             )}
 
             {isLoading ? (

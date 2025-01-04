@@ -36,13 +36,15 @@ const Table = (props: { data: string[][], headers: string[], searchTerms?: strin
         return { highlightedText, hasMatch };
     };
 
-    // Filtrar las filas que contienen coincidencias
-    const filteredData = data.filter((row) =>
-        row.some((value) => {
-            const { hasMatch } = highlightMatches(value, props.searchTerms || []);
-            return hasMatch;
-        })
-    );
+    let filteredData = data
+    if (props.searchTerms) {
+        filteredData = data.filter((row) =>
+            row.some((value) => {
+                const { hasMatch } = highlightMatches(value, props.searchTerms || []);
+                return hasMatch;
+            })
+        );
+    }
 
     return (
         <table width="100%" className={classes.table}>
