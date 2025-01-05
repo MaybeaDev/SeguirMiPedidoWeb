@@ -238,16 +238,16 @@ const IngresarFacturacionTab = () => {
                                 p.campaña,
                                 p.codigo,
                                 p.consultora,
-                                p.nombreConsultora,
+                                p.facturacion,
                                 p.telefono,
                                 p.direccion,
                             ]
                         ))} headers={
                             [
-                                "Campaña",
+                                `Campaña (${data.length})`,
                                 "Codigo",
                                 "Consultora",
-                                "Nombre Cons.",
+                                "Facturacion",
                                 "Telefono",
                                 "Direccion",
                             ]
