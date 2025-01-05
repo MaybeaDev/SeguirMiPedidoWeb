@@ -156,7 +156,7 @@ const IngresarFacturacionTab = () => {
             batch.set(docRef, object);
         }
         Object.keys(premios).forEach((k) => {
-            batch.set(doc(db, "Premios", k), premios[k])
+            batch.set(doc(db, "Premios", k), {premios:premios[k], transportista:""})
         })
         const docRef = doc(db, "metadatos/campanias");
         const campañasMetadata = await getDoc(docRef);

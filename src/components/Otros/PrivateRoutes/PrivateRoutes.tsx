@@ -42,7 +42,7 @@ export interface PaqueteContext {
 const PrivateRoute: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-    const [premiosContext, setPremiosContext] = useState<Record<string, Record<string, number>>>({});
+    const [premiosContext, setPremiosContext] = useState<Record<string, {premios:Record<string, number>, transportista:string}>>({});
     const [paquetesContext, setPaquetes] = useState<PaqueteContext[]>([]);
     const [rutasContext, setRutas] = useState<Record<string, RutaContext>>({});
     const [transportistasContext, setTransportistas] = useState<Record<string, TransportistaContext>>({});
@@ -94,9 +94,9 @@ const PrivateRoute: React.FC = () => {
     const getPremios = () => {
         const q = query(collection(db, "Premios"));
         onSnapshot(q, (querySnapshot) => {
-            const premios: Record<string, Record<string, number>> = {}
+            const premios: Record<string, {premios:Record<string, number>, transportista:string}> = {}
             querySnapshot.forEach((doc) => {
-                premios[doc.id] = doc.data()
+                premios[doc.id] = {premios: doc.data().premios, transportista: doc.data().transportista}
             })
             setPremiosContext(premios)
         })

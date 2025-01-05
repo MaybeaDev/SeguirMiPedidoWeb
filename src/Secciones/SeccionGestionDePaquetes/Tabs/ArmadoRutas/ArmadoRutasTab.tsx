@@ -19,7 +19,7 @@ type Paquete = {
 
 
 const ArmadoRutasTab: React.FC = () => {
-    const { paquetesContext, rutasContext, premiosContext } = useOutletContext<{ paquetesContext: PaqueteContext[], rutasContext: Record<string, RutaContext>, premiosContext: Record<string, Record<string, number>> }>();
+    const { paquetesContext, rutasContext, premiosContext } = useOutletContext<{ paquetesContext: PaqueteContext[], rutasContext: Record<string, RutaContext>, premiosContext: Record<string, {premios:Record<string, number>, transportista:string}> }>();
     const [paquetesNoAsignados, setPaquetesNoAsignados] = useState<Paquete[]>([]);
     const [paquetesParaAsignar, setPaquetesParaAsignar] = useState<Paquete[]>([]);
     const [noEncontrados, setNoEncontrados] = useState<string[]>([])
@@ -98,7 +98,7 @@ const ArmadoRutasTab: React.FC = () => {
         const premios: Record<string, number> = {};
         const pedidos = [...new Set(paquetesParaAsignar.map((p) => p.codigo.slice(0, 10)))];
         pedidos.forEach((codigo) => {
-            const premio = premiosContext[codigo];
+            const premio = premiosContext[codigo].premios;
             if (!premio) return;
             Object.entries(premio).forEach(([nombrePremio, cantidad]) => {
                 premios[nombrePremio] = (premios[nombrePremio] || 0) + cantidad;
