@@ -16,11 +16,11 @@ interface Paquete {
     codigo: string,
     consultora: string,
     nombreConsultora: string,
-    facturacion:string,
+    facturacion: string,
     direccion: string,
     referencia: string,
     telefono: string,
-    campaña: string
+    campaña: string,
 }
 
 const IngresarFacturacionTab = () => {
@@ -28,6 +28,7 @@ const IngresarFacturacionTab = () => {
 
     const [errorFile, setErrorFile] = useState<string | null>(null)
     const [data, setData] = useState<Paquete[]>([]);
+    const [premios, setPremios] = useState<Record<string, Record<string, number>>>({});
     const [isLoading, setIsLoading] = useState(false)
     const [inputValue, setInputValue] = useState("")
     const [loadingState, setLoadingState] = useState(false)
@@ -52,32 +53,48 @@ const IngresarFacturacionTab = () => {
                 const worksheet = workbook.Sheets[ultimaFacturacion];
                 const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as string[][];
                 setIsLoading(false);
-                const parsedHeaders = data.map((row) => ([row[0] as string, row[15] as string, row[9] as string, row[10] as string, row[11] as string, row[12] as string, row[26] as string]))
+                const parsedHeaders = data.map((row) => ([row[0] as string, row[15] as string, row[9] as string, row[10] as string, row[11] as string, row[12] as string, row[26] as string, row[17] as string, row[18] as string]))
                 const comienzoTabla = parsedHeaders.findIndex((headers) => {
-                    if (JSON.stringify(headers) === JSON.stringify(["PEDIDO", "CAJAS", "CONSULTORA", "NOMBRE CONSULTORA", "DIRECCION", "TELEFONO", "CAMPAÑA FACTURACION"])) {
+                    if (JSON.stringify(headers) === JSON.stringify(["PEDIDO", "CAJAS", "CONSULTORA", "NOMBRE CONSULTORA", "DIRECCION", "TELEFONO", "CAMPAÑA FACTURACION", "NOMBRE AFP", "CANTIDAD"])) {
                         return true
                     }
                 })
                 if (comienzoTabla >= 0) {
-                    const parsedData = data.slice(comienzoTabla + 1).map((row) => ({
-                        codigo: row[0].toString().trim() || "",
-                        cajas: row[15] ? parseInt(row[15]) : 0,
-                        consultora: row[9].toString().trim() || "",
-                        nombreConsultora: row[10].toString().trim() || "",
-                        facturacion:ultimaFacturacion + "-" + new Date().getFullYear().toString(),
-                        direccion: row[11].toString().trim() || "",
-                        telefono: row[12].toString().trim() || "",
-                        campaña: row[26].toString().trim() || "",
-                    }));
+                    console.log(data.slice(comienzoTabla + 1).length)
+                    const parsedData = data.slice(comienzoTabla + 1).map((row) => {
+                        console.log(row)
+                        return {
+                            codigo: row[0] ? row[0].toString().trim() : "",
+                            cajas: row[15] ? parseInt(row[15]) : 0,
+                            consultora: row[9].toString().trim() || "",
+                            nombreConsultora: row[10].toString().trim() || "",
+                            facturacion: ultimaFacturacion + "-" + new Date().getFullYear().toString(),
+                            direccion: row[11].toString().trim() || "",
+                            telefono: row[12].toString().trim() || "",
+                            campaña: row[26].toString().trim() || "",
+                            nombreAFP: row[17].toString().trim() || "",
+                            cantidadAFP: row[18].toString().trim() || "",
+                        }
+                    });
 
                     // Filtrar las filas que tienen un "codigo" vacío o null
-                    const validData = parsedData.filter(item => item.codigo && String(item.codigo).trim() !== "" && item.cajas > 0);
+                    const validData = parsedData.filter(item => item.codigo != "" && String(item.codigo).trim() !== "");
                     setIsLoading(false);
                     console.log(validData);
                     const fullData: Paquete[] = []
+                    const premios: Record<string, Record<string, number>> = {}
                     validData.forEach((pedido) => {
+                        if (pedido.nombreAFP != "") {
+                            console.log(parseInt(pedido.cantidadAFP))
+                            if (!premios[pedido.codigo]) {
+                                premios[pedido.codigo] = {}
+                            }
+                            if (!premios[pedido.codigo][pedido.nombreAFP]) {
+                                premios[pedido.codigo][pedido.nombreAFP] = 0
+                            }
+                            premios[pedido.codigo][pedido.nombreAFP] += parseInt(pedido.cantidadAFP)
+                        }
                         for (let i = 1; i <= pedido.cajas; i++) {
-
                             const direccion = pedido.direccion.split("REFERENCIA")[0] ?? pedido.direccion;
                             const referencia = pedido.direccion.split("REFERENCIA")[1] ?? "";
                             fullData.push({
@@ -85,14 +102,14 @@ const IngresarFacturacionTab = () => {
                                 consultora: pedido.consultora,
                                 nombreConsultora: pedido.nombreConsultora,
                                 direccion: direccion,
-                                facturacion:pedido.facturacion,
+                                facturacion: pedido.facturacion,
                                 referencia: referencia,
                                 telefono: pedido.telefono,
                                 campaña: pedido.campaña,
                             })
                         }
                     })
-                    console.log(fullData.map((p) => p.codigo))
+                    setPremios(premios)
                     ingresarData(fullData);
                 } else {
                     setErrorFile("La plantilla no es la correcta. Descarga la plantilla con el botón superior");
@@ -138,6 +155,9 @@ const IngresarFacturacionTab = () => {
             };
             batch.set(docRef, object);
         }
+        Object.keys(premios).forEach((k) => {
+            batch.set(doc(db, "Premios", k), premios[k])
+        })
         const docRef = doc(db, "metadatos/campanias");
         const campañasMetadata = await getDoc(docRef);
         const campañasList = new Set(campañasMetadata.data()!.campañas);
@@ -206,7 +226,7 @@ const IngresarFacturacionTab = () => {
                         {errorFile ? <FileDropzone onFileSelect={handleFileSelect} errorString={`${errorFile}`} />
                             : <FileDropzone onFileSelect={handleFileSelect} />}
                         <br />
-                        <Button style={{ width: "60%" }} disabled={data.length ?  (paquetesContext.length ? false : true) : true} onClick={handleConfirmarCarga}>Confirmar carga</Button>
+                        <Button style={{ width: "60%" }} disabled={data.length ? (paquetesContext.length ? false : true) : true} onClick={handleConfirmarCarga}>Confirmar carga</Button>
                     </center>
                 </div>
                 <div className={classes.rightContent}>

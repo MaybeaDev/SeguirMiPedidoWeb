@@ -8,10 +8,10 @@ const ModalRutas = (props: {
     onClose: () => void;
     paquetes: { codigo: string }[];
     onConfirm: (ruta: { rutaId: string | null, alias: string | null }) => void;
-    rutas : Record<string, RutaContext>
+    rutas: Record<string, RutaContext>
 }) => {
     const [rutas, setRutas] = useState<{ id: string, alias: string }[]>([])
-    const [isNuevaRuta, setNuevaRuta] = useState<boolean>(true)
+    const [isNuevaRuta, setNuevaRuta] = useState(true)
     const [inputValue, setInputValue] = useState("")
     const [validInput, setValidInput] = useState(false)
     const [ruta, setRuta] = useState<{ rutaId: string | null, alias: string | null }>({ rutaId: null, alias: null })
@@ -19,8 +19,8 @@ const ModalRutas = (props: {
     const getRutas = async (): Promise<void> => {
         const rutas = Object.values(props.rutas).map((r) => {
             return {
-                id:r.id,
-                alias:r.alias
+                id: r.id,
+                alias: r.alias
             }
         })
         setRutas(rutas);
@@ -28,7 +28,7 @@ const ModalRutas = (props: {
 
     useEffect(() => {
         getRutas();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.rutas]);
 
 
@@ -36,6 +36,10 @@ const ModalRutas = (props: {
         if (validInput) {
             props.onConfirm(ruta)
             props.onClose(); // Cierra el modal
+            setNuevaRuta(true)
+            setInputValue("")
+            setValidInput(false)
+            setRuta({ rutaId: null, alias: null })
         }
     };
     const handleOnChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -45,7 +49,7 @@ const ModalRutas = (props: {
             setRuta({ rutaId: null, alias: "" })
             setValidInput(false);
         } else {
-            setRuta({ rutaId: event.target.value, alias: null })
+            setRuta({ rutaId: event.target.value, alias: rutas.find((r) => r.id == event.target.value)!.alias })
             setValidInput(true)
             setNuevaRuta(false);
         }
@@ -77,7 +81,7 @@ const ModalRutas = (props: {
                 </select>
                 {isNuevaRuta &&
                     <>
-                        <input type="text" value={inputValue} onInput={handleInput} placeholder="Asigna un nombre autodescriptivo..."/>
+                        <input type="text" value={inputValue} onInput={handleInput} placeholder="Asigna un nombre autodescriptivo..." />
                     </>
                 }
                 <button disabled={!validInput} className={validInput ? classes.confirmButton : classes.confirmButtonDanger} onClick={handleConfirmar}>

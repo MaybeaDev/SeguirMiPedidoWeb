@@ -9,6 +9,8 @@ import ModalRutas from "../../../../components/Layout/ModalRutas/ModalRutas";
 import classes from "./ArmadoRutasTab.module.css";
 import { useOutletContext } from "react-router-dom";
 import { PaqueteContext, RutaContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
+import ModalPremios from "../../../../components/Layout/ModalPremios/ModalPremios";
+import Table from "../../../../components/UI/Table/Table";
 type Paquete = {
     codigo: string;
     direccion: string;
@@ -17,15 +19,16 @@ type Paquete = {
 
 
 const ArmadoRutasTab: React.FC = () => {
-    const { paquetesContext, rutasContext } = useOutletContext<{ paquetesContext: PaqueteContext[], rutasContext: Record<string, RutaContext> }>();
+    const { paquetesContext, rutasContext, premiosContext } = useOutletContext<{ paquetesContext: PaqueteContext[], rutasContext: Record<string, RutaContext>, premiosContext: Record<string, Record<string, number>> }>();
     const [paquetesNoAsignados, setPaquetesNoAsignados] = useState<Paquete[]>([]);
     const [paquetesParaAsignar, setPaquetesParaAsignar] = useState<Paquete[]>([]);
     const [noEncontrados, setNoEncontrados] = useState<string[]>([])
     const [filtroIzquierda, setFiltroIzquierda] = useState<string>("");
     const [filtroDerecha, setFiltroDerecha] = useState<string>("");
-    const [tablaIzquierdaBouncing, setTablaIzquierdaBouncing] = useState(false)
-    const [tablaDerechaBouncing, setTablaDerechaBouncing] = useState(false)
     const [isOpenModal, setIsOpenModal] = useState(false)
+    const [isOpenModalPremios, setIsOpenModalPremios] = useState(false)
+    const [ruta, setRuta] = useState("")
+    const [modalPremiosData, setModalPremiosData] = useState<Record<string, number>>({})
     const [isLoading, setIsLoading] = useState(true)
     const isFirstRender = useRef(true);
 
@@ -50,13 +53,6 @@ const ArmadoRutasTab: React.FC = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [paquetesContext]);
 
-    const filtrarPaquetes = (paquetes: Paquete[], filtro: string): Paquete[] => {
-        return paquetes.filter((p) =>
-            p.codigo.toString().toLowerCase().includes(filtro.toLowerCase()) ||
-            p.direccion.toString().toLowerCase().includes(filtro.toLowerCase()) ||
-            p.consultora.toString().toLowerCase().includes(filtro.toLowerCase())
-        );
-    };
     const guardarRuta = async (rutaObjetivo: { rutaId: string | null, alias: string | null }) => {
         if (!rutaObjetivo.rutaId) {
             const a = rutaObjetivo.alias!.trim()
@@ -71,6 +67,7 @@ const ArmadoRutasTab: React.FC = () => {
                 guardarRuta({ rutaId: r.id, alias: a.charAt(0).toUpperCase() + a.slice(1).toLowerCase() })
             })
         } else {
+            setRuta(rutaObjetivo.alias!)
             const batch = writeBatch(db);
             const rutaRef = doc(db, "Rutas", rutaObjetivo.rutaId)
             batch.update(rutaRef, { "activa": true, "cargado": true, "completado": false })
@@ -92,40 +89,64 @@ const ArmadoRutasTab: React.FC = () => {
                 })
             }
             batch.commit();
+            setModalPremiosData(obtenerPremios());
+            setIsOpenModalPremios(true)
         }
     }
 
+    const obtenerPremios = (): Record<string, number> => {
+        const premios: Record<string, number> = {};
+        const pedidos = [...new Set(paquetesParaAsignar.map((p) => p.codigo.slice(0, 10)))];
+        pedidos.forEach((codigo) => {
+            const premio = premiosContext[codigo];
+            if (!premio) return;
+            Object.entries(premio).forEach(([nombrePremio, cantidad]) => {
+                premios[nombrePremio] = (premios[nombrePremio] || 0) + cantidad;
+            });
+        });
+        return premios;
+    };
+
     const handleOnKeyDownIzquierda = (e: React.KeyboardEvent<HTMLInputElement>): void => {
         if (e.key === "Enter") {
-            const paquetesMover = paquetesNoAsignados.filter((p) => filtroIzquierda == p.codigo);
-            const paquetesOtraLista = paquetesParaAsignar.filter((p) => filtroIzquierda == p.codigo);
+            let paquetesMover = paquetesNoAsignados.filter((p) => filtroIzquierda == p.codigo);
+            let paquetesOtraLista = paquetesParaAsignar.filter((p) => filtroIzquierda == p.codigo);
+            if (filtroIzquierda.length == 10) {
+                paquetesMover = paquetesNoAsignados.filter((p) => filtroIzquierda == p.codigo.slice(0, 10));
+                paquetesOtraLista = paquetesParaAsignar.filter((p) => filtroIzquierda == p.codigo.slice(0, 10));
+            } else if (filtroIzquierda.length == 13){
+                if (paquetesMover.length > 0) {
+                    paquetesMover = paquetesNoAsignados.filter((p) => filtroIzquierda.slice(0, 10) == p.codigo.slice(0, 10));
+                    paquetesOtraLista = paquetesParaAsignar.filter((p) => filtroIzquierda.slice(0, 10) == p.codigo.slice(0, 10));
+                }
+            }
+
             if (paquetesMover.length == 0 && paquetesOtraLista.length == 0) {
                 const noEncontradosCopy = [...noEncontrados]
                 noEncontradosCopy.push(filtroIzquierda)
                 setNoEncontrados(noEncontradosCopy)
             }
-            setPaquetesNoAsignados(paquetesNoAsignados.filter((p) => filtroIzquierda != p.codigo));
+
+            setPaquetesNoAsignados(paquetesNoAsignados.filter((p) => !paquetesMover.map((paquete) => paquete.codigo).includes(p.codigo)));
             setPaquetesParaAsignar([...paquetesParaAsignar, ...paquetesMover]);
-            if (paquetesMover.length) {
-                setTablaDerechaBouncing(true)
-                setTimeout(() => {
-                    setTablaDerechaBouncing(false)
-                }, 300)
-            }
             setFiltroIzquierda("")
         }
     };
     const handleOnKeyDownDerecha = (e: React.KeyboardEvent<HTMLInputElement>): void => {
         if (e.key === "Enter") {
-            const paquetesMover = paquetesParaAsignar.filter((p) => filtroDerecha == p.codigo);
-            setPaquetesParaAsignar(paquetesParaAsignar.filter((p) => filtroDerecha != p.codigo));
-            setPaquetesNoAsignados([...paquetesNoAsignados, ...paquetesMover]);
-            if (paquetesMover.length) {
-                setTablaIzquierdaBouncing(true)
-                setTimeout(() => {
-                    setTablaIzquierdaBouncing(false)
-                }, 300)
+            let paquetesMover = paquetesParaAsignar.filter((p) => filtroDerecha == p.codigo);
+            if (filtroDerecha.length == 10) {
+                paquetesMover = paquetesParaAsignar.filter((p) => filtroDerecha == p.codigo.slice(0, 10));
+                console.log("PM=10", paquetesMover)
+            } else if (filtroDerecha.length == 13){
+                if (paquetesMover.length > 0) {
+                    paquetesMover = paquetesParaAsignar.filter((p) => filtroDerecha.slice(0, 10) == p.codigo.slice(0, 10));
+                    console.log("PM=13", paquetesMover)
+                }
             }
+            console.log("PaquetesMover", paquetesMover)
+            setPaquetesParaAsignar(paquetesParaAsignar.filter((p) => !paquetesMover.map((paquete) => paquete.codigo).includes(p.codigo)));
+            setPaquetesNoAsignados([...paquetesNoAsignados, ...paquetesMover]);
             setFiltroDerecha("")
         }
     };
@@ -146,7 +167,19 @@ const ArmadoRutasTab: React.FC = () => {
                 rutas={rutasContext}
                 onConfirm={guardarRuta}
             />
+            <ModalPremios
+                isOpen={isOpenModalPremios}
+                premios={modalPremiosData}
+                ruta={ruta}
+                onConfirm={() => { setModalPremiosData({}); setIsOpenModalPremios(false) }}
+            />
             <h2>Armado de rutas</h2>
+            {
+                <Table data={Object.entries(obtenerPremios()).map(([premio, cantidad]) => [
+                    premio,
+                    cantidad.toString(),
+                ])} headers={["Premio", "Cantidad"]} />
+            }
             <div className={classes.containerNoEncontrados}>
                 {noEncontrados.map((c) => (
                     <label>{c}</label>
@@ -178,64 +211,54 @@ const ArmadoRutasTab: React.FC = () => {
 
                     <h3 style={{ marginTop: "0" }}>Paquetes sin ruta asignada ({paquetesNoAsignados.length})</h3>
                     <div className={classes.tableContainer}>
-                        <table className={tablaIzquierdaBouncing ? classes.table + " bouncing" : classes.table}>
-                            <thead className={classes.thead}>
-                                <tr className={classes.trHeadder}>
-                                    <th className={classes.th}>Codigo</th>
-                                    <th className={classes.th}>Consultora</th>
-                                    <th className={classes.th}>Direccion</th>
-                                </tr>
-                            </thead>
-                            <tbody className={classes.tbody}>
-                                {filtrarPaquetes(paquetesNoAsignados, filtroIzquierda).reverse().map((paquete) => (
-                                    <tr
-                                        className={classes.tr}
-                                        key={paquete.codigo}
-                                    >
-                                        <td className={classes.td}>{paquete.codigo}</td>
-                                        <td className={classes.td}>{paquete.consultora}</td>
-                                        <td className={classes.td}>{paquete.direccion}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                        <Table
+                            data={paquetesNoAsignados.map(
+                                (p) => {
+                                    return [
+                                        p.codigo,
+                                        p.consultora,
+                                        p.direccion
+                                    ]
+                                })}
+                            headers={["Codigo", "Consultora", "Direccion"]}
+                            searchTerms={filtroIzquierda.split(";")} />
+                        <center>
+                            {isLoading ? (
+                                <div className={classes.spinnerContainer}>
+                                    <div className={classes.spinner}></div>
+                                    <p>Obteniendo cajas...</p>
+                                </div>
+                            ) :
+                                paquetesNoAsignados.length == 0 &&
+                                <p>No hay cajas sin asignar!</p>
+                            }
+                        </center>
                     </div>
-                    <center>
-                        {isLoading ? (
-                            <div className={classes.spinnerContainer}>
-                                <div className={classes.spinner}></div>
-                                <p>Obteniendo cajas...</p>
-                            </div>
-                        ) :
-                            paquetesNoAsignados.length == 0 &&
-                            <p>No hay cajas sin asignar!</p>
-                        }
-                    </center>
+
                 </center>
                 <center style={{ width: "49%" }}>
                     <h3 style={{ marginTop: "0" }}>Paquetes para asignar a una ruta ({paquetesParaAsignar.length})</h3>
                     <div className={classes.tableContainer}>
-                        <table className={tablaDerechaBouncing ? classes.table + " bouncing" : classes.table}>
-                            <thead className={classes.thead}>
-                                <tr className={classes.trHeadder}>
-                                    <th className={classes.th}>Codigo</th>
-                                    <th className={classes.th}>Direccion</th>
-                                    <th className={classes.th}>Referencia</th>
-                                </tr>
-                            </thead>
-                            <tbody className={classes.tbody}>
-                                {filtrarPaquetes(paquetesParaAsignar, filtroDerecha).reverse().map((paquete) => (
-                                    <tr
-                                        className={classes.tr}
-                                        key={paquete.codigo}
-                                    >
-                                        <td className={classes.td}>{paquete.codigo}</td>
-                                        <td className={classes.td}>{paquete.direccion}</td>
-                                        <td className={classes.td}>{paquete.consultora}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                        <Table data={paquetesParaAsignar.map((p) => {
+                            return [
+                                p.codigo,
+                                p.consultora,
+                                p.direccion
+                            ]
+                        })} headers={["Codigo", "Consultora", "Direccion"]}
+                            searchTerms={filtroDerecha.split(";")}
+                        />
+                        <center>
+                            {isLoading ? (
+                                <div className={classes.spinnerContainer}>
+                                    <div className={classes.spinner}></div>
+                                    <p>Obteniendo cajas...</p>
+                                </div>
+                            ) :
+                                paquetesNoAsignados.length == 0 &&
+                                <p>No hay cajas sin asignar!</p>
+                            }
+                        </center>
                     </div>
                 </center>
             </div>

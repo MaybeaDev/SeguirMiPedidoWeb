@@ -1,7 +1,7 @@
 .table {
   width: 100%;
   border-collapse: collapse; /* Para que las celdas estén juntas */
-  margin: 20px 0; /* Espaciado superior e inferior */
+  margin-bottom: 20px; /* Espaciado superior e inferior */
 }
 
 .thead {
@@ -9,7 +9,6 @@
 }
 .trHeadder {
   text-align: left;
-  border-bottom: 2px solid #ddd;
 }
 .trHeadder th:first-child {
   border-top-left-radius: 20px;/* Color de fondo para el primer <th> */

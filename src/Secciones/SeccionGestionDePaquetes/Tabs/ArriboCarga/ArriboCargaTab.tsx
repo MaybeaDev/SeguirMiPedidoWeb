@@ -1,7 +1,6 @@
 import classes from "./ArriboCargaTab.module.css"
 
 
-import Button from "../../../../components/UI/Button/Button";
 import { useEffect, useRef, useState } from "react";
 import TablaArribo from "../../../../components/Otros/TableArribo/TablaArribo";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
@@ -29,15 +28,16 @@ const ArriboCargaTab = () => {
     const [noEncontrados, setNoEncontrados] = useState<string[]>([])
     const [inputValue, setInputValue] = useState("")
     const [codigoValido, setCodigoValido] = useState<boolean>()
+    const [ultimoValidado, setUltimoValidado] = useState("")
     const codigoQueue = useRef<string[]>([]); // Cola de códigos pendientes
     const isProcessing = useRef(false);
     const inputRef = useRef<HTMLInputElement>(null)
     const isFirstRender = useRef(true);
     useEffect(() => {
         if (isFirstRender.current && paquetesContext.length == 0) {
-        isFirstRender.current = false;
-        return;
-    }
+            isFirstRender.current = false;
+            return;
+        }
         obtenerPaquetesNoArribados()
         setIsLoading(false)
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -66,7 +66,9 @@ const ArriboCargaTab = () => {
                     enqueueCodigo(c.trim())
                 })
             } else {
-                enqueueCodigo(inputValue.trim())
+                if (inputValue.trim().length > 0) {
+                    enqueueCodigo(inputValue.trim())
+                }
             }
             console.log("Limpiado")
             setInputValue("");
@@ -76,6 +78,7 @@ const ArriboCargaTab = () => {
         setInputValue(event.target.value)
     }
     const validarCodigo = async (codigo: string) => {
+        setUltimoValidado(codigo)
         const docRef = doc(db, "Paquetes", codigo)
         console.log(codigo)
         const paquete = await getDoc(docRef)
@@ -113,10 +116,10 @@ const ArriboCargaTab = () => {
         const filtradosOrdenados = filtrados.sort((a, b) => {
             const [diaA, mesA, añoA] = a.facturacion.split("-").map(Number);
             const [diaB, mesB, añoB] = b.facturacion.split("-").map(Number);
-        
+
             const dateA = new Date(añoA, mesA - 1, diaA); // Crear objeto Date
             const dateB = new Date(añoB, mesB - 1, diaB);
-        
+
             return dateB.getTime() - dateA.getTime(); // Ordenar de más reciente a más antigua
         });
         filtradosOrdenados.forEach((paquete) => {
@@ -138,7 +141,6 @@ const ArriboCargaTab = () => {
         setData(paquetes)
     }
 
-    const handleConfirmarArribo = () => { }
 
     return (
         <>
@@ -147,25 +149,33 @@ const ArriboCargaTab = () => {
             <div className={classes.content}>
                 <div className={classes.leftContent}>
                     <h3>Escanear codigos</h3>
-                    <label>Ultimo escaneado: </label>
-                    <center>
-                        <input ref={inputRef} className={`${classes.readOnlyInput} ${codigoValido == undefined
-                            ? ""
-                            : codigoValido
-                                ? classes.validInput
-                                : classes.invalidInput}
+                    {ultimoValidado != "" && (
+                        <>
+                            <label>Ultimo escaneado: </label>
+                            <center>
+                                <input ref={inputRef} className={`${classes.readOnlyInput} ${codigoValido == undefined
+                                    ? ""
+                                    : codigoValido
+                                        ? classes.validInput
+                                        : classes.invalidInput}
                         `
-                        } style={{ width: "50%" }} readOnly></input>
-                    </center>
+                                } style={{ width: "50%" }} value={ultimoValidado} readOnly></input>
+                                <label style={{ marginLeft: 10 }}>{codigoQueue.current.length} en proceso</label>
+                            </center>
+                        </>
+                    )}
                     <center>
-                        <input type="text" className={classes.input} value={inputValue} onChange={inputHandler} onKeyDown={keyDownHandler} placeholder="buscar fila..." />
-                        <Button style={{ width: "60%" }} disabled={data.length ? false : true} onClick={handleConfirmarArribo}>Confirmar Arribo</Button>
-                        <h4>No encontrados:</h4>
-                        <div className={classes.containerNoEncontrados}>
-                            {noEncontrados.map((c) => (
-                                <label>{c}</label>
-                            ))}
-                        </div>
+                        <input type="text" className={classes.input} value={inputValue} onChange={inputHandler} onKeyDown={keyDownHandler} placeholder="Escanear Aqui..." />
+                        {noEncontrados.length > 0 && (
+                            <>
+                                <h4>No encontrados:</h4>
+                                <div className={classes.containerNoEncontrados}>
+                                    {noEncontrados.map((c) => (
+                                        <label>{c}</label>
+                                    ))}
+                                </div>
+                            </>
+                        )}
                     </center>
                 </div>
                 <div className={classes.rightContent}>

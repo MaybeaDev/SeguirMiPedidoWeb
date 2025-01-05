@@ -42,6 +42,7 @@ export interface PaqueteContext {
 const PrivateRoute: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    const [premiosContext, setPremiosContext] = useState<Record<string, Record<string, number>>>({});
     const [paquetesContext, setPaquetes] = useState<PaqueteContext[]>([]);
     const [rutasContext, setRutas] = useState<Record<string, RutaContext>>({});
     const [transportistasContext, setTransportistas] = useState<Record<string, TransportistaContext>>({});
@@ -55,6 +56,7 @@ const PrivateRoute: React.FC = () => {
         getTransportistas()
         getRutas()
         getPaquetes()
+        getPremios()
         return () => unsubscribe();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
@@ -89,6 +91,16 @@ const PrivateRoute: React.FC = () => {
             setPaquetes(paq);
         })
     };
+    const getPremios = () => {
+        const q = query(collection(db, "Premios"));
+        onSnapshot(q, (querySnapshot) => {
+            const premios: Record<string, Record<string, number>> = {}
+            querySnapshot.forEach((doc) => {
+                premios[doc.id] = doc.data()
+            })
+            setPremiosContext(premios)
+        })
+    }
     const getRutas = () => {
         const q = query(collection(db, "Rutas"));
         onSnapshot(q, (querySnapshot) => {
@@ -149,7 +161,7 @@ const PrivateRoute: React.FC = () => {
 
     if (loading) { return <div>Loading...</div>; }
     if (!user) { return <Navigate to="/login" />; }
-    return <Outlet context={{ paquetesContext, rutasContext, transportistasContext }} />;
+    return <Outlet context={{ paquetesContext, premiosContext, rutasContext, transportistasContext }} />;
 };
 
 export default PrivateRoute;

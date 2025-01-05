@@ -6,11 +6,9 @@
 }
 .tableContainer {
   width: 100%;
-  margin-bottom: 2%;
-  max-height: 40vh; /* Altura máxima para el scroll */
+  max-height: 40vh;
   overflow-y: auto; /* Scroll vertical */
-  border-radius: 20px; /* Border-radius para el contenedor */
-  border: 1px solid #ddd; /* Borde opcional */
+  border-radius: 20px;
   box-sizing: border-box;
 }
 .tableContainer::-webkit-scrollbar {
