@@ -50,7 +50,7 @@ const Index = () => {
     function verEstado(estadoNumerico: number): string {
         switch (estadoNumerico) {
             case 0:
-                return 'Enviado desde el almacén';
+                return 'Enviado de bodega central a Puerto Montt';
             case 1:
                 return 'Recibido en Bodega';
             case 2:

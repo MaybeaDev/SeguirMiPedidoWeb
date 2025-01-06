@@ -147,7 +147,7 @@ const IngresarFacturacionTab = () => {
                 coordenadas: coordenadas,
                 historial: [
                     {
-                        detalles: "El vendedor nos envió tu pedido",
+                        detalles: "Pronto recibiremos tu pedido",
                         estado: 0,
                         fecha: Timestamp.now(),
                     },

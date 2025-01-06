@@ -43,6 +43,7 @@ function App() {
               <Route path="arriboCarga" element={<ArriboCargaTab />} />
               <Route path="despachos" element={<DespachosTab />} />
               <Route path="armadoRutas" element={<ArmadoRutasTab />} />
+              <Route path="verPaquetes/:query/:excluir" element={<VerPaquetesTab />} />
               <Route path="verPaquetes/:query" element={<VerPaquetesTab />} />
               <Route path="verPaquetes" element={<VerPaquetesTab />} />
               <Route path="gestionDeRutas" element={<GestionRutas />} />

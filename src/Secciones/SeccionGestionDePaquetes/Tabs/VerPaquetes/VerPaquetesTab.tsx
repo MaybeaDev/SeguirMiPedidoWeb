@@ -23,7 +23,8 @@ const VerPaquetesTab = () => {
     const [tableData, setTableData] = useState<string[][]>([]);
     const [isLoading, setIsLoading] = useState(true)
     const [mensajeCargando, setMensajeCargando] = useState("Obteniendo Paquetes...")
-    const { query } = useParams()
+    const { query, excluir } = useParams()
+    const [coincidirTodos] = useState(excluir ? false : true)
     const [searchQuery, setSearchQuery] = useState<string>(query ?? "");
     const isFirstRender = useRef(true);
 
@@ -93,25 +94,31 @@ const VerPaquetesTab = () => {
         filtrarTabla(query)
     };
     const filtrarTabla = (query: string, paq?: string[][]) => {
-        const searchTerms = query
-            .split(";") // Divide por punto y coma
-            .map((term) => normalizeString(term)) // Normaliza cada término
-            .filter((term) => term.length > 0); // Elimina términos vacíos
+        console.log(coincidirTodos, paq?.length, paquetes.length)
+        if (coincidirTodos) {
+            const searchTerms = query
+                .split(";") // Divide por punto y coma
+                .map((term) => normalizeString(term)) // Normaliza cada término
+                .filter((term) => term.length > 0); // Elimina términos vacíos
 
-        const filteredData = paq ? paq.filter((paquete) =>
-            searchTerms.every((term) =>
-                paquete.some((field) =>
-                    normalizeString((field ?? "").toString()).includes(term)
+            const filteredData = paq ? paq.filter((paquete) =>
+                searchTerms.every((term) =>
+                    paquete.some((field) =>
+                        normalizeString((field ?? "").toString()).includes(term)
+                    )
+                )
+            ) : paquetes.filter((paquete) =>
+                searchTerms.every((term) =>
+                    paquete.some((field) =>
+                        normalizeString((field ?? "").toString()).includes(term)
+                    )
                 )
             )
-        ) : paquetes.filter((paquete) =>
-            searchTerms.every((term) =>
-                paquete.some((field) =>
-                    normalizeString((field ?? "").toString()).includes(term)
-                )
-            )
-        )
-        setTableData(filteredData);
+            setTableData(filteredData);
+        }
+        else {
+            setTableData(paq ?? paquetes)
+        }
     }
 
     const normalizeString = (str: string): string => {
@@ -124,7 +131,7 @@ const VerPaquetesTab = () => {
             .toLowerCase(); // Convierte a minúsculas
     };
     const handleVerCodigosDeBarra = () => {
-        const codes = [...tableData.slice(0,500).map(d => d[1])];
+        const codes = [...tableData.slice(0, 500).map(d => d[1])];
         sessionStorage.setItem("codesBarcodes", JSON.stringify(codes))
         window.open(`/barcode-page`, "_blank");
     };
@@ -138,6 +145,7 @@ const VerPaquetesTab = () => {
                 value={searchQuery}
                 onChange={handleSearch}
             />
+            {/* <Button onClick={() => { setCoincidirTodos(!coincidirTodos); filtrarTabla(searchQuery) }}>{coincidirTodos ? "Coincidir todos" : "Busqueda parcial"}</Button> */}
             {tableData.length > 300 ? (
                 <div style={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "center" }}>
                     <h3 style={{ marginRight: "10px" }}>{`Mostrando los primeros 300 de ${tableData.length} resultados`}</h3>
@@ -156,25 +164,26 @@ const VerPaquetesTab = () => {
                     <p>{mensajeCargando}</p>
                 </div>
             ) : (
-
-                <Table
-                    max={200}
-                    headers={[
-                        "Campaña / Facturacion",
-                        "Codigo",
-                        "Codigo consu.",
-                        "Estado",
-                        "Fecha",
-                        "Consultora",
-                        "Telefono",
-                        "Direccion",
-                        "Referencia",
-                        "Ruta",
-                        "Transportista",
-                    ]}
-                    data={tableData}
-                    searchTerms={searchQuery.split(";").map((term) => normalizeString(term))}
-                />
+                <>
+                    <Table
+                        max={200}
+                        headers={[
+                            "Campaña / Facturacion",
+                            "Codigo",
+                            "Codigo consu.",
+                            "Estado",
+                            "Fecha",
+                            "Consultora",
+                            "Telefono",
+                            "Direccion",
+                            "Referencia",
+                            "Ruta",
+                            "Transportista",
+                        ]}
+                        data={tableData}
+                        searchTerms={searchQuery.split(";").map((term) => normalizeString(term))}
+                    />
+                </>
             )}
         </>
     );
