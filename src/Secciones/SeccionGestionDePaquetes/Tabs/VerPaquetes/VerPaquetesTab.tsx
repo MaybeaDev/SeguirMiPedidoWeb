@@ -2,7 +2,7 @@ import classes from "./VerPaquetesTab.module.css"
 
 import { useEffect, useRef, useState } from "react";
 import Table from "../../../../components/UI/Table/Table";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useParams } from "react-router-dom";
 import { PaqueteContext, RutaContext, TransportistaContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
 import Button from "../../../../components/UI/Button/Button";
 function formatDate(date: Date) {
@@ -23,7 +23,8 @@ const VerPaquetesTab = () => {
     const [tableData, setTableData] = useState<string[][]>([]);
     const [isLoading, setIsLoading] = useState(true)
     const [mensajeCargando, setMensajeCargando] = useState("Obteniendo Paquetes...")
-    const [searchQuery, setSearchQuery] = useState<string>("");
+    const { query } = useParams()
+    const [searchQuery, setSearchQuery] = useState<string>(query ?? "");
     const isFirstRender = useRef(true);
 
     useEffect(() => {
@@ -50,7 +51,7 @@ const VerPaquetesTab = () => {
             const r = p.rutaAlias
             const t = p.transportistaNombre
             const paquete = [
-                `${p.campaña ?? "C. no disponible"} <br/> F: ${p.facturacion ?? "No especificada"}`,
+                `${p.campaña ?? "C. no disponible"} <br/> F:${p.facturacion ?? "No especificada"}`,
                 p.id,
                 p.consultora,
                 (() => {
