@@ -78,10 +78,10 @@ const ArriboCargaTab = () => {
         setInputValue(event.target.value)
     }
     const validarCodigo = async (codigo: string) => {
-        setUltimoValidado(codigo)
         const docRef = doc(db, "Paquetes", codigo)
         console.log(codigo)
         const paquete = await getDoc(docRef)
+        setUltimoValidado(codigo)
         inputRef.current!.value = codigo
         if (paquete.exists()) {
             setCodigoValido(true)

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { doc, writeBatch } from "firebase/firestore";
+import { collection, doc, getDocs, query, where, writeBatch } from "firebase/firestore";
 import { db } from "../../../firebaseConfig";
 
 import classes from "./TableRutas.module.css";
@@ -151,6 +151,23 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
             }
         })
         Object.keys(cambios).forEach(key => {
+            const q = query(collection(db, "Premios"), where("ruta", "==", key))
+            getDocs(q).then((snap) => {
+                if (snap.docs.length > 0) {
+                    const batch2 = writeBatch(db)
+                    snap.forEach(d => {
+                        const data:{ruta:string, transportista?:string} = {
+                            ruta: key,
+                        }
+                        if (cambios[key].transportista) {
+                            data.transportista= cambios[key].transportista
+                        }
+                        batch2.update(doc(db, "Premios", d.id), data)
+                    })
+                    batch2.commit()
+                }
+            })
+
             const docRef = doc(db, "Rutas", key)
             const data: {
                 transportista?: string,

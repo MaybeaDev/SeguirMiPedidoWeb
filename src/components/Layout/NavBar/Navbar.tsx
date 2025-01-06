@@ -28,12 +28,36 @@ const Navbar = () => {
     }, []);
 
     // const handleFunction = async () => {
+
     //     const batch = writeBatch(db)
-    //     const q = query(collection(db, "Paquetes"), where("transportistaNombre", "==", "Matias Silva"))
-    //     const snap = await getDocs(q)
-    //     snap.forEach((d) => {
-    //         batch.update(doc(db, "Paquetes", d.id), {transportista:"TnJFO50R27XpihUaclobFP6AOOt2"})
+    //     const q = query(collection(db, "Usuarios"))
+    //     const u = (await getDocs(q)).docs.map(d => {
+    //         return { uid: d.id, nombre: d.data().nombre }
     //     })
+    //     const q2 = query(collection(db, "Paquetes"), where("estado", "==", 3))
+    //     const paquetes = (await getDocs(q2)).docs.map(d => {
+    //         return {
+    //             id: d.id,
+    //             ruta: d.data().ruta,
+    //             transportista: d.data().transportista,
+    //             transportistaNombre: d.data().transportistaNombre,
+    //         }
+    //     })
+    //     const q3 = query(collection(db, "Rutas"))
+    //     const r = (await getDocs(q3)).docs.map(d => {
+    //         return { id: d.id, transportista: d.data().transportista }
+    //     })
+    //     console.log(paquetes)
+    //     paquetes.forEach(p => {
+    //         if (p.transportistaNombre) {
+    //             console.log(u.find(u => u.nombre === p.transportistaNombre)?.uid ?? "")
+    //             batch.update(doc(db, "Paquetes", p.id), { transportista: u.find(u => u.nombre === p.transportistaNombre)?.uid ?? "" })
+    //         } else if(p.ruta) {
+    //             console.log(r.find(r => r.id === p.ruta)?.transportista ?? "")
+    //             batch.update(doc(db, "Paquetes", p.id), { transportista: r.find(r => r.id === p.ruta)?.transportista ?? "" })
+    //         }
+    //     })
+    //     console.log("Guardando...")
     //     batch.commit().then(() => {
     //         console.log("Batch de actualización exitosa");
     //     }).catch((error) => {

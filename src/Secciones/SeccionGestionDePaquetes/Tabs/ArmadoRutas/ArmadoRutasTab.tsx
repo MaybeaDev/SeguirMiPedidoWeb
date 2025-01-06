@@ -19,7 +19,7 @@ type Paquete = {
 
 
 const ArmadoRutasTab: React.FC = () => {
-    const { paquetesContext, rutasContext, premiosContext } = useOutletContext<{ paquetesContext: PaqueteContext[], rutasContext: Record<string, RutaContext>, premiosContext: Record<string, {premios:Record<string, number>, transportista:string}> }>();
+    const { paquetesContext, rutasContext, premiosContext } = useOutletContext<{ paquetesContext: PaqueteContext[], rutasContext: Record<string, RutaContext>, premiosContext: Record<string, { premios: Record<string, number>, transportista: string }> }>();
     const [paquetesNoAsignados, setPaquetesNoAsignados] = useState<Paquete[]>([]);
     const [paquetesParaAsignar, setPaquetesParaAsignar] = useState<Paquete[]>([]);
     const [noEncontrados, setNoEncontrados] = useState<string[]>([])
@@ -75,7 +75,9 @@ const ArmadoRutasTab: React.FC = () => {
                 paquetesParaAsignar.forEach(paquete => {
                     const sfRef = doc(db, "Paquetes", paquete.codigo);
                     batch.update(sfRef, {
-                        "ruta": rutaObjetivo.rutaId, "estado": 2, historial: arrayUnion({
+                        "ruta": rutaObjetivo.rutaId,
+                        "estado": 2,
+                        historial: arrayUnion({
                             fecha: new Date(),
                             estado: 2,
                             detalles: "Tu pedido está en reparto"
@@ -86,6 +88,15 @@ const ArmadoRutasTab: React.FC = () => {
                 paquetesParaAsignar.forEach(paquete => {
                     const sfRef = doc(db, "Paquetes", paquete.codigo);
                     batch.update(sfRef, { "ruta": rutaObjetivo.rutaId });
+                })
+            }
+            if (rutaObjetivo.rutaId && rutasContext[rutaObjetivo.rutaId] && rutasContext[rutaObjetivo.rutaId!].transportista != "") {
+                [... new Set(paquetesParaAsignar.filter(p => p.codigo.slice(0, 4) != "DESP").map(p => p.codigo.slice(0, 10)))].forEach(p => {
+                    const sfRef = doc(db, "Premios", p);
+                    batch.update(sfRef, {
+                        "transportista": rutasContext[rutaObjetivo.rutaId!].transportista,
+                        "ruta": rutasContext[rutaObjetivo.rutaId!].id
+                    });
                 })
             }
             batch.commit();
@@ -114,7 +125,7 @@ const ArmadoRutasTab: React.FC = () => {
             if (filtroIzquierda.length == 10) {
                 paquetesMover = paquetesNoAsignados.filter((p) => filtroIzquierda == p.codigo.slice(0, 10));
                 paquetesOtraLista = paquetesParaAsignar.filter((p) => filtroIzquierda == p.codigo.slice(0, 10));
-            } else if (filtroIzquierda.length == 13){
+            } else if (filtroIzquierda.length == 13) {
                 if (paquetesMover.length > 0) {
                     paquetesMover = paquetesNoAsignados.filter((p) => filtroIzquierda.slice(0, 10) == p.codigo.slice(0, 10));
                     paquetesOtraLista = paquetesParaAsignar.filter((p) => filtroIzquierda.slice(0, 10) == p.codigo.slice(0, 10));
@@ -138,7 +149,7 @@ const ArmadoRutasTab: React.FC = () => {
             if (filtroDerecha.length == 10) {
                 paquetesMover = paquetesParaAsignar.filter((p) => filtroDerecha == p.codigo.slice(0, 10));
                 console.log("PM=10", paquetesMover)
-            } else if (filtroDerecha.length == 13){
+            } else if (filtroDerecha.length == 13) {
                 if (paquetesMover.length > 0) {
                     paquetesMover = paquetesParaAsignar.filter((p) => filtroDerecha.slice(0, 10) == p.codigo.slice(0, 10));
                     console.log("PM=13", paquetesMover)

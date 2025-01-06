@@ -50,7 +50,7 @@ const VerPaquetesTab = () => {
             const r = p.rutaAlias
             const t = p.transportistaNombre
             const paquete = [
-                p.campaña ?? "No disponible",
+                `${p.campaña ?? "C. no disponible"} <br/> F: ${p.facturacion ?? "No especificada"}`,
                 p.id,
                 p.consultora,
                 (() => {
@@ -159,7 +159,7 @@ const VerPaquetesTab = () => {
                 <Table
                     max={200}
                     headers={[
-                        "Campaña",
+                        "Campaña / Facturacion",
                         "Codigo",
                         "Codigo consu.",
                         "Estado",
