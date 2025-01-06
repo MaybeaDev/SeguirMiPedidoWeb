@@ -1,34 +1,23 @@
 .timeline {
   list-style: none;
-  padding: 0;
   position: relative;
   width: max-content;
-  border-radius: 20px;
-  padding: 50px;
-  padding-left: 0px;
-}
-
-.timeline::before {
-  content: '';
-  position: absolute;
-  left: 30px;
-  top: 70px;
-  bottom: 120px;
-  width: 2px;
-  background: #5e6874;
+  border-radius: 10px;
+  padding-inline: 50px;
+  max-height: 50vh;
+  overflow: auto;
+  border: solid 1px #000000;
 }
 
 .timelineItem {
   position: relative;
-  padding-left: 60px;
-  margin-bottom: 15px;
 }
 
 .timelineItem:first-child:before {
   content: '';
   position: absolute;
-  left: 22px;
-  top: 0;
+  left: -32px;
+  top: 25%;
   width: 16px;
   height: 16px;
   border-radius: 50%;
@@ -36,9 +25,33 @@
   border: 2px solid #0d6efd;
 }
 
+.timelineItem::before {
+  content: '';
+  position: absolute;
+  left: -32px;
+  top:25%;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #9b9fa7;
+  border: 2px solid #00000000;
+}
+.timelineItem::after {
+  
+  content: '';
+  position: absolute;
+  left: -24px;
+  top: 22px;
+  width: 3px;
+  z-index: -1;
+  height: 100%;
+  background: rgb(91, 91, 91);
+}
+
+
 .timelineItem.completed .timeline-icon {
   position: absolute;
-  left: 12px;
+  left: -16px;
   top: -4px;
   background-color: white;
   border-radius: 50%;
@@ -55,17 +68,7 @@
   display: none;
 }
 
-.timelineItem::before {
-  content: '';
-  position: absolute;
-  left: 22px;
-  top:0px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #9b9fa7;
-  border: none;
-}
+
 
 .timelineItem h6,
 .timelineItem h5,
@@ -83,8 +86,32 @@
 .h5{
   font-weight: 750;
   margin-block: 3px;
+  max-width: 50vw;
 }
 .h6 {
   font-weight: 600;
   margin-top: 3px;
+  max-width: 50vw;
+}
+
+/* Estilo para la barra de desplazamiento */
+::-webkit-scrollbar {
+  width: 8px; /* Ancho de la barra de desplazamiento */
+}
+
+/* Estilo para el "thumb" (parte que se mueve) */
+::-webkit-scrollbar-thumb {
+  background-color: #ffae52; /* Color del "thumb" */
+  border-radius: 10px; /* Bordes redondeados */
+}
+
+/* Estilo para la pista de la barra de desplazamiento */
+::-webkit-scrollbar-track {
+  margin-block: 10px;
+}
+
+/* Estilo para la pista de la barra de desplazamiento cuando está vacía */
+::-webkit-scrollbar-track-piece {
+  border-radius: 30px; /* Bordes redondeados */
+  background-color: #0000002d; /* Color de la pista vacía */
 }

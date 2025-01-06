@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 
 
@@ -21,8 +21,8 @@ interface Paquete {
     }[]
 }
 interface PaqueteExtended extends Paquete {
-    campaña:string,
-    consultora:string
+    campaña: string,
+    consultora: string
 }
 
 
@@ -34,6 +34,7 @@ const Index = () => {
     const [consCode, setConsCode] = useState('');
     const [searchResult, setSearchResult] = useState<Paquete>({});
     const [searchResultCons, setSearchResultCons] = useState<PaqueteExtended[]>([]);
+    const targetRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         console.log(id)
@@ -94,7 +95,7 @@ const Index = () => {
                 fecha: d.fecha.toDate().toLocaleString(),
                 detalles: d.detalles.toString()
             }))
-            result.push({ campaña:p.data().campania, codigo: p.id, consultora:p.data().consultora, ultimaModif: datos[datos.length - 1].fecha, historial: datos })
+            result.push({ campaña: p.data().campania, codigo: p.id, consultora: p.data().consultora, ultimaModif: datos[datos.length - 1].fecha, historial: datos })
         })
         console.log(result)
         setSearchResultCons(result)
@@ -127,54 +128,195 @@ const Index = () => {
         <div className={classes.indexContainer}>
             <center>
                 <Card style={{ width: "80%", marginTop: "40px" }}>
-                    <div style={{ display: "flex", width: "100%" }}>
-                        <Card style={{ width: "50%", marginTop: "40px" }}>
-                            <h1 className={classes.h1}>Buscar por codigo de pedido</h1>
-                            <div className="search-box">
+                    <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+                        <Card style={{ flex: 1 }}>
+                            <h1 className={classes.h1} style={{ marginBottom: 5 }}>Buscar por codigo de pedido</h1>
+                            <div className="search-box" style={{ flexDirection: "row", display: "flex", justifyContent: "center" }}>
                                 <input
-                                    style={{ width: "40%" }}
+                                    style={{ flex: 1 }}
                                     type="text"
                                     value={orderCode}
                                     onChange={handleInputChange}
                                     onKeyDown={handleKeyPress}
                                     placeholder="Introduce el código del paquete"
                                 />
-                                <Button onClick={()=>{searchOrder()}}>Buscar</Button>
+                                <Button style={{ flex: 0, marginBlock: 15 }} onClick={() => { searchOrder() }}>Buscar</Button>
                             </div>
                         </Card>
 
-                        <Card style={{ width: "50%", marginTop: "40px" }}>
-                            <h1 className={classes.h1}>Buscar por codigo de consultora</h1>
-                            <div className="search-box">
+                        <Card style={{ flex: 1 }}>
+                            <h1 className={classes.h1} style={{ marginBottom: 5 }}>Buscar por codigo de consultora</h1>
+                            <div className="search-box" style={{ flexDirection: "row", display: "flex", justifyContent: "center" }}>
                                 <input
-                                    style={{ width: "40%" }}
+                                    style={{ flex: 1 }}
                                     type="text"
                                     value={consCode}
                                     onChange={handleInputChangeCons}
                                     onKeyDown={handleKeyPressCons}
                                     placeholder="Introduce el código de consultora"
                                 />
-                                <Button onClick={()=>{searchOrderCons()}}>Buscar</Button>
+                                <Button style={{ flex: 0, marginBlock: 15 }} onClick={() => { searchOrderCons() }}>Buscar</Button>
                             </div>
                         </Card>
                     </div>
-                    <div className={classes.searchResult}>
+                    <div className={classes.searchResult} style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
                         {searchResult.ultimaModif != undefined ? (
-                            <p><b>Última modificación:</b> {searchResult.ultimaModif.toLocaleString()}</p>
+                            <p style={{ flex: 1 }}><b>Última modificación:</b> {searchResult.ultimaModif.toLocaleString()}</p>
                         ) :
                             ""
                         }
-                        {searchResult.historial != undefined ? (
-                            <>
+                        <div ref={targetRef} style={{ flex: 1 }}>
+                            {searchResult.historial != undefined ? (
                                 <EstadoPaquete historial={searchResult.historial}></EstadoPaquete>
-                            </>
-                        ) : searchResultCons.length >= 0 && (
-                            <p>Introduce un codigo de paquete</p>
-                        )
-                        }
+                            ) : searchResultCons.length >= 0 && (
+                                <p>Introduce un codigo de paquete</p>
+                            )
+                            }
+                        </div>
                     </div>
-                    {searchResultCons.length >= 0 ? (
-                        <div>
+                    <div className={classes.containerResult}>
+                        {searchResultCons
+                            .sort((a, b) => {
+                                const getPriority = (item: typeof a) => {
+                                    const lastState = item.historial![item.historial!.length - 1].estado ?? "";
+                                    switch (lastState) {
+                                        case "En reparto":
+                                            return 1; // Más prioritario
+                                        case "Falla en entrega, se reintentará":
+                                            return 2;
+                                        case "Falla en entrega, devuelto al vendedor":
+                                            return 3;
+                                        case "Recibido en Bodega":
+                                            return 4;
+                                        case "Enviado de bodega central a Puerto Montt":
+                                            return 5;
+                                        case "Entregado":
+                                            return 6; // Menos prioritario
+                                        default:
+                                            return 7; // Otros estados
+                                    }
+                                };
+
+                                return getPriority(a) - getPriority(b);
+                            })
+                            .map((c) => {
+                                let estado = 0;
+                                switch (c.historial![c.historial!.length - 1].estado ?? "") {
+                                    case "Enviado de bodega central a Puerto Montt":
+                                        estado = 0;
+                                        break;
+                                    case "Recibido en Bodega":
+                                        estado = 1;
+                                        break;
+                                    case "En reparto":
+                                        estado = 2;
+                                        break;
+                                    case "Entregado":
+                                        estado = 3;
+                                        break;
+                                    case "Falla en entrega, se reintentará":
+                                        estado = 4;
+                                        break;
+                                    case "Falla en entrega, devuelto al vendedor":
+                                        estado = 5;
+                                        break;
+                                    default:
+                                        estado = 6;
+                                }
+                                return (
+                                    <div
+                                        onClick={() => {
+                                            setOrderCode(c.codigo ?? "");
+                                            searchOrder(c.codigo);
+                                            targetRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                                        }}
+                                        className={classes.containerResultItem}
+                                        style={{
+                                            alignContent: "flex-start",
+                                            backgroundColor:
+                                                estado == 2
+                                                    ? "rgba(255,255,0,0.05)"
+                                                    : estado == 3
+                                                        ? "rgba(0,255,0,0.05)"
+                                                        : "rgba(255, 0, 0, 0.05)",
+                                        }}
+                                    >
+                                        <div
+                                            className={classes.item}
+                                            style={{
+                                                display: "flex",
+                                                flexDirection: "row",
+                                                flexWrap: "wrap",
+                                                justifyContent: "space-between",
+                                                width: "100%",
+                                            }}
+                                        >
+                                            <label style={{ paddingInline: 5, flexShrink: 0 }}>Campaña: </label>
+                                            <label style={{ paddingInline: 5, textAlign: "right", flexGrow: 1 }}>{c.campaña}</label>
+                                        </div>
+                                        <div
+                                            className={classes.item}
+                                            style={{
+                                                display: "flex",
+                                                flexDirection: "row",
+                                                flexWrap: "wrap",
+                                                justifyContent: "space-between",
+                                                width: "100%",
+                                            }}
+                                        >
+                                            <label style={{ paddingInline: 5, flexShrink: 0 }}>Código de paquete: </label>
+                                            <label style={{ paddingInline: 5, textAlign: "right", flexGrow: 1 }}>{c.codigo}</label>
+                                        </div>
+                                        <div
+                                            className={classes.item}
+                                            style={{
+                                                display: "flex",
+                                                flexDirection: "row",
+                                                flexWrap: "wrap",
+                                                justifyContent: "space-between",
+                                                width: "100%",
+                                            }}
+                                        >
+                                            <label style={{ paddingInline: 5, flexShrink: 0 }}>Consultora: </label>
+                                            <label style={{ paddingInline: 5, textAlign: "right", flexGrow: 1 }}>{c.consultora}</label>
+                                        </div>
+                                        <div
+                                            className={classes.item}
+                                            style={{
+                                                display: "flex",
+                                                flexDirection: "row",
+                                                flexWrap: "wrap",
+                                                justifyContent: "space-between",
+                                                width: "100%",
+                                            }}
+                                        >
+                                            <label style={{ paddingInline: 5, flexShrink: 0 }}>Estado: </label>
+                                            <label style={{ paddingInline: 5, textAlign: "right", flexGrow: 1 }}>
+                                                {c.historial![c.historial!.length - 1].estado ?? ""}
+                                            </label>
+                                        </div>
+                                        <div
+                                            className={classes.item}
+                                            style={{
+                                                display: "flex",
+                                                flexDirection: "row",
+                                                flexWrap: "wrap",
+                                                justifyContent: "space-between",
+                                                width: "100%",
+                                            }}
+                                        >
+                                            <label style={{ paddingInline: 5, flexShrink: 0 }}>Ultima modificación: </label>
+                                            <label style={{ paddingInline: 5, textAlign: "right", flexGrow: 1 }}>
+                                                {c.historial![c.historial!.length - 1].fecha ?? ""}
+                                            </label>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                    </div>;
+
+                    {searchResultCons.length > 0 ? (
+                        <div style={{ flex: 1 }}>
                             <Table data={searchResultCons.map((p) => {
                                 return [
                                     p.campaña,
@@ -199,7 +341,7 @@ const Index = () => {
                     )}
                 </Card>
             </center>
-        </div>
+        </div >
     );
 };
 

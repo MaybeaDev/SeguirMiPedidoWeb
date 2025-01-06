@@ -32,7 +32,7 @@
 .button {
   padding: 10px 15px;
   border: none;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   border-radius: 4px;
   cursor: pointer;
@@ -46,4 +46,38 @@
   margin-top: 20px;
   font-size: 16px;
   color: #333;
+}
+
+.containerResult {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Dos columnas de igual tamaño */
+  gap: 10px; /* Espacio entre los elementos */
+}
+
+.containerResultItem {
+  background-color: #f9e2be; /* Solo para dar color a los elementos */
+  padding: 5px;
+  text-align: center;
+  color: white;
+  border-radius: 10px;
+}
+.containerResult .item {
+  font-size: 14px;
+  margin-block: 4px;
+  background-color: #00000014;
+  box-shadow: 0 0 1px 1px #00000014;
+  border-radius: 5px;
+}
+/* Cuando haya un número impar de elementos, el último ocupará toda la fila */
+.containerResult > .containerResultItem:nth-child(2n + 1):not(:last-child) {
+  grid-column: span 1; /* Los elementos en posiciones impares ocuparán 50% */
+}
+
+.containerResult > .containerResultItem:nth-child(2n) {
+  grid-column: span 1; /* Los elementos en posiciones pares ocuparán 50% */
+}
+
+/* Cuando haya más de 2 elementos y el total es impar, el último ocupará toda la fila */
+.containerResult > .containerResultItem:nth-child(2n + 1):last-child {
+  grid-column: span 2; /* El último elemento ocupará 100% */
 }
