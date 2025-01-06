@@ -90,14 +90,16 @@ const ArmadoRutasTab: React.FC = () => {
                     batch.update(sfRef, { "ruta": rutaObjetivo.rutaId });
                 })
             }
-            if (rutaObjetivo.rutaId && rutasContext[rutaObjetivo.rutaId] && rutasContext[rutaObjetivo.rutaId!].transportista != "") {
-                [... new Set(paquetesParaAsignar.filter(p => p.codigo.slice(0, 4) != "DESP").map(p => p.codigo.slice(0, 10)))].forEach(p => {
-                    const sfRef = doc(db, "Premios", p);
-                    batch.update(sfRef, {
-                        "transportista": rutasContext[rutaObjetivo.rutaId!].transportista,
-                        "ruta": rutasContext[rutaObjetivo.rutaId!].id
-                    });
-                })
+            if (Object.keys(modalPremiosData).length > 0) {
+                if (rutaObjetivo.rutaId && rutasContext[rutaObjetivo.rutaId] && rutasContext[rutaObjetivo.rutaId!].transportista != "") {
+                    [... new Set(paquetesParaAsignar.filter(p => p.codigo.slice(0, 4) != "DESP").map(p => p.codigo.slice(0, 10)))].forEach(p => {
+                        const sfRef = doc(db, "Premios", p);
+                        batch.update(sfRef, {
+                            "transportista": rutasContext[rutaObjetivo.rutaId!].transportista,
+                            "ruta": rutasContext[rutaObjetivo.rutaId!].id
+                        });
+                    })
+                }
             }
             batch.commit();
             setModalPremiosData(obtenerPremios());

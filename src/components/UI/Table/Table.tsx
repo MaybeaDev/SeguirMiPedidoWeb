@@ -4,11 +4,11 @@ import { ReactNode } from "react";
 
 const Table = (props: { data: string[][], headers: string[], searchTerms?: string[], redirect?: number, max?:number, children? : (key: string) => ReactNode }) => {
     const navigate = useNavigate();
-    const data = props.data.slice(0, props.max ?? props.data.length)
-    console.log(data.slice(-10))
+    const data = props.data
 
     const highlightMatches = (texto: string, terms: string[]): { highlightedText: string, hasMatch: boolean } => {
         const text = texto.toString();
+
         // Si no hay términos válidos, devuelve el texto original y sin coincidencias
         if (!terms || terms.length === 0 || terms.every((term) => term.trim() === "")) {
             return { highlightedText: text, hasMatch: true };
@@ -38,14 +38,12 @@ const Table = (props: { data: string[][], headers: string[], searchTerms?: strin
 
     let filteredData = data
     if (props.searchTerms) {
-        console.log(filteredData.length)
         filteredData = data.filter((row) =>
             row.some((value) => {
                 const { hasMatch } = highlightMatches(value, props.searchTerms || []);
                 return hasMatch;
             })
         );
-        console.log(filteredData.length)
     }
 
     return (
@@ -58,7 +56,7 @@ const Table = (props: { data: string[][], headers: string[], searchTerms?: strin
                 </tr>
             </thead>
             <tbody className={classes.tbody}>
-                {filteredData.map((row, rowIndex) => (
+                {filteredData.slice(0, props.max ?? props.data.length).map((row, rowIndex) => (
                     <tr
                         key={rowIndex}
                         className={`${classes.tr} ${props.redirect !== undefined && classes.clickeable}`}

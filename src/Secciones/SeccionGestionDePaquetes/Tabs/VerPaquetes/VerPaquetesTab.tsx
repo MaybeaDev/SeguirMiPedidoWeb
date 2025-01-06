@@ -24,7 +24,7 @@ const VerPaquetesTab = () => {
     const [isLoading, setIsLoading] = useState(true)
     const [mensajeCargando, setMensajeCargando] = useState("Obteniendo Paquetes...")
     const { query, excluir } = useParams()
-    const [coincidirTodos] = useState(excluir ? false : true)
+    const [coincidirTodos, setCoincidirTodos] = useState(excluir ? false : true)
     const [searchQuery, setSearchQuery] = useState<string>(query ?? "");
     const isFirstRender = useRef(true);
 
@@ -93,15 +93,15 @@ const VerPaquetesTab = () => {
         setSearchQuery(query);
         filtrarTabla(query)
     };
-    const filtrarTabla = (query: string, paq?: string[][]) => {
-        console.log(coincidirTodos, paq?.length, paquetes.length)
-        if (coincidirTodos) {
+    const filtrarTabla = (query: string, paq?: string[][], coincidir?: boolean) => {
+        let filteredData: string[][] = []
+        if (coincidir ?? coincidirTodos) {
             const searchTerms = query
                 .split(";") // Divide por punto y coma
                 .map((term) => normalizeString(term)) // Normaliza cada término
                 .filter((term) => term.length > 0); // Elimina términos vacíos
 
-            const filteredData = paq ? paq.filter((paquete) =>
+            filteredData = paq ? paq.filter((paquete) =>
                 searchTerms.every((term) =>
                     paquete.some((field) =>
                         normalizeString((field ?? "").toString()).includes(term)
@@ -114,11 +114,31 @@ const VerPaquetesTab = () => {
                     )
                 )
             )
-            setTableData(filteredData);
         }
         else {
-            setTableData(paq ?? paquetes)
+            const searchTerms = query
+                .split(";") // Divide por punto y coma
+                .map((term) => normalizeString(term)) // Normaliza cada término
+                .filter((term) => term.length > 0); // Elimina términos vacíos
+
+            filteredData = paq ? paq.filter((paquete) =>
+                searchTerms.some((term) =>
+                    paquete.some((field) =>
+                        normalizeString((field ?? "").toString()).includes(term)
+                    )
+                )
+            ) : paquetes.filter((paquete) =>
+                searchTerms.some((term) =>
+                    paquete.some((field) =>
+                        normalizeString((field ?? "").toString()).includes(term)
+                    )
+                )
+            )
         }
+        if (filteredData.length == 0) {
+            filteredData = paq ?? paquetes
+        }
+        setTableData(filteredData);
     }
 
     const normalizeString = (str: string): string => {
@@ -131,7 +151,7 @@ const VerPaquetesTab = () => {
             .toLowerCase(); // Convierte a minúsculas
     };
     const handleVerCodigosDeBarra = () => {
-        const codes = [...tableData.slice(0, 500).map(d => d[1])];
+        const codes = [...tableData.map(d => d[1]).slice(0, 500)];
         sessionStorage.setItem("codesBarcodes", JSON.stringify(codes))
         window.open(`/barcode-page`, "_blank");
     };
@@ -145,7 +165,7 @@ const VerPaquetesTab = () => {
                 value={searchQuery}
                 onChange={handleSearch}
             />
-            {/* <Button onClick={() => { setCoincidirTodos(!coincidirTodos); filtrarTabla(searchQuery) }}>{coincidirTodos ? "Coincidir todos" : "Busqueda parcial"}</Button> */}
+            <Button onClick={() => { setCoincidirTodos(!coincidirTodos); filtrarTabla(searchQuery, undefined, !coincidirTodos) }}>{coincidirTodos ? "Coincidir todos" : "Busqueda parcial"}</Button>
             {tableData.length > 300 ? (
                 <div style={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "center" }}>
                     <h3 style={{ marginRight: "10px" }}>{`Mostrando los primeros 300 de ${tableData.length} resultados`}</h3>
