@@ -67,6 +67,8 @@ const VerPaquetesTab = () => {
                             return "Entregado";
                         case 4:
                             return "Entrega fallida";
+                        case 5:
+                            return "Devuelto";
                         default:
                             return "En Proceso";
                     }

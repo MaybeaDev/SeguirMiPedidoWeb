@@ -39,7 +39,7 @@ const ArmadoRutasTab: React.FC = () => {
         }
         setIsLoading(true);
         const paquetes: Paquete[] = [];
-        const filtrados = paquetesContext.filter((p) => (p.ruta == "" && p.estado != 0))
+        const filtrados = paquetesContext.filter((p) => (p.ruta == "" && p.estado != 0 && p.estado != 5))
         filtrados.forEach((paquete) => {
             paquetes.push({
                 codigo: paquete.id,

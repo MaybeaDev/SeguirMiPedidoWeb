@@ -22,7 +22,7 @@ const EditarRutaTab = () => {
 
     const getPaquetes = (id: string) => {
         const filtrados = paquetesContext.filter((p) => {
-            return p.ruta == id && ![0, 3].includes(p.estado)
+            return p.ruta == id && ![0, 3, 5].includes(p.estado)
         })
         const paq: string[][] = []
         setRuta(rutasContext[rutaID!] ? rutasContext[rutaID!].alias : "Ruta no encontrada")
@@ -75,7 +75,7 @@ const EditarRutaTab = () => {
                 estado: 3, historial: arrayUnion({
                     estado: 3,
                     fecha: new Date(),
-                    detalles: "Pedido entregado"
+                    detalles: "Pedido entregado por sistema"
                 })
             })
         }
@@ -84,10 +84,10 @@ const EditarRutaTab = () => {
         const p = paquetesContext.find(p => p.id == key)
         if (p) {
             await updateDoc(doc(db, "Paquetes", key), {
-                estado: 4, historial: arrayUnion({
-                    estado: 4,
+                estado: 5, historial: arrayUnion({
+                    estado: 5,
                     fecha: new Date(),
-                    detalles: "Pedido no entregado"
+                    detalles: "Pedido devuelto a Santiago"
                 })
             })
         }
@@ -137,7 +137,7 @@ const EditarRutaTab = () => {
                         </button>
                         <button className={classes.button + " " + classes.buttonNoEntregado}
                             onDoubleClick={() => { marcarNoEntregado(key); }}>
-                            Marcar no entregado
+                            Devolver Pedido
                         </button>
                     </>
 
