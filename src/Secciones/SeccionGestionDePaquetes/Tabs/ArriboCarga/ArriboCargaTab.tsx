@@ -160,7 +160,7 @@ return (
                     </>
                 )}
                 <center>
-                    <input type="text" className={classes.input} value={inputValue} onChange={inputHandler} onKeyDown={keyDownHandler} placeholder="Escanear Aqui..." />
+                    <input autoFocus type="text" className={classes.input} value={inputValue} onChange={inputHandler} onKeyDown={keyDownHandler} placeholder="Escanear Aqui..." />
                     {noEncontrados.length > 0 && (
                         <>
                             <h4>No encontrados:</h4>
@@ -174,9 +174,9 @@ return (
                 </center>
             </div>
             <div className={classes.rightContent}>
-                {Object.values(data).map((value,) => {
+                {Object.values(data).map((value,_) => {
                     return (
-                        <TablaArribo data={
+                        <TablaArribo key={_} data={
                             value.map((p) => [
                                 p.codigo,
                                 p.consultora,

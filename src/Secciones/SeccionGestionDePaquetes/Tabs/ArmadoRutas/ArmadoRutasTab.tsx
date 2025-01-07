@@ -199,8 +199,9 @@ const ArmadoRutasTab: React.FC = () => {
                 ))}
             </div>
             <div className={classes.filtersContainer}>
-                <div className={classes.filterGroup}>
-                    <input className={classes.input}
+                <div className={classes.filterGroup} style={{margin:0}}>
+                    <input autoFocus
+                    style={{margin:0}}
                         type="text"
                         placeholder="Buscar..."
                         value={filtroIzquierda}
@@ -209,8 +210,9 @@ const ArmadoRutasTab: React.FC = () => {
                     />
                 </div>
 
-                <div className={classes.filterGroup}>
-                    <input className={classes.input}
+                <div className={classes.filterGroup} style={{margin:0}}>
+                    <input 
+                    style={{margin:0}}
                         type="text"
                         placeholder="Buscar..."
                         value={filtroDerecha}
