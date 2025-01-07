@@ -13,8 +13,8 @@
 }
 
 .modalContent {
-  background: #fdf3e5; /* Beige claro, consistente con tu captura */
-  border: 1px solid #e0c29f; /* Borde similar a la temática */
+  background: #fde5e5; /* Beige claro, consistente con tu captura */
+  border: 1px solid #e09f9f; /* Borde similar a la temática */
   border-radius: 8px;
   padding: 20px;
   width: 400px;
@@ -33,13 +33,13 @@
   font-size: 18px;
   font-weight: bold;
   cursor: pointer;
-  color: #e67e22; /* Naranja oscuro */
+  color: #e62222; /* Naranja oscuro */
 }
 
 .confirmButton {
   width: 100%;
   padding: 10px;
-  background: #e67e22; /* Naranja */
+  background: #e62222; /* Naranja */
   color: white;
   border: none;
   border-radius: 4px;
@@ -50,11 +50,11 @@
 }
 
 .confirmButton:hover {
-  background: #cf6d1a; /* Naranja oscuro */
+  background: #cf1a1a; /* Naranja oscuro */
 }
 
 .confirmButton:disabled {
-  background: #e0c29f; /* Beige desactivado */
+  background: #e09f9f; /* Beige desactivado */
   cursor: not-allowed;
 }
 

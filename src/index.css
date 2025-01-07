@@ -46,3 +46,24 @@ input:focus {
   border-color: #e62222; /* Naranja de enfoque */
   box-shadow: 0 0 10px rgba(230, 34, 34, 0.5); /* Sombra de enfoque */
 }
+/* Estilo para la barra de desplazamiento */
+::-webkit-scrollbar {
+  width: 8px; /* Ancho de la barra de desplazamiento */
+}
+
+/* Estilo para el "thumb" (parte que se mueve) */
+::-webkit-scrollbar-thumb {
+  background-color: #ff5252; /* Color del "thumb" */
+  border-radius: 10px; /* Bordes redondeados */
+}
+
+/* Estilo para la pista de la barra de desplazamiento */
+::-webkit-scrollbar-track {
+  margin-block: 10px;
+}
+
+/* Estilo para la pista de la barra de desplazamiento cuando está vacía */
+::-webkit-scrollbar-track-piece {
+  border-radius: 30px; /* Bordes redondeados */
+  background-color: #0000002d; /* Color de la pista vacía */
+}

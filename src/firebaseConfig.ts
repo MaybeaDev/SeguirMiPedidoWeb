@@ -1,8 +1,7 @@
-// firebaseConfig.ts
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore"; // Si usas Firestore
-import { getAuth } from "firebase/auth"; // Si usas Authentication
-import { getFunctions } from 'firebase/functions';
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore"; 
+import { getAuth } from "firebase/auth";
+import { getFunctions } from "firebase/functions";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD0bToBunqEnq38bya1jRhxG7Xv4i41ctU",
@@ -15,7 +14,12 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-// Exporta los servicios que necesitas
-export const db = getFirestore(app);
-export const auth = getAuth(app);
-export const functions = getFunctions(app);
+// Configurar Firestore con persistencia local y soporte para múltiples pestañas
+const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+});
+
+const auth = getAuth(app);
+const functions = getFunctions(app);
+
+export { db, auth, functions };
