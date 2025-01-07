@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import classes from "./Table.module.css";
 import { ReactNode } from "react";
 
-const Table = (props: { data: string[][], headers: string[], searchTerms?: string[], redirect?: number, max?:number, children? : (key: string) => ReactNode }) => {
+const Table = (props: { data: string[][], headers: string[], indexCol?:number, searchTerms?: string[], redirect?: number, max?:number, children? : (key: string) => ReactNode }) => {
     const navigate = useNavigate();
     const data = props.data
 
@@ -80,7 +80,7 @@ const Table = (props: { data: string[][], headers: string[], searchTerms?: strin
                         })}
                         {
                             props.children && (
-                                <td className={classes.td}>{props.children(row[0])}</td>
+                                <td className={classes.td}>{props.children(row[props.indexCol ?? 0])}</td>
                             )
                         }
                     </tr>

@@ -2,7 +2,7 @@ import classes from "./VerPaquetesTab.module.css"
 
 import { useEffect, useRef, useState } from "react";
 import Table from "../../../../components/UI/Table/Table";
-import { useOutletContext, useParams } from "react-router-dom";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { PaqueteContext, RutaContext, TransportistaContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
 import Button from "../../../../components/UI/Button/Button";
 function formatDate(date: Date) {
@@ -18,6 +18,7 @@ function formatDate(date: Date) {
 }
 
 const VerPaquetesTab = () => {
+    const navigate = useNavigate()
     const { paquetesContext, rutasContext, transportistasContext } = useOutletContext<{ paquetesContext: PaqueteContext[], rutasContext: Record<string, RutaContext>, transportistasContext: Record<string, TransportistaContext> }>();
     const [paquetes, setPaquetes] = useState<string[][]>([]);
     const [tableData, setTableData] = useState<string[][]>([]);
@@ -188,6 +189,7 @@ const VerPaquetesTab = () => {
             ) : (
                 <>
                     <Table
+                    indexCol={1}
                         max={200}
                         headers={[
                             "Campaña / Facturacion",
@@ -204,9 +206,19 @@ const VerPaquetesTab = () => {
                         ]}
                         data={tableData}
                         searchTerms={searchQuery.split(";").map((term) => normalizeString(term))}
-                    />
-                </>
-            )}
+                    >
+                        {(rowIndex: string) => {
+                            return (
+                                <div onClick={() => {console.log(rowIndex); navigate(`/${rowIndex}`)}
+                        }>
+                        <label>&#128269;</label>
+                    </div>
+                    )
+                        }}
+                </Table>
+        </>
+    )
+}
         </>
     );
 };
