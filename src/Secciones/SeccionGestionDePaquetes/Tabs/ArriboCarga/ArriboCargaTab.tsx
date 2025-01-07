@@ -3,7 +3,7 @@ import classes from "./ArriboCargaTab.module.css"
 
 import { useEffect, useRef, useState } from "react";
 import TablaArribo from "../../../../components/Otros/TableArribo/TablaArribo";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { db } from "../../../../firebaseConfig";
 import { useOutletContext } from "react-router-dom";
 import { PaqueteContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
@@ -78,143 +78,138 @@ const ArriboCargaTab = () => {
         setInputValue(event.target.value)
     }
     const validarCodigo = async (codigo: string) => {
-        const docRef = doc(db, "Paquetes", codigo)
+        const p = paquetesContext.find(p => p.id == codigo)
         console.log(codigo)
-        const paquete = await getDoc(docRef)
         setUltimoValidado(codigo)
-        inputRef.current!.value = codigo
-        if (paquete.exists()) {
+        if (p) {
             setCodigoValido(true)
-            if (paquete.data().estado == 0) {
+            if (p.estado == 0) {
                 setArribados([
                     ...arribados, codigo
                 ])
-                updateDoc(docRef, {
-                    estado: 1, historial: [
-                        ...paquete.data().historial,
-                        {
-                            estado: 1,
-                            fecha: new Date(),
-                            detalles: "Recibido por Rolando Transportes!"
-                        }
-                    ]
+                updateDoc(doc(db, "Paquetes", codigo), {
+                    estado: 1, historial: arrayUnion({
+                        estado: 1,
+                        fecha: new Date(),
+                        detalles: "Recibido por Rolando Transportes!"
+                    })
                 })
-                console.log(`Codigo ${codigo} arribado`)
+console.log(`Codigo ${codigo} arribado`)
             } else {
-                console.log("El paquete ya está arribado")
-            }
+    console.log("El paquete ya está arribado")
+}
         } else {
-            setCodigoValido(false);
-            setNoEncontrados((prev) => [...prev, codigo]);
-            console.log(`Código ${codigo} no encontrado`);
+    setCodigoValido(false);
+    setNoEncontrados((prev) => [...prev, codigo]);
+    console.log(`Código ${codigo} no encontrado`);
+}
+    }
+
+const obtenerPaquetesNoArribados = () => {
+    const paquetes: Record<string, Paquete[]> = {}
+    const filtrados = paquetesContext.filter((p) => p.estado == 0)
+    const filtradosOrdenados = filtrados.sort((a, b) => {
+        const [diaA, mesA, añoA] = a.facturacion.split("-").map(Number);
+        const [diaB, mesB, añoB] = b.facturacion.split("-").map(Number);
+
+        const dateA = new Date(añoA, mesA - 1, diaA); // Crear objeto Date
+        const dateB = new Date(añoB, mesB - 1, diaB);
+
+        return dateB.getTime() - dateA.getTime(); // Ordenar de más reciente a más antigua
+    });
+    filtradosOrdenados.forEach((paquete) => {
+        if (!paquetes[paquete.facturacion]) {
+            paquetes[paquete.facturacion] = []
         }
-    }
-
-    const obtenerPaquetesNoArribados = () => {
-        const paquetes: Record<string, Paquete[]> = {}
-        const filtrados = paquetesContext.filter((p) => p.estado == 0)
-        const filtradosOrdenados = filtrados.sort((a, b) => {
-            const [diaA, mesA, añoA] = a.facturacion.split("-").map(Number);
-            const [diaB, mesB, añoB] = b.facturacion.split("-").map(Number);
-
-            const dateA = new Date(añoA, mesA - 1, diaA); // Crear objeto Date
-            const dateB = new Date(añoB, mesB - 1, diaB);
-
-            return dateB.getTime() - dateA.getTime(); // Ordenar de más reciente a más antigua
-        });
-        filtradosOrdenados.forEach((paquete) => {
-            if (!paquetes[paquete.facturacion]) {
-                paquetes[paquete.facturacion] = []
-            }
-            paquetes[paquete.facturacion]
-                .push({
-                    codigo: paquete.id,
-                    consultora: paquete.consultora,
-                    campaña: paquete.campaña,
-                    fechaIngreso: paquete.facturacion,
-                    recibe: paquete.receptor,
-                    telefono: paquete.contacto,
-                    direccion: paquete.direccion,
-                    arribado: arribados.find((p) => p == paquete.id) == undefined ? false : true
-                })
-        })
-        setData(paquetes)
-    }
+        paquetes[paquete.facturacion]
+            .push({
+                codigo: paquete.id,
+                consultora: paquete.consultora,
+                campaña: paquete.campaña,
+                fechaIngreso: paquete.facturacion,
+                recibe: paquete.receptor,
+                telefono: paquete.contacto,
+                direccion: paquete.direccion,
+                arribado: arribados.find((p) => p == paquete.id) == undefined ? false : true
+            })
+    })
+    setData(paquetes)
+}
 
 
-    return (
-        <>
-            <h2>Arribar Carga</h2>
-            <br />
-            <div className={classes.content}>
-                <div className={classes.leftContent}>
-                    <h3>Escanear codigos</h3>
-                    {ultimoValidado != "" && (
-                        <>
-                            <label>Ultimo escaneado: </label>
-                            <center>
-                                <input ref={inputRef} className={`${classes.readOnlyInput} ${codigoValido == undefined
-                                    ? ""
-                                    : codigoValido
-                                        ? classes.validInput
-                                        : classes.invalidInput}
+return (
+    <>
+        <h2>Arribar Carga</h2>
+        <br />
+        <div className={classes.content}>
+            <div className={classes.leftContent}>
+                <h3>Escanear codigos</h3>
+                {ultimoValidado != "" && (
+                    <>
+                        <label>Ultimo escaneado: </label>
+                        <center>
+                            <input ref={inputRef} className={`${classes.readOnlyInput} ${codigoValido == undefined
+                                ? ""
+                                : codigoValido
+                                    ? classes.validInput
+                                    : classes.invalidInput}
                         `
-                                } style={{ width: "50%" }} value={ultimoValidado} readOnly></input>
-                                <label style={{ marginLeft: 10 }}>{codigoQueue.current.length} en proceso</label>
-                            </center>
+                            } style={{ width: "50%" }} value={ultimoValidado} readOnly></input>
+                            <label style={{ marginLeft: 10 }}>{codigoQueue.current.length} en proceso</label>
+                        </center>
+                    </>
+                )}
+                <center>
+                    <input type="text" className={classes.input} value={inputValue} onChange={inputHandler} onKeyDown={keyDownHandler} placeholder="Escanear Aqui..." />
+                    {noEncontrados.length > 0 && (
+                        <>
+                            <h4>No encontrados:</h4>
+                            <div className={classes.containerNoEncontrados}>
+                                {noEncontrados.map((c) => (
+                                    <label>{c}</label>
+                                ))}
+                            </div>
                         </>
                     )}
-                    <center>
-                        <input type="text" className={classes.input} value={inputValue} onChange={inputHandler} onKeyDown={keyDownHandler} placeholder="Escanear Aqui..." />
-                        {noEncontrados.length > 0 && (
-                            <>
-                                <h4>No encontrados:</h4>
-                                <div className={classes.containerNoEncontrados}>
-                                    {noEncontrados.map((c) => (
-                                        <label>{c}</label>
-                                    ))}
-                                </div>
-                            </>
-                        )}
-                    </center>
-                </div>
-                <div className={classes.rightContent}>
-                    {Object.values(data).map((value,) => {
-                        return (
-                            <TablaArribo data={
-                                value.map((p) => [
-                                    p.codigo,
-                                    p.consultora,
-                                    p.campaña,
-                                    p.fechaIngreso,
-                                    p.recibe,
-                                    p.telefono,
-                                    p.arribado
-                                ])
-                            } headers={[
-                                "Código",
-                                "Consultora",
-                                "Campaña",
-                                "Fecha facturacion",
-                                "Recibe",
-                                "Teléfono",
-                            ]} />
-                        )
-                    })}
-
-
-                    <center>
-                        {isLoading && (
-                            <div className={classes.spinnerContainer}>
-                                <div className={classes.spinner}></div>
-                                <p>Obteniendo paquetes no arribados...</p>
-                            </div>
-                        )}
-                    </center>
-                </div>
+                </center>
             </div>
-        </>
-    );
+            <div className={classes.rightContent}>
+                {Object.values(data).map((value,) => {
+                    return (
+                        <TablaArribo data={
+                            value.map((p) => [
+                                p.codigo,
+                                p.consultora,
+                                p.campaña,
+                                p.fechaIngreso,
+                                p.recibe,
+                                p.telefono,
+                                p.arribado
+                            ])
+                        } headers={[
+                            "Código",
+                            "Consultora",
+                            "Campaña",
+                            "Fecha facturacion",
+                            "Recibe",
+                            "Teléfono",
+                        ]} />
+                    )
+                })}
+
+
+                <center>
+                    {isLoading && (
+                        <div className={classes.spinnerContainer}>
+                            <div className={classes.spinner}></div>
+                            <p>Obteniendo paquetes no arribados...</p>
+                        </div>
+                    )}
+                </center>
+            </div>
+        </div>
+    </>
+);
 };
 
 export default ArriboCargaTab;

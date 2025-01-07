@@ -3,7 +3,7 @@ import classes from "./EditarRuta.module.css"
 
 
 import { useOutletContext, useParams } from "react-router-dom";
-import { arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
+import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { db } from "../../../../firebaseConfig";
 import { useEffect, useState } from "react";
 import Table from "../../../../components/UI/Table/Table";
@@ -11,14 +11,14 @@ import { PaqueteContext, RutaContext } from "../../../../components/Otros/Privat
 
 
 const EditarRutaTab = () => {
-    const { paquetesContext, rutasContext } = useOutletContext<{ paquetesContext: PaqueteContext[], rutasContext : Record<string, RutaContext> }>();
+    const { paquetesContext, rutasContext } = useOutletContext<{ paquetesContext: PaqueteContext[], rutasContext: Record<string, RutaContext> }>();
     const [paquetes, setPaquetes] = useState<string[][]>([])
     const [ruta, setRuta] = useState("")
     const [searchQuery, setSearchQuery] = useState<string>("");
     const { rutaID } = useParams()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => { getPaquetes(rutaID!);console.log("datos actualizados") }, [paquetesContext])
+    useEffect(() => { getPaquetes(rutaID!); console.log("datos actualizados") }, [paquetesContext])
 
     const getPaquetes = (id: string) => {
         const filtrados = paquetesContext.filter((p) => {
@@ -48,18 +48,16 @@ const EditarRutaTab = () => {
                 ]
             )
         })
-        setPaquetes(paq)        
+        setPaquetes(paq)
     }
 
     const devolverABodega = async (key: string) => {
-        const paquete = paquetes.find((p) => p[0] == key)
-        const docRef = doc(db, "Paquetes", paquete![0])
-        const docSnap = await getDoc(docRef)
-        if (docSnap.exists()) {
-            if (docSnap.data().estado == 1) {
-                updateDoc(docRef, { ruta: "" })
+        const p = paquetesContext.find(p => p.id == key)
+        if (p) {
+            if (p.estado == 1) {
+                updateDoc(doc(db, "Paquetes", key), { ruta: "" })
             } else {
-                await updateDoc(docRef, {
+                updateDoc(doc(db, "Paquetes", key), {
                     ruta: "",
                     estado: 1, historial: arrayUnion({
                         estado: 1,
@@ -71,11 +69,9 @@ const EditarRutaTab = () => {
         }
     }
     const marcarEntregado = async (key: string) => {
-        const paquete = paquetes.find((p) => p[0] == key)
-        const docRef = doc(db, "Paquetes", paquete![0])
-        const docSnap = await getDoc(docRef)
-        if (docSnap.exists()) {
-            await updateDoc(docRef, {
+        const p = paquetesContext.find(p => p.id == key)
+        if (p) {
+            updateDoc(doc(db, "Paquetes", key), {
                 estado: 3, historial: arrayUnion({
                     estado: 3,
                     fecha: new Date(),
@@ -85,11 +81,9 @@ const EditarRutaTab = () => {
         }
     }
     const marcarNoEntregado = async (key: string) => {
-        const paquete = paquetes.find((p) => p[0] == key)
-        const docRef = doc(db, "Paquetes", paquete![0])
-        const docSnap = await getDoc(docRef)
-        if (docSnap.exists()) {
-            await updateDoc(docRef, {
+        const p = paquetesContext.find(p => p.id == key)
+        if (p) {
+            await updateDoc(doc(db, "Paquetes", key), {
                 estado: 4, historial: arrayUnion({
                     estado: 4,
                     fecha: new Date(),

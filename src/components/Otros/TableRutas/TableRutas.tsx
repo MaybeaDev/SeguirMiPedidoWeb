@@ -21,7 +21,6 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
     const [filtro, setFiltro] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [isSaved, setIsSaved] = useState(false)
-
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -104,9 +103,9 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
     const handleFiltrar = () => {
         const query = filtro;
         const searchTerms = query
-            .split(";") // Divide por punto y coma
-            .map((term) => normalizeString(term)) // Normaliza cada término
-            .filter((term) => term.length > 0); // Elimina términos vacíos
+            .split(";")
+            .map((term) => normalizeString(term))
+            .filter((term) => term.length > 0);
         const filteredData = data.filter((ruta) =>
             searchTerms.every((term) =>
                 normalizeString(ruta.alias).includes(term)
@@ -116,12 +115,12 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
     }
     const normalizeString = (str: string): string => {
         return str
-            .normalize("NFD") // Descompone los caracteres con tildes en base + tilde
-            .replace(/[\u0300-\u036f]/g, "") // Elimina las tildes y diacríticos
-            .replace(/[\u200B-\u200D\uFEFF]/g, "") // Elimina caracteres invisibles
-            .replace(/\s+/g, " ") // Reemplaza múltiples espacios por uno solo
-            .trim() // Elimina espacios al inicio y final
-            .toLowerCase(); // Convierte a minúsculas
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[\u200B-\u200D\uFEFF]/g, "")
+            .replace(/\s+/g, " ")
+            .trim()
+            .toLowerCase();
     };
 
 
