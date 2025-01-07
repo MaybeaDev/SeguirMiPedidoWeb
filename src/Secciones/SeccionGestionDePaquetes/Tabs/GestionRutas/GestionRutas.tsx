@@ -31,7 +31,9 @@ const GestionRutas = () => {
         const dat: Data[] = []
         const trab: { id: string, nombre: string }[] = []
         Object.values(transportistasContext).forEach((t) => {
-            trab.push({id: t.id, nombre: t.nombre})
+            if (t.tipo == 0) {
+                trab.push({id: t.id, nombre: t.nombre})
+            }
         })
         Object.values(rutasContext).forEach((k) => {
             let estado = "0";
