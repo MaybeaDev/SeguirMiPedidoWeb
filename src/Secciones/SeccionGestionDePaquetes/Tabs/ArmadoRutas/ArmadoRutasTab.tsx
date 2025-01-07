@@ -90,15 +90,24 @@ const ArmadoRutasTab: React.FC = () => {
                     batch.update(sfRef, { "ruta": rutaObjetivo.rutaId });
                 })
             }
-            if (Object.keys(modalPremiosData).length > 0) {
+            if (Object.keys(obtenerPremios()).length > 0) {
+
                 if (rutaObjetivo.rutaId && rutasContext[rutaObjetivo.rutaId] && rutasContext[rutaObjetivo.rutaId!].transportista != "") {
-                    [... new Set(paquetesParaAsignar.filter(p => p.codigo.slice(0, 4) != "DESP").map(p => p.codigo.slice(0, 10)))].forEach(p => {
-                        const sfRef = doc(db, "Premios", p);
-                        batch.update(sfRef, {
-                            "transportista": rutasContext[rutaObjetivo.rutaId!].transportista,
-                            "ruta": rutasContext[rutaObjetivo.rutaId!].id
-                        });
-                    })
+                    const paquetes = [... new Set(paquetesParaAsignar.filter(p => p.codigo.slice(0, 4) != "DESP").map(p => p.codigo.slice(0, 10)))]
+                    paquetes.forEach(
+                        p => {
+                            if (premiosContext[p]) {
+                                console.log({
+                                    "transportista": rutasContext[rutaObjetivo.rutaId!].transportista,
+                                    "ruta": rutasContext[rutaObjetivo.rutaId!].id
+                                })
+                                const sfRef = doc(db, "Premios", p);
+                                batch.update(sfRef, {
+                                    "transportista": rutasContext[rutaObjetivo.rutaId!].transportista,
+                                    "ruta": rutasContext[rutaObjetivo.rutaId!].id
+                                });
+                            }
+                        })
                 }
             }
             batch.commit();
@@ -194,14 +203,14 @@ const ArmadoRutasTab: React.FC = () => {
                 ])} headers={["Premio", "Cantidad"]} />
             }
             <div className={classes.containerNoEncontrados}>
-                {noEncontrados.map((c) => (
-                    <label>{c}</label>
+                {noEncontrados.map((c, _) => (
+                    <label key={_}>{c}</label>
                 ))}
             </div>
             <div className={classes.filtersContainer}>
-                <div className={classes.filterGroup} style={{margin:0}}>
+                <div className={classes.filterGroup} style={{ margin: 0 }}>
                     <input autoFocus
-                    style={{margin:0}}
+                        style={{ margin: 0 }}
                         type="text"
                         placeholder="Buscar..."
                         value={filtroIzquierda}
@@ -210,9 +219,9 @@ const ArmadoRutasTab: React.FC = () => {
                     />
                 </div>
 
-                <div className={classes.filterGroup} style={{margin:0}}>
-                    <input 
-                    style={{margin:0}}
+                <div className={classes.filterGroup} style={{ margin: 0 }}>
+                    <input
+                        style={{ margin: 0 }}
                         type="text"
                         placeholder="Buscar..."
                         value={filtroDerecha}

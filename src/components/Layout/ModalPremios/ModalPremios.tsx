@@ -26,7 +26,8 @@ const ModalPremios = (props: {
   return (
     <div className={classes.modal}>
       <div className={classes.modalContent}>
-        <h2>Esta es la ultima oportunidad para visualizar los premios de los paquetes que estás agregando<br/><h3>Toma una captura de pantalla</h3></h2>
+        <h2 style={{marginBottom:0}}>Esta es la ultima oportunidad para visualizar los premios de los paquetes que estás agregando</h2>
+        <h3>Toma una captura de pantalla</h3>
         <h1>Ruta: {props.ruta}</h1>
         <Table data={data} headers={headers} />
         <div className={classes.modalActions}>
