@@ -9,6 +9,7 @@ import classes from "./SeccionEmpleados.module.css"
 import Tab from "../../components/UI/Tab/Tab";
 import NavBarTab from "../../components/Layout/NavBar/NavBarTab";
 const SeccionEmpleados = () => {
+    
     return (
         <div className={classes.container}>
             <NavBarTab group="gestionDeEmpleados">
