@@ -1,40 +1,37 @@
-import { collection, getDocs } from "firebase/firestore";
 import Table from "../../../../components/UI/Table/Table"
-import { db } from "../../../../firebaseConfig";
 import { useEffect, useState } from "react";
-
-
-
-
+import { TransportistaContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
+import { useOutletContext } from "react-router-dom";
 
 
 const ListadoTab = () => {
+    const { transportistasContext } = useOutletContext<{ transportistasContext: Record<string, TransportistaContext> }>();
     const [usuarios, setUsuarios] = useState<string[][]>([])
     const [tableData, setTableData] = useState<string[][]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
 
     const getUsers = async () => {
-        const querySnapshot = await getDocs(collection(db, "Usuarios"));
         const users: string[][] = []
-        querySnapshot.docs.map((doc) => {
+        Object.values(transportistasContext).map((doc) => {
             users.push([
-                doc.data().nombre,
-                doc.data().tipo === 0 ? "Transportista" : (
-                    doc.data().tipo === 1 ? "Empresa" : "Desconocido..."
+                doc.nombre,
+                doc.tipo === 0 ? "Transportista" : (
+                    doc.tipo === 1 ? "Empresa" : "Desconocido..."
                 ),
-                doc.data().rut,
-                doc.data().correo,
-                doc.data().telefono,
-                doc.data().ultimaConexion ? doc.data().ultimaConexion.toDate().toLocaleString() : "No registrado",
-                doc.data().versionApp ?? "App antigua"
+                doc.rut,
+                doc.correo,
+                doc.telefono,
+                doc.ultimaConexion ? doc.ultimaConexion.toDate().toLocaleString() : "No registrado",
+                doc.versionApp ?? "App antigua"
             ])
-        });
+        })
         setUsuarios(users);
         setTableData(users);
     }
     useEffect(() => {
         getUsers()
-    }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [transportistasContext])
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         const query = e.target.value;
@@ -66,8 +63,8 @@ const ListadoTab = () => {
         <>
             <h2>Listado de usuarios</h2>
             <input type="text" placeholder="Buscar..." value={searchQuery} onChange={handleSearch} />
-            <Table data={tableData} headers={["Nombre", "Tipo", "Rut", "Correo", "Telefono", "Ultima conexión", "VersionApp"]} 
-            searchTerms={searchQuery.split(";").map((term) => normalizeString(term))} // Normaliza y divide términos
+            <Table data={tableData} headers={["Nombre", "Tipo", "Rut", "Correo", "Telefono", "Ultima conexión", "VersionApp"]}
+                searchTerms={searchQuery.split(";").map((term) => normalizeString(term))} // Normaliza y divide términos
             ></Table>
         </>
     )

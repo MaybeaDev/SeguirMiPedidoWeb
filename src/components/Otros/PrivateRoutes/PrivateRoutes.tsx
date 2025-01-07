@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
-import { collection, onSnapshot, query, Timestamp, where } from 'firebase/firestore';
+import { collection, onSnapshot, query, Timestamp } from 'firebase/firestore';
 import { db } from '../../../firebaseConfig';
 export interface RutaContext {
     id: string;
@@ -19,6 +19,9 @@ export interface TransportistaContext {
     rut: string,
     telefono: string,
     id: string,
+    tipo:number,
+    ultimaConexion:Timestamp,
+    versionApp:string
 }
 export interface PaqueteContext {
     id: string;
@@ -132,7 +135,7 @@ const PrivateRoute: React.FC = () => {
         })
     }
     const getTransportistas = () => {
-        const q = query(collection(db, "Usuarios"), where("tipo", "==", 0));
+        const q = query(collection(db, "Usuarios"));
         onSnapshot(q, (querySnapshot) => {
             const transportistas: { [key: string]: TransportistaContext } = {}
             querySnapshot.forEach((doc) => {
@@ -141,7 +144,10 @@ const PrivateRoute: React.FC = () => {
                     nombre: capitalize(doc.data().nombre),
                     rut: doc.data().rut,
                     telefono: doc.data().telefono,
-                    id: doc.id
+                    id: doc.id,
+                    tipo: doc.data().tipo,
+                    ultimaConexion: doc.data().ultimaConexion,
+                    versionApp: doc.data().versionApp ?? null
                 }
                 transportistas[transportista.id] = transportista
             })
