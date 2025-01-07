@@ -8,16 +8,41 @@ html {
 body {
   margin: 0;
   padding: 0;
-  background-color: #fff2e0;
+  background-color: #ffe0e0;
   display: flex;
 }
 h1, h2, h3, h4, h5, h6, p, label {
-  color: rgb(27, 15, 0)
+  color: rgb(27, 0, 0)
 }
 .highlight {
   font-weight: bold;
   color: #000000; /* Rojo o cualquier color que prefieras */
-  background-color: #d79c3d; /* Fondo suave para destacar */
+  background-color: #d73d3d; /* Fondo suave para destacar */
   padding: 2px;
   border-radius: 3px;
+}
+h2 {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 15px;
+  font-family: "Arial", sans-serif;
+}
+select,
+input {
+  width: 80%;
+  padding: 10px;
+  margin: 10px 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 2px solid #e09f9f;
+  border-radius: 15px;
+  font-size: 16px;
+  color: #333;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+select:focus,
+input:focus {
+  border-color: #e62222; /* Naranja de enfoque */
+  box-shadow: 0 0 10px rgba(230, 34, 34, 0.5); /* Sombra de enfoque */
 }

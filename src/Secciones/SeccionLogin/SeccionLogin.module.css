@@ -5,11 +5,11 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f4f4f9; /* Color de fondo suave */
+  background-color: #fde1e1; /* Color de fondo suave */
 }
 
 .loginBox {
-  background-color: #fff;
+  background-color: #fdeeee;
   padding: 30px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -22,7 +22,7 @@
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 20px;
-  color: #333; /* Título en color oscuro */
+  color: #333333; /* Título en color oscuro */
 }
 
 .error {
@@ -45,11 +45,11 @@
 
 .input:focus {
   outline: none;
-  border-color: #e67e22; /* Naranja */
+  border-color: #e62222; /* Naranja */
 }
 
 .submitButton {
-  background-color: #e67e22; /* Naranja */
+  background-color: #e62222; /* Naranja */
   color: white;
   padding: 12px;
   border: none;
@@ -59,9 +59,9 @@
 }
 
 .submitButton:hover {
-  background-color: #cf6d1a; /* Naranja más oscuro */
+  background-color: #cf1a1a; /* Naranja más oscuro */
 }
 
 .submitButton:active {
-  background-color: #9e5512; /* Naranja aún más oscuro */
+  background-color: #9e1212; /* Naranja aún más oscuro */
 }

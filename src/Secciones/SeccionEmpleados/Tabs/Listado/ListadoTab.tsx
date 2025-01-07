@@ -25,7 +25,8 @@ const ListadoTab = () => {
                 doc.data().rut,
                 doc.data().correo,
                 doc.data().telefono,
-                doc.data().ultimaConexion ? doc.data().ultimaConexion.toDate().toLocaleString() : "No registrado"
+                doc.data().ultimaConexion ? doc.data().ultimaConexion.toDate().toLocaleString() : "No registrado",
+                doc.data().versionApp ?? "App antigua"
             ])
         });
         setUsuarios(users);
@@ -65,7 +66,7 @@ const ListadoTab = () => {
         <>
             <h2>Listado de usuarios</h2>
             <input type="text" placeholder="Buscar..." value={searchQuery} onChange={handleSearch} />
-            <Table data={tableData} headers={["Nombre", "Tipo", "Rut", "Correo", "Telefono", "Ultima conexión"]} 
+            <Table data={tableData} headers={["Nombre", "Tipo", "Rut", "Correo", "Telefono", "Ultima conexión", "VersionApp"]} 
             searchTerms={searchQuery.split(";").map((term) => normalizeString(term))} // Normaliza y divide términos
             ></Table>
         </>

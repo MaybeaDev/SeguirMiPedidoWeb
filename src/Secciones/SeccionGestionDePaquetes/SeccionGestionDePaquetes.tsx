@@ -20,7 +20,7 @@ const SeccionGestionDePaquetes = () => {
                 <Tab id="gestionDeRutas" name={"Gestion de Rutas"} to="gestionDeRutas" />
             </NavBarTab>
             <div className={classes.content}>
-                <Card style={{ overflowX: "auto", marginTop: "0px", borderTopLeftRadius: 0, borderTopRightRadius: 0, marginInline: 20, border: "solid 2px #c77b00", borderTop: "none" }}>
+                <Card style={{ overflowX: "auto", marginTop: "0px", borderTopLeftRadius: 0, borderTopRightRadius: 0, marginInline: 20, border: "solid 2px #c70000", borderTop: "none" }}>
                     <div style={{ minWidth: "700px" }}>
                         <Outlet context={{paquetesContext, premiosContext, rutasContext, transportistasContext}} />
                     </div>
