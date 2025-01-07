@@ -1,11 +1,13 @@
+.inputGroup {
+  display: flex;
+  flex-direction: row;
+}
 
 .inputGroup label {
-  display: inline-block;
-  width: 14%;
+  flex: 1;
 }
 .inputGroup input {
   display: inline-block;
-  width: 14%;
   border-radius: 0;
   box-sizing: border-box;
   height: 45px;

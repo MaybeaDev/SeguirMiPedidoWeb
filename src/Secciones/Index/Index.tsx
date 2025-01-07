@@ -93,7 +93,7 @@ const Index = () => {
         setBuscandoOrdenCons(true)
         setOrdenConsBuscada(true)
         setSearchResultCons([])
-        const q = query(collection(db, "Paquetes"), where("consultora", "==", cons ?? consCode))
+        const q = query(collection(db, "Paquetes"), where("consultora", "==", cons?.toUpperCase() ?? consCode.toUpperCase()))
         const paquetes = await getDocs(q)
         const result: PaqueteExtended[] = []
         paquetes.forEach((p) => {

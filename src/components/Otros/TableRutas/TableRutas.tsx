@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { collection, doc, getDocs, query, where, writeBatch } from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebaseConfig";
-
 import classes from "./TableRutas.module.css";
 import Button from "../../UI/Button/Button";
 import { useNavigate } from "react-router-dom";
+
 interface Data {
     id: string,
     alias: string,
@@ -14,235 +14,56 @@ interface Data {
 }
 
 const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombre: string }[] }) => {
-    const [data, setData] = useState<Data[]>(props.initData)
-    const [dataFiltered, setDataFiltered] = useState<Data[]>(props.initData)
-    const [needSaveDataTransportista, setNeedSaveDataTransportista] = useState(false)
-    const [needSaveDataEstado, setNeedSaveDataEstado] = useState(false)
-    const [filtro, setFiltro] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
     const [isSaved, setIsSaved] = useState(false)
     const navigate = useNavigate()
 
     useEffect(() => {
-        if (props.initData && props.initData.length > 0) {
-            setIsLoading(true);
-            setIsSaved(true);
-            setNeedSaveDataEstado(false);
-            setNeedSaveDataTransportista(false);
-            setData(props.initData);
-            setDataFiltered(props.initData);
-            setIsLoading(false);
-            setTimeout(() => { setIsSaved(false) }, 600)
-        }
+        setIsSaved(true);
+        setTimeout(() => { setIsSaved(false) }, 600)
     }, [props.initData])
 
-    useEffect(() => {
-        handleFiltrar()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [filtro, data])
+    const handleChangeTransportista = async (value: string, rutaID: string) => {
+        updateDoc(doc(db, "Rutas", rutaID), { transportista: value, transportistaNombre: props.trabajadores.find(t => t.id == value)!.nombre })
 
-    const handleChangeTransportista = async (value: string, index: number) => {
-        const newData = data.map((data, i) => {
-            if (i === index) {
-                const newVal = {
-                    ...data,
-                    transportista: value
-                }
-                return newVal
-            } else return data
-        })
-        setData(newData);
-        const transportistasAntes = props.initData.map(it => it.transportista)
-        const transportistasDespues = newData.map(it => it.transportista)
-        let sonIguales = true
-
-        transportistasAntes.forEach((it, index) => {
-            const after = transportistasDespues[index]
-            if (it != after) {
-                sonIguales = false
-            }
-        })
-        if (sonIguales) {
-            setNeedSaveDataTransportista(false);
-        } else {
-            setNeedSaveDataTransportista(true);
+    };
+    const handleChangeEstado = async (value: string, rutaID: string) => {
+        const data = {
+            completado: false,
+            en_reparto: false,
+            cargado: false,
+            activa: false
         }
-        handleFiltrar()
-    };
-    const handleChangeEstado = async (value: string, index: number) => {
-        const newData = data.map((data, i) => {
-            if (i === index) {
-                const newVal = {
-                    ...data,
-                    estado: value
-                }
-                return newVal
-            } else return data
-        })
-        setData(newData);
-        const estadosAntes = props.initData.map(it => it.estado)
-        const estadosDespues = newData.map(it => it.estado)
-        let sonIguales = true
-
-        estadosAntes.forEach((it, index) => {
-            const after = estadosDespues[index]
-            if (it != after) {
-                sonIguales = false
-
-            }
-        })
-        if (sonIguales) {
-            setNeedSaveDataEstado(false);
-        } else {
-            setNeedSaveDataEstado(true);
+        if (value === "0") {   //Desactivada
+            data.completado = false
+            data.en_reparto = false
+            data.cargado = false;
+            data.activa = false;
+        } else if (value === "1") {   //Activada
+            data.completado = false
+            data.en_reparto = false
+            data.cargado = false;
+            data.activa = true;
+        } else if (value === "2") {   //Cargada
+            data.completado = false
+            data.en_reparto = false
+            data.cargado = true;
+            data.activa = true;
+        } else if (value === "3") {   //EnReparto
+            data.completado = false;
+            data.en_reparto = true;
+            data.cargado = true;
+            data.activa = true;
+        } else if (value === "4") {   //Completada
+            data.completado = true;
+            data.en_reparto = false;
+            data.cargado = false;
+            data.activa = false;
         }
-        handleFiltrar()
+        updateDoc(doc(db, "Rutas", rutaID), data)
     };
-
-
-    const handleFiltrar = () => {
-        const query = filtro;
-        const searchTerms = query
-            .split(";")
-            .map((term) => normalizeString(term))
-            .filter((term) => term.length > 0);
-        const filteredData = data.filter((ruta) =>
-            searchTerms.every((term) =>
-                normalizeString(ruta.alias).includes(term)
-            )
-        );
-        setDataFiltered(filteredData);
-    }
-    const normalizeString = (str: string): string => {
-        return str
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/[\u200B-\u200D\uFEFF]/g, "")
-            .replace(/\s+/g, " ")
-            .trim()
-            .toLowerCase();
-    };
-
-
-
-    const saveChanges = async () => {
-        setIsLoading(true);
-        const batch = writeBatch(db)
-
-        const estadosAntes = props.initData.map((it) => [it.estado, it.id])
-        const estadosDespues = data.map((it) => [it.estado, it.id])
-        const transportistasAntes = props.initData.map((it) => [it.transportista, it.id])
-        const transportistasDespues = data.map((it) => [it.transportista, it.id])
-
-        const cambios: { [x: string]: { estado?: number, transportista?: string } } = {}
-        transportistasAntes.forEach((it, index) => {
-            const antes = it[0]
-            const despues = transportistasDespues[index][0]
-            if (antes != despues) {
-                cambios[it[1]] = { transportista: despues }
-            }
-        })
-        estadosAntes.forEach((it, index) => {
-            const antes = it[0]
-            const despues = estadosDespues[index][0]
-            if (antes != despues) {
-                cambios[it[1]] = { estado: parseInt(despues) }
-            }
-        })
-        Object.keys(cambios).forEach(key => {
-            const q = query(collection(db, "Premios"), where("ruta", "==", key))
-            getDocs(q).then((snap) => {
-                if (snap.docs.length > 0) {
-                    const batch2 = writeBatch(db)
-                    snap.forEach(d => {
-                        const data:{ruta:string, transportista?:string} = {
-                            ruta: key,
-                        }
-                        if (cambios[key].transportista) {
-                            data.transportista= cambios[key].transportista
-                        }
-                        batch2.update(doc(db, "Premios", d.id), data)
-                    })
-                    batch2.commit()
-                }
-            })
-
-            const docRef = doc(db, "Rutas", key)
-            const data: {
-                transportista?: string,
-                transportistaNombre?: string,
-                activa?: boolean,
-                cargado?: boolean,
-                en_reparto?: boolean,
-                completado?: boolean,
-            } = {}
-            if (cambios[key].transportista != undefined) {
-                data.transportista = cambios[key].transportista ?? ""
-                const transportistaNombre = props.trabajadores.find((t) => t.id == cambios[key].transportista)
-                data.transportistaNombre = transportistaNombre ? transportistaNombre.nombre : ""
-            }
-            if (cambios[key].estado != undefined) {
-                if (cambios[key].estado === 0) {   //Desactivada
-                    data.completado = false
-                    data.en_reparto = false
-                    data.cargado = false;
-                    data.activa = false;
-                } else if (cambios[key].estado === 1) {   //Activada
-                    data.completado = false
-                    data.en_reparto = false
-                    data.cargado = false;
-                    data.activa = true;
-                } else if (cambios[key].estado === 2) {   //Cargada
-                    data.completado = false
-                    data.en_reparto = false
-                    data.cargado = true;
-                    data.activa = true;
-                } else if (cambios[key].estado === 3) {   //EnReparto
-                    data.completado = false;
-                    data.en_reparto = true;
-                    data.cargado = true;
-                    data.activa = true;
-                } else if (cambios[key].estado === 4) {   //Completada
-                    data.completado = true;
-                    data.en_reparto = false;
-                    data.cargado = false;
-                    data.activa = false;
-                }
-            }
-            batch.update(docRef, data)
-        })
-        await batch.commit();
-        setIsLoading(false);
-        setIsSaved(true);
-        setNeedSaveDataEstado(false)
-        setNeedSaveDataTransportista(false)
-    };
-    const highlightMatches = (text: string, terms: string[]): string => {
-        if (!terms || terms.length === 0 || terms.every((term) => term.trim() === "")) {
-            return text;
-        }
-
-        const escapedTerms = terms
-            .map((term) => term.trim())
-            .filter((term) => term.length > 0)
-            .map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
-
-        if (escapedTerms.length === 0) {
-            return text;
-        }
-        const regex = new RegExp(`(${escapedTerms.join("|")})`, "gi");
-        return text.replace(regex, (match) => `<span class="highlight">${match}</span>`);
-    };
-
 
     return (
         <div>
-            <input
-                type="text"
-                placeholder="Filtrar rutas..."
-                value={filtro}
-                onChange={(e) => setFiltro(e.target.value)}
-            />
             <table width="100%" className={`${classes.table} ${isSaved && "bouncing"}`}>
                 <thead className={classes.thead}>
                     <tr className={classes.trHeadder}>
@@ -253,16 +74,9 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
                     </tr>
                 </thead>
                 <tbody className={classes.tbody}>
-                    {dataFiltered.map((ruta, index) => (
+                    {props.initData.map((ruta, index) => (
                         <tr key={index} className={classes.tr}>
-                            <td
-                                className={classes.td}
-                                dangerouslySetInnerHTML={{
-                                    __html: filtro
-                                        ? highlightMatches(ruta.alias, [filtro])
-                                        : ruta.alias,
-                                }}
-                            ></td>
+                            <td className={classes.td}>{ruta.alias}</td>
                             <td className={classes.td}>
                                 {parseInt(ruta.paquetes) ? (
                                     <Button
@@ -277,7 +91,7 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
                                     <select
                                         style={{ margin: 0, padding: "5px" }}
                                         value={ruta.estado}
-                                        onChange={(e) => handleChangeEstado(e.target.value, index)}
+                                        onChange={(e) => handleChangeEstado(e.target.value, ruta.id)}
                                     >
                                         <option value="0">Inactiva</option>
                                         <option value="1">Activa</option>
@@ -295,7 +109,7 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
                                     <select
                                         style={{ margin: 0, padding: "5px" }}
                                         value={ruta.transportista}
-                                        onChange={(e) => handleChangeTransportista(e.target.value, index)}
+                                        onChange={(e) => handleChangeTransportista(e.target.value, ruta.id)}
                                     >
                                         <option value="">No asignado</option>
                                         {props.trabajadores.map((trabajador, index) => (
@@ -315,15 +129,6 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
                     ))}
                 </tbody>
             </table>
-
-            {(needSaveDataTransportista || needSaveDataEstado) && (isLoading ?
-                <div className={classes.spinnerContainer}>
-                    <div className={classes.spinner}></div>
-                </div>
-                :
-                <Button onClick={saveChanges} style={{ marginTop: "10px" }}>
-                    Guardar Cambios
-                </Button>)}
         </div>
     );
 };

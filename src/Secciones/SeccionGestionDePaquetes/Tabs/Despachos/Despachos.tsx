@@ -10,34 +10,12 @@ import JsBarcode from "jsbarcode";
 import { Document, Packer, Paragraph, Table as TableDocx, TableRow, TableCell, ImageRun, TextRun } from "docx";
 import { obtenerCoordenadas } from "../../../../mapbox";
 
-interface Consultora {
-    transportista: string,
-    consultora: string,
-    fono: string,
-    ciudad: string,
-    direccion: string,
-}
 const DespachosTab = () => {
 
     const [data, setData] = useState<string[][]>([])
     const [descargado, setDescargado] = useState(false)
-    const [consultoras, setConsultoras] = useState<Consultora[]>([])
-    const [fechaInputValue, setFechaInputValue] = useState(new Date().toISOString().split("T")[0])
     const formRef = useRef<HTMLFormElement>(null)
-    useEffect(() => {
-        const docRef = doc(db, "metadatos/despachos")
-        getDoc(docRef).then((d) => {
-            setConsultoras(d.data()!.historial.map((c: Consultora) => {
-                return {
-                    transportista: c.transportista,
-                    consultora: c.consultora,
-                    fono: c.fono,
-                    ciudad: c.ciudad,
-                    direccion: c.direccion
-                }
-            }))
-        })
-    }, [])
+
     useEffect(() => {
         setDescargado(false)
     }, [data])
@@ -49,66 +27,65 @@ const DespachosTab = () => {
             handleAgregarDespacho()
         }
     }
-    const handleOnChangeConsultora = (e: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(e.target.value)
-        formRef.current!.Consultora.value = e.target.value
-        const consultora = consultoras.find((c) => c.consultora === formRef.current!.Consultora.value)
-        if (consultora) {
-            formRef.current!.Transportista.value = consultora.transportista
-            formRef.current!.Fono.value = consultora.fono
-            formRef.current!.Ciudad.value = consultora.ciudad
-            formRef.current!.Direccion.value = consultora.direccion
-            formRef.current!.Fecha.focus()
-        }
-    }
     const handleAgregarDespacho = async () => {
         if (formRef.current!) {
-            const consultora = formRef.current.Consultora
-            const transportista = formRef.current.Transportista
+            const nombre = formRef.current.Nombre
+            const destinatario = formRef.current.Destinatario
             const fono = formRef.current.Fono
             const ciudad = formRef.current.Ciudad
             const direccion = formRef.current.Direccion
-            const fecha = formRef.current.Fecha
-            if (consultora.value == "") {
-                consultora.focus()
-            } else if (transportista.value == "") {
-                transportista.focus()
+            const bultos = formRef.current.Bultos
+            if (nombre.value == "") {
+                console.log(nombre)
+                nombre.focus()
+            } else if (destinatario.value == "") {
+                destinatario.focus()
             } else if (fono.value == "") {
                 fono.focus()
             } else if (ciudad.value == "") {
                 ciudad.focus()
             } else if (direccion.value == "") {
                 direccion.focus()
-            } else if (fecha.value == "") {
-                fecha.focus()
-            } else if (new Date(fecha.value) > new Date('2100-12-31')) {
-                alert("La fecha ingresada no es válida")
+            } else if (bultos.value == "") {
+                bultos.focus()
+            } else if (parseInt(bultos.value) <= 0) {
+                bultos.value = 1
+                bultos.focus()
+            } else if (parseInt(bultos.value) > 100) {
+                bultos.value = 100
+                bultos.focus()
             } else {
                 const docRef = doc(db, "metadatos/contador")
                 const ultimoDespacho = await (await getDoc(docRef)).data()!.ultimoDespacho
                 updateDoc(docRef, { ultimoDespacho: parseInt(ultimoDespacho) + 1 })
-                const codigo = "DESP" + ultimoDespacho.toString().padStart(10, "0");
-                const date = new Date(fecha.value);
-                const day = String(date.getDate()).padStart(2, '0');
-                const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses comienzan desde 0
-                const year = date.getFullYear();
+                const newData: string[][] = []
+                for (let i = 0; i < parseInt(bultos.value); i++) {
+                    console.log(i)
+                    const codigo = "DESP" + ultimoDespacho.toString().padStart(6, "0") + i.toString().padStart(3, "0")
+                    const date = new Date();
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses comienzan desde 0
+                    const year = date.getFullYear();
 
-                const formattedDate = `${day}/${month}/${year}`;
-
+                    const formattedDate = `${day}/${month}/${year}`;
+                    newData.push(
+                        [
+                            codigo,
+                            nombre.value.toUpperCase(),
+                            destinatario.value.toUpperCase(),
+                            fono.value,
+                            ciudad.value.toUpperCase(),
+                            direccion.value.toUpperCase(),
+                            formattedDate,
+                        ]
+                    )
+                }
                 setData([
                     ...data,
-                    [
-                        codigo,
-                        consultora.value.toUpperCase(),
-                        transportista.value.toUpperCase(),
-                        fono.value,
-                        ciudad.value.toUpperCase(),
-                        direccion.value.toUpperCase(),
-                        formattedDate,
-                    ]
+                    ...newData
                 ])
                 formRef.current.reset()
-                formRef.current!.Consultora.focus()
+                formRef.current!.Nombre.focus()
             }
 
         }
@@ -119,55 +96,35 @@ const DespachosTab = () => {
             await handleDescargarListado()
         }
         const batch = writeBatch(db)
-        const consultorasAGuardar: string[] = []
+        const nombresAGuardar: string[] = []
         for (const row of data) {
             const docRef = doc(db, "Paquetes", String(row[0]));
             const coordenadas = await obtenerCoordenadas(row[5]);
-            consultorasAGuardar.push(row[1])
+            nombresAGuardar.push(row[1])
             const object = {
                 contacto: String(row[3]),
-                consultora: "Despacho particular",
-                direccion: row[5],
-                referencia: row[4],
                 campaña: "Despacho particular",
-                transportistaNombre: row[2],
+                direccion: row[5],
                 estado: 1,
-                receptor: row[1],
-                ruta: "",
-                coordenadas: coordenadas,
                 historial: [
                     {
                         detalles: "Hemos recibido la encomienda",
                         estado: 1,
-                        fecha: formatToFirebaseTimestamp(row[6]),
+                        fecha: Timestamp.fromDate(new Date()),
                     },
                 ],
+                receptor: row[2],
+                referencia: row[4],
+                facturacion: " Particular",
+                ruta: "",
+                rutaAlias: "",
+                transportistaNombre: "",
+                consultora: row[1],
+                coordenadas: coordenadas,
             };
             batch.set(docRef, object)
         }
         batch.commit();
-        const docRef = doc(db, "metadatos/despachos")
-        getDoc(docRef).then((d) => {
-            const historial: Consultora[] = [...d.data()!.historial]
-            const ingresos = data.map((d) => {
-                return {
-                    consultora: d[1],
-                    transportista: d[2],
-                    fono: d[3],
-                    ciudad: d[4],
-                    direccion: d[5],
-                }
-            })
-            const existentes = historial.filter((h) => ingresos.map((h) => h.consultora).includes(h.consultora))
-            const inexistentes = (ingresos.filter((c) => !historial.map(h => h.consultora).includes(c.consultora)))
-            console.log(historial, existentes, inexistentes)
-            for (const existente of existentes) {
-                const indice = historial.indexOf(existente)
-                historial[indice] = ingresos[indice]
-
-            }
-            updateDoc(docRef, { historial: [...historial,...inexistentes] })
-        })
         setData([])
     }
     const handleEliminarData = (fila: string) => {
@@ -240,7 +197,7 @@ const DespachosTab = () => {
                                         },
                                         children: [
                                             new TextRun({
-                                                text: row[1],
+                                                text: row[2],
                                                 font: "calibri",
                                                 size: 52,
                                             })
@@ -306,41 +263,27 @@ const DespachosTab = () => {
             link.click();
         });
     }
-    const formatToFirebaseTimestamp = (dateString: string): Timestamp => {
-        const [day, month, year] = dateString.split('/').map(Number);
-        // Nota: Los meses en JavaScript comienzan desde 0, por lo que restamos 1 al mes.
-        const date = new Date(year, month - 1, day);
-        return Timestamp.fromDate(date);
-    }
-
-
-
     return (
         <div className={classes.root}>
             <h2>Despachos</h2>
             <div className={classes.inputGroup}>
-                <label>Consultora</label>
-                <label>Transportista</label>
-                <label>Fono</label>
+                <label>Cliente</label>
+                <label>Destinatario</label>
+                <label>Fono contacto</label>
                 <label>Ciudad</label>
                 <label>Direccion</label>
-                <label>Fecha</label>
+                <label>Bultos</label>
                 <label></label>
             </div>
             <form ref={formRef}>
                 <div className={classes.inputGroup}>
-                    <input onKeyDown={handleOnKeyDown} onChange={handleOnChangeConsultora} required autoComplete="off" name="Consultora" type="text" list="datalist" placeholder="Consultora" />
-                    <datalist id="datalist">
-                        {consultoras.map((c, index) => (
-                            <option key={index} value={c.consultora}>{`${c.transportista}, ${c.ciudad}, ${c.direccion}`}</option>
-                        ))}
-                    </datalist>
-                    <input autoComplete="off" autoCapitalize="characters" onKeyDown={handleOnKeyDown} required name="Transportista" type="text" placeholder="Transportista" />
-                    <input autoComplete="off" autoCapitalize="characters" onKeyDown={handleOnKeyDown} required name="Fono" type="number" placeholder="Fono" />
-                    <input autoComplete="off" autoCapitalize="characters" onKeyDown={handleOnKeyDown} required name="Ciudad" type="text" placeholder="Ciudad" />
-                    <input autoComplete="off" autoCapitalize="characters" onKeyDown={handleOnKeyDown} required name="Direccion" type="text" placeholder="Direccion" />
-                    <input autoComplete="off" autoCapitalize="characters" onKeyDown={handleOnKeyDown} onChange={(e) => { setFechaInputValue(e.target.value) }} required name="Fecha" value={fechaInputValue} type="date" max="2100-12-31" placeholder="Fecha" />
-                    <input onClick={handleAgregarDespacho} type="button" placeholder="Fecha" value="Agregar" />
+                    <input style={{ flex: 1 }} autoComplete="off" onKeyDown={handleOnKeyDown} required name="Nombre" type="text" placeholder="Cliente" />
+                    <input style={{ flex: 1 }} autoComplete="off" onKeyDown={handleOnKeyDown} required name="Destinatario" type="text" placeholder="Destinatario" />
+                    <input style={{ flex: 1 }} autoComplete="off" onKeyDown={handleOnKeyDown} required name="Fono" type="number" placeholder="Fono" />
+                    <input style={{ flex: 1 }} autoComplete="off" onKeyDown={handleOnKeyDown} required name="Ciudad" type="text" placeholder="Ciudad" />
+                    <input style={{ flex: 1 }} autoComplete="off" onKeyDown={handleOnKeyDown} required name="Direccion" type="text" placeholder="Direccion" />
+                    <input style={{ flex: 1 }} autoComplete="off" onKeyDown={handleOnKeyDown} required name="Bultos" type="number" min="1" max="1000" placeholder="Bultos" />
+                    <input style={{ flex: 1 }} onClick={handleAgregarDespacho} type="button" placeholder="Fecha" value="Agregar" />
                 </div>
             </form>
             <div className={classes.spaceAround}>
@@ -350,8 +293,8 @@ const DespachosTab = () => {
             <Table data={data} headers={
                 [
                     "Codigo",
-                    "Consultora",
-                    "Transportista",
+                    "Cliente",
+                    "Destinatario",
                     "Fono",
                     "Ciudad",
                     "Direccion",

@@ -3,7 +3,7 @@ import classes from "./EditarRuta.module.css"
 
 
 import { useOutletContext, useParams } from "react-router-dom";
-import { arrayUnion, doc, updateDoc } from "firebase/firestore";
+import { arrayUnion, deleteField, doc, updateDoc, writeBatch } from "firebase/firestore";
 import { db } from "../../../../firebaseConfig";
 import { useEffect, useState } from "react";
 import Table from "../../../../components/UI/Table/Table";
@@ -11,7 +11,7 @@ import { PaqueteContext, RutaContext } from "../../../../components/Otros/Privat
 
 
 const EditarRutaTab = () => {
-    const { paquetesContext, rutasContext } = useOutletContext<{ paquetesContext: PaqueteContext[], rutasContext: Record<string, RutaContext> }>();
+    const { paquetesContext, rutasContext, premiosContext } = useOutletContext<{ paquetesContext: PaqueteContext[], rutasContext: Record<string, RutaContext>, premiosContext: Record<string, Record<string, number>> }>();
     const [paquetes, setPaquetes] = useState<string[][]>([])
     const [ruta, setRuta] = useState("")
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -29,7 +29,7 @@ const EditarRutaTab = () => {
         filtrados.forEach((p) => {
             paq.push(
                 [
-                    p.id,
+                    p.id.slice(0, p.id.length - 3),
                     p.consultora,
                     p.contacto,
                     (() => {
@@ -48,16 +48,39 @@ const EditarRutaTab = () => {
                 ]
             )
         })
-        setPaquetes(paq)
+        // Contar las ocurrencias de cada paquete
+        const counts: Record<string, number> = {};
+        paq.forEach((item) => {
+            const key = JSON.stringify(item);
+            counts[key] = (counts[key] || 0) + 1;
+        });
+
+        // Crear la lista única con el conteo añadido al primer elemento
+        const paquetesUnicos = Array.from(new Set(paq.map((item) => JSON.stringify(item))))
+            .map((item) => JSON.parse(item))
+            .map((item: string[]) => {
+                const key = JSON.stringify(item);
+                const count = counts[key];
+                item[0] += count > 1 ? ` (${count})` : ""; // Añadir el conteo si hay duplicados
+                return item;
+            });
+
+        setPaquetes(paquetesUnicos);
     }
 
     const devolverABodega = async (key: string) => {
-        const p = paquetesContext.find(p => p.id == key)
-        if (p) {
+        console.log(key.split(" ")[0].split(" ")[0])
+        const paquetes = paquetesContext.filter(p => p.id.slice(0, p.id.length - 3) == key.split(" ")[0])
+        console.log(paquetes.length)
+        const batch = writeBatch(db)
+        if (premiosContext[key.split(" ")[0]]) {
+            batch.update(doc(db, "Premios", key.split(" ")[0]), { transportista: "", ruta: deleteField() })
+        }
+        paquetes.forEach((p, index) => {
             if (p.estado == 1) {
-                updateDoc(doc(db, "Paquetes", key), { ruta: "" })
+                batch.update(doc(db, "Paquetes", key.split(" ")[0] + (index + 1).toString().padStart(3, "0")), { ruta: "" })
             } else {
-                updateDoc(doc(db, "Paquetes", key), {
+                batch.update(doc(db, "Paquetes", key.split(" ")[0] + (index + 1).toString().padStart(3, "0")), {
                     ruta: "",
                     estado: 1, historial: arrayUnion({
                         estado: 1,
@@ -66,7 +89,8 @@ const EditarRutaTab = () => {
                     })
                 })
             }
-        }
+        })
+        batch.commit()
     }
     const marcarEntregado = async (key: string) => {
         const p = paquetesContext.find(p => p.id == key)
