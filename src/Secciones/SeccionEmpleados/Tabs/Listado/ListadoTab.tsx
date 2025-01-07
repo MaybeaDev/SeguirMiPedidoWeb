@@ -13,24 +13,23 @@ const ListadoTab = () => {
     const getUsers = async () => {
         const users: string[][] = []
         Object.values(transportistasContext).map((doc) => {
-            users.push([
-                doc.nombre,
-                doc.tipo === 0 ? "Transportista" : (
-                    doc.tipo === 1 ? "Empresa" : "Desconocido..."
-                ),
-                doc.rut,
-                doc.correo,
-                doc.telefono,
-                doc.ultimaConexion ? doc.ultimaConexion.toDate().toLocaleString() : "No registrado",
-                doc.versionApp ?? "App antigua"
-            ])
+            if (doc.tipo == 0) {
+                users.push([
+                    doc.nombre,
+                    doc.rut,
+                    doc.correo,
+                    doc.telefono,
+                    doc.ultimaConexion ? doc.ultimaConexion.toDate().toLocaleString() : "No registrado",
+                    doc.versionApp ?? "App antigua"
+                ])
+            }
         })
         setUsuarios(users);
         setTableData(users);
     }
     useEffect(() => {
         getUsers()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [transportistasContext])
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,7 +62,7 @@ const ListadoTab = () => {
         <>
             <h2>Listado de usuarios</h2>
             <input type="text" placeholder="Buscar..." value={searchQuery} onChange={handleSearch} />
-            <Table data={tableData} headers={["Nombre", "Tipo", "Rut", "Correo", "Telefono", "Ultima conexión", "VersionApp"]}
+            <Table data={tableData} headers={["Nombre", "Rut", "Correo", "Telefono", "Ultima conexión", "VersionApp"]}
                 searchTerms={searchQuery.split(";").map((term) => normalizeString(term))} // Normaliza y divide términos
             ></Table>
         </>
