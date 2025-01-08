@@ -30,14 +30,22 @@ const IngresarFacturacionTab = () => {
     const [data, setData] = useState<Paquete[]>([]);
     const [premios, setPremios] = useState<Record<string, Record<string, number>>>({});
     const [isLoading, setIsLoading] = useState(false)
-    const [inputValue, setInputValue] = useState("")
     const [loadingState, setLoadingState] = useState(false)
     const [avanceCarga, setAvanceCarga] = useState(0)
     const [totalCarga, setTotalCarga] = useState(0)
+    const [facturaciones, setFacturaciones] = useState<string[]>([])
 
 
-    const inputHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setInputValue(event.target.value)
+    const excelDateToJSDate = (serial: number): string => {
+        const excelEpoch = new Date(Date.UTC(1900, 0, 1));
+        const daysOffset = serial - 1;
+        const jsDate = new Date(excelEpoch.getTime() + daysOffset * 24 * 60 * 60 * 1000);
+
+        const day = String(jsDate.getUTCDate() - 1).padStart(2, '0');
+        const month = String(jsDate.getUTCMonth() + 1).padStart(2, '0');
+        const year = jsDate.getUTCFullYear();
+
+        return `${day}-${month}-${year}`;
     }
     const handleFileSelect = (file: File) => {
         setData([]);
@@ -48,44 +56,37 @@ const IngresarFacturacionTab = () => {
             const fileContent = e.target?.result;
             if (fileContent) {
                 const workbook = XLSX.read(fileContent, { type: "array" });
-                const factIndex = workbook.SheetNames.indexOf("Facturacion Total");
-                const ultimaFacturacion = workbook.SheetNames[factIndex - 2];
-                const worksheet = workbook.Sheets[ultimaFacturacion];
+                const worksheet = workbook.Sheets["Facturacion Total"];
                 const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as string[][];
                 setIsLoading(false);
-                const parsedHeaders = data.map((row) => ([row[0] as string, row[15] as string, row[9] as string, row[10] as string, row[11] as string, row[12] as string, row[26] as string, row[17] as string, row[18] as string]))
+                const parsedHeaders = data.map((row) => ([row[0] as string, row[5] as string, row[15] as string, row[9] as string, row[10] as string, row[11] as string, row[12] as string, row[26] as string, row[17] as string, row[18] as string]))
                 const comienzoTabla = parsedHeaders.findIndex((headers) => {
-                    if (JSON.stringify(headers) === JSON.stringify(["PEDIDO", "CAJAS", "CONSULTORA", "NOMBRE CONSULTORA", "DIRECCION", "TELEFONO", "CAMPAÑA FACTURACION", "NOMBRE AFP", "CANTIDAD"])) {
+                    if (JSON.stringify(headers) === JSON.stringify(["PEDIDO", "Fecha", "CAJAS", "CONSULTORA", "NOMBRE CONSULTORA", "DIRECCION", "TELEFONO", "CAMPAÑA FACTURACION", "NOMBRE AFP", "CANTIDAD"])) {
                         return true
                     }
                 })
                 if (comienzoTabla >= 0) {
-                    console.log(data.slice(comienzoTabla + 1).length)
                     const parsedData = data.slice(comienzoTabla + 1).map((row) => {
-                        console.log(row)
                         return {
                             codigo: row[0] ? row[0].toString().trim() : "",
                             cajas: row[15] ? parseInt(row[15]) : 0,
-                            consultora: row[9].toString().trim() || "",
-                            nombreConsultora: row[10].toString().trim() || "",
-                            facturacion: ultimaFacturacion + "-" + new Date().getFullYear().toString(),
-                            direccion: row[11].toString().trim() || "",
-                            telefono: row[12].toString().trim() || "",
-                            campaña: row[26].toString().trim() || "",
-                            nombreAFP: row[17].toString().trim() || "",
-                            cantidadAFP: row[18].toString().trim() || "",
+                            consultora: row[9] ? row[9].toString().trim() : "",
+                            nombreConsultora: row[10] ? row[10].toString().trim() : "",
+                            facturacion: row[5] ? excelDateToJSDate(parseInt(row[5])) : "",
+                            direccion: row[11] ? row[11].toString().trim() : "",
+                            telefono: row[12] ? row[12].toString().trim() : "",
+                            campaña: row[26] ? row[26].toString().trim() : "",
+                            nombreAFP: row[17] ? row[17].toString().trim() : "",
+                            cantidadAFP: row[18] ? row[18].toString().trim() : "",
                         }
                     });
-
-                    // Filtrar las filas que tienen un "codigo" vacío o null
                     const validData = parsedData.filter(item => item.codigo != "" && String(item.codigo).trim() !== "");
+                    setFacturaciones([...new Set(validData.map(p => p.facturacion))])
                     setIsLoading(false);
-                    console.log(validData);
                     const fullData: Paquete[] = []
                     const premios: Record<string, Record<string, number>> = {}
                     validData.forEach((pedido) => {
                         if (pedido.nombreAFP != "") {
-                            console.log(parseInt(pedido.cantidadAFP))
                             if (!premios[pedido.codigo]) {
                                 premios[pedido.codigo] = {}
                             }
@@ -109,8 +110,15 @@ const IngresarFacturacionTab = () => {
                             })
                         }
                     })
-                    setPremios(premios)
-                    ingresarData(fullData);
+                    const newData = fullData.filter(f => !paquetesContext.map(pc => pc.id).includes(f.codigo))
+                    const pedidos = [...new Set(newData.map(d => d.codigo))]
+                    const newPremios: Record<string, Record<string, number>> = {}
+                    pedidos.forEach(p => {
+                        if (premios[p])
+                        newPremios[p] = premios[p]
+                    })
+                    setPremios(newPremios)
+                    ingresarData(newData);
                 } else {
                     setErrorFile("La plantilla no es la correcta. Descarga la plantilla con el botón superior");
                     return;
@@ -156,7 +164,7 @@ const IngresarFacturacionTab = () => {
             batch.set(docRef, object);
         }
         Object.keys(premios).forEach((k) => {
-            batch.set(doc(db, "Premios", k), {premios:premios[k], transportista:""})
+            batch.set(doc(db, "Premios", k), { premios: premios[k], transportista: "" })
         })
         const docRef = doc(db, "metadatos/campanias");
         const campañasMetadata = await getDoc(docRef);
@@ -181,12 +189,9 @@ const IngresarFacturacionTab = () => {
         const idsToCheck = data.map((item) => String(item.codigo));
         const encontrados = obtenerDocumentosExistentes(idsToCheck)
         if (idsToCheck.length == encontrados.length) {
-            alert("Los codigos de la ultima facturación ya han sido ingresados, se abortará la operacion")
-        } else if (encontrados.length > 0) {
-            alert(`Los siguientes códigos ya existen en la base de datos por lo que se abortará la operación: ${[...encontrados].join(", ")}`);
+            alert("Todos los paquetes ya han sido ingresados, se abortará la operacion")
         } else {
-            // console.log("Ahora se guardaría")
-            await guardarEnFirebase(data)
+            await guardarEnFirebase(data.filter(p => !encontrados.includes(p.codigo)))
         }
         setLoadingState(false)
     }
@@ -194,9 +199,10 @@ const IngresarFacturacionTab = () => {
         const encontrados = paquetesContext.filter(p => ids.includes(p.id))
         return encontrados.map(p => p.id)
     };
-    const ingresarData = (data: Paquete[]) => {
-        if (data.length > 0) {
-            setData(data);
+    const ingresarData = (d: Paquete[]) => {
+        console.log(d)
+        if (d.length > 0) {
+            setData(d);
         }
     }
 
@@ -230,9 +236,18 @@ const IngresarFacturacionTab = () => {
                     </center>
                 </div>
                 <div className={classes.rightContent}>
-                    <input type="text" className={classes.input} value={inputValue} onInput={inputHandler} placeholder="buscar fila..." />
+                    {facturaciones.length > 0 &&
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                            <label>Facturaciones encontradas</label><br />
+                            <div style={{ display: "flex", flexDirection: "row" }}>
+                                {facturaciones.filter(f => data.map(d => d.facturacion).includes(f)).map(p => (
+                                    <label>{p}, </label>
+                                ))
+                                }
+                            </div>
+                        </div>
+                    }
                     <Table
-                        searchTerms={inputValue.split(";")}
                         data={data.map((p) => (
                             [
                                 p.campaña,

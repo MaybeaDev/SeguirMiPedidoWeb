@@ -6,7 +6,7 @@ import classes from "./NavBar.module.css"
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../firebaseConfig"
 // import { db } from "../../../firebaseConfig"
-// import { collection, doc, getDocs, query, where, writeBatch } from "firebase/firestore";
+// import { collection, doc, getDoc, getDocs, query, updateDoc, where, writeBatch } from "firebase/firestore";
 // import Button from "../../UI/Button/Button";
 const Navbar = () => {
     const [user, setUser] = useState<boolean>(false);
@@ -28,25 +28,34 @@ const Navbar = () => {
     }, []);
 
     // const handleFunction = async () => {
-    //     const batch = writeBatch(db)
-        
-    //     const q = query(collection(db, "Paquetes"), where("estado", "==", 3), where("ruta", "==", ""))
+    //     // const batch = writeBatch(db)
+
+    //     const q = query(collection(db, "Paquetes"), where("estado", "==", 2), where("ruta", "==", "O7u1sQZBvxMMUrPnVUir"))
     //     const paquetes = (await getDocs(q)).docs.map(d => {
     //         return {
     //             id: d.id,
     //             ruta: d.data().ruta,
     //         }
     //     })
+
     //     console.log(paquetes)
-    //     paquetes.forEach(p => {
-    //         batch.update(doc(db, "Paquetes", p.id), { ruta: "Sistema", rutaAlias:"Sistema", transportistaNombre:"Sistema" })
+    //     paquetes.forEach(async p => {
+    //         const premioRef = doc(db, "Premios", p.id.slice(0, 10))
+    //         const premio = await getDoc(premioRef)
+    //         if (premio.exists()) {
+    //             console.log("existe")
+    //             await updateDoc(doc(db, "Premios", p.id.slice(0, 10)), { transportista: "hTnTPDzF7odTBS31RaJnyNGRS8l2", ruta: "O7u1sQZBvxMMUrPnVUir" })
+    //         }
     //     })
-    //     console.log("Guardando...")
-    //     batch.commit().then(() => {
-    //         console.log("Batch de actualización exitosa");
-    //     }).catch((error) => {
-    //         console.error("Error al actualizar batch: ", error);
-    //     });
+        // paquetes.forEach(p => {
+        //     batch.update(doc(db, "Paquetes", p.id), { ruta: "Sistema", rutaAlias:"Sistema", transportistaNombre:"Sistema" })
+        // })
+        // console.log("Guardando...")
+        // batch.commit().then(() => {
+        //     console.log("Batch de actualización exitosa");
+        // }).catch((error) => {
+        //     console.error("Error al actualizar batch: ", error);
+        // });
     // }
 
 
