@@ -94,34 +94,34 @@ const EditarRutaTab = () => {
     }
     const marcarEntregado = async (pedido: string) => {
         const key = pedido.split(" ")[0]
-        const p = paquetesContext.find(p => p.id.slice(0, 10) == key)
-        if (p) {
-            updateDoc(doc(db, "Paquetes", key), {
+        const paquetes = paquetesContext.filter(p => p.id.slice(0, 10) == key)
+        paquetes.forEach(p => {
+            updateDoc(doc(db, "Paquetes", p.id), {
                 estado: 3, historial: arrayUnion({
                     estado: 3,
                     fecha: new Date(),
                     detalles: "Pedido entregado por sistema"
                 })
             })
-            if (premiosContext[key]) {
-                updateDoc(doc(db, "Premios", key), { entregado: true, ruta: deleteField(), transportista: "" })
-            }
+        })
+        if (premiosContext[key]) {
+            updateDoc(doc(db, "Premios", key), { entregado: true, ruta: deleteField(), transportista: "" })
         }
     }
     const marcarNoEntregado = async (pedido: string) => {
         const key = pedido.split(" ")[0]
-        const p = paquetesContext.find(p => p.id.slice(0, 10) == key)
-        if (p) {
-            updateDoc(doc(db, "Paquetes", key), {
+        const paquetes = paquetesContext.filter(p => p.id.slice(0, 10) == key)
+        paquetes.forEach(p => {
+            updateDoc(doc(db, "Paquetes", p.id), {
                 estado: 5, historial: arrayUnion({
                     estado: 5,
                     fecha: new Date(),
                     detalles: "Pedido devuelto a Santiago"
                 })
             })
-            if (premiosContext[key]) {
-                updateDoc(doc(db, "Premios", key), { entregado: false, ruta: deleteField(), transportista: "" })
-            }
+        })
+        if (premiosContext[key]) {
+            updateDoc(doc(db, "Premios", key), { entregado: false, ruta: deleteField(), transportista: "" })
         }
     }
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
