@@ -105,7 +105,7 @@ const EditarRutaTab = () => {
             })
         })
         if (premiosContext[key]) {
-            updateDoc(doc(db, "Premios", key), { entregado: true, ruta: deleteField(), transportista: "" })
+            updateDoc(doc(db, "Premios", key), { entregado: true })
         }
     }
     const marcarNoEntregado = async (pedido: string) => {
