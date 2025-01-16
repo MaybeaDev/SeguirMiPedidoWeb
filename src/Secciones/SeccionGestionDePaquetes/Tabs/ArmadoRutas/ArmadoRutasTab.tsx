@@ -19,7 +19,7 @@ type Paquete = {
 
 
 const ArmadoRutasTab: React.FC = () => {
-    const { paquetesContext, rutasContext, premiosContext } = useOutletContext<{ paquetesContext: PaqueteContext[], rutasContext: Record<string, RutaContext>, premiosContext: Record<string, { premios: Record<string, number>, transportista: string }> }>();
+    const { paquetesContext, rutasContext, premiosContext } = useOutletContext<{ paquetesContext: PaqueteContext[], rutasContext: Record<string, RutaContext>, premiosContext: Record<string, { premios: Record<string, number>; transportista: string, entregado:boolean }> }>();
     const [paquetesNoAsignados, setPaquetesNoAsignados] = useState<Paquete[]>([]);
     const [paquetesParaAsignar, setPaquetesParaAsignar] = useState<Paquete[]>([]);
     const [noEncontrados, setNoEncontrados] = useState<string[]>([])
@@ -28,7 +28,7 @@ const ArmadoRutasTab: React.FC = () => {
     const [isOpenModal, setIsOpenModal] = useState(false)
     const [isOpenModalPremios, setIsOpenModalPremios] = useState(false)
     const [ruta, setRuta] = useState("")
-    const [modalPremiosData, setModalPremiosData] = useState<Record<string, number>>({})
+    const [modalPremiosData, setModalPremiosData] = useState<Record<string, number>[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const isFirstRender = useRef(true);
 
@@ -111,7 +111,7 @@ const ArmadoRutasTab: React.FC = () => {
                 }
             }
             batch.commit();
-            setModalPremiosData(obtenerPremios());
+            setModalPremiosData([obtenerPremios()]);
             setIsOpenModalPremios(true)
         }
     }
@@ -193,7 +193,7 @@ const ArmadoRutasTab: React.FC = () => {
                 isOpen={isOpenModalPremios}
                 premios={modalPremiosData}
                 ruta={ruta}
-                onConfirm={() => { setModalPremiosData({}); setIsOpenModalPremios(false) }}
+                onConfirm={() => { setModalPremiosData([]); setIsOpenModalPremios(false) }}
             />
             <h2>Armado de rutas</h2>
             {

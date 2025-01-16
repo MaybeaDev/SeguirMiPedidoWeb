@@ -8,7 +8,7 @@ import Tab from "../../components/UI/Tab/Tab";
 import NavBarTab from "../../components/Layout/NavBar/NavBarTab"
 import { PaqueteContext, RutaContext, TransportistaContext } from "../../components/Otros/PrivateRoutes/PrivateRoutes";
 const SeccionGestionDePaquetes = () => {
-    const { paquetesContext, rutasContext, transportistasContext, premiosContext } = useOutletContext<{ paquetesContext: PaqueteContext[] | [], rutasContext:Record<string, RutaContext>, transportistasContext:Record<string, TransportistaContext>, premiosContext:Record<string, Record<string, number>> }>();
+    const { paquetesContext, rutasContext, transportistasContext, premiosContext } = useOutletContext<{ paquetesContext: PaqueteContext[] | [], rutasContext:Record<string, RutaContext>, transportistasContext:Record<string, TransportistaContext>, premiosContext:Record<string,{ premios: Record<string, number>; transportista: string, entregado:boolean }> }>();
     return (
         <div className={classes.container}>
             <NavBarTab group="gestionDeRutas">

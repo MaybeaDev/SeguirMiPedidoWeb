@@ -11,7 +11,7 @@ import { PaqueteContext, RutaContext } from "../../../../components/Otros/Privat
 
 
 const EditarRutaTab = () => {
-    const { paquetesContext, rutasContext, premiosContext } = useOutletContext<{ paquetesContext: PaqueteContext[], rutasContext: Record<string, RutaContext>, premiosContext: Record<string, Record<string, number>> }>();
+    const { paquetesContext, rutasContext, premiosContext } = useOutletContext<{ paquetesContext: PaqueteContext[], rutasContext: Record<string, RutaContext>, premiosContext: Record<string, { premios: Record<string, number>; transportista: string, entregado:boolean }> }>();
     const [paquetes, setPaquetes] = useState<string[][]>([])
     const [ruta, setRuta] = useState("")
     const [searchQuery, setSearchQuery] = useState<string>("");

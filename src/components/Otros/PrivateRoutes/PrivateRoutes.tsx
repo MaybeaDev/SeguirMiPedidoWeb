@@ -117,9 +117,9 @@ const PrivateRoute: React.FC = () => {
     const getPremios = () => {
         const q = query(collection(db, 'Premios'));
         return onSnapshot(q, (querySnapshot) => {
-            const premios: Record<string, { premios: Record<string, number>; transportista: string }> = {};
+            const premios: Record<string, { premios: Record<string, number>; transportista: string, entregado:boolean }> = {};
             querySnapshot.forEach((doc) => {
-                premios[doc.id] = { premios: doc.data().premios, transportista: doc.data().transportista };
+                premios[doc.id] = { premios: doc.data().premios, transportista: doc.data().transportista, entregado: doc.data().entregado ?? false };
             });
             setPremiosContext(premios);
         });

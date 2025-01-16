@@ -1,23 +1,27 @@
 import Button from "../../UI/Button/Button";
 import Table from "../../UI/Table/Table";
 
-
 import classes from "./ModalPremios.module.css";
 
 const ModalPremios = (props: {
   isOpen: boolean;
-  ruta: string;
-  premios: Record<string, number>;
+  ruta?: string;
+  transportista?: string;
+  titulo?: string;
+  subtitulo?: string;
+  premios: Record<string, number>[];
   onConfirm: () => void;
 }) => {
   if (!props.isOpen) return null;
 
   // Transformar los premios en formato para la tabla
   const headers = ["Premio", "Cantidad"];
-  const data = Object.entries(props.premios).map(([premio, cantidad]) => [
-    premio,
-    cantidad.toString(),
-  ]);
+  const data = props.premios.map((campaña) => {
+    return Object.entries(campaña).map(([premio, cantidad]) => [
+      premio,
+      cantidad.toString(),
+    ]);
+  });
 
   const handleConfirmar = () => {
     props.onConfirm();
@@ -26,14 +30,31 @@ const ModalPremios = (props: {
   return (
     <div className={classes.modal}>
       <div className={classes.modalContent}>
-        <h2 style={{marginBottom:0}}>Esta es la ultima oportunidad para visualizar los premios de los paquetes que estás agregando</h2>
-        <h3>Toma una captura de pantalla</h3>
-        <h1>Ruta: {props.ruta}</h1>
-        <Table data={data} headers={headers} />
+        {props.titulo ? (
+          <h2 style={{ marginBottom: 0 }}>{props.titulo}</h2>
+        ) : (
+          <></>
+        )}
+        {props.subtitulo ? <h3>{props.subtitulo}</h3> : <></>}
+        {props.ruta ? <h1>Ruta: {props.ruta}</h1> : <></>}
+        {data.length == 1 ? (
+          <>
+            <label>Campaña actual</label>
+            <Table data={data[0]} headers={headers}></Table>
+          </>
+        ) : data.length == 2 ? (
+          <>
+            <label>Campaña anterior</label>
+            <Table data={data[0]} headers={headers}></Table>
+            <label>Campaña actual</label>
+            <Table data={data[1]} headers={headers}></Table>
+          </>
+        ) : (
+          <label>raaaro</label>
+        )}
+
         <div className={classes.modalActions}>
-          <Button onClick={handleConfirmar}>
-            Continuar y Cerrar
-          </Button>
+          <Button onClick={handleConfirmar}>Continuar y Cerrar</Button>
         </div>
       </div>
     </div>
