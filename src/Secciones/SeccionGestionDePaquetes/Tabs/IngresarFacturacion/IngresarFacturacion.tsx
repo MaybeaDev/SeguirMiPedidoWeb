@@ -85,6 +85,7 @@ const IngresarFacturacionTab = () => {
                     setIsLoading(false);
                     const fullData: Paquete[] = []
                     const premios: Record<string, Record<string, number>> = {}
+                    console.log(premios)
                     validData.forEach((pedido) => {
                         if (pedido.nombreAFP != "") {
                             if (!premios[pedido.codigo]) {
@@ -110,13 +111,19 @@ const IngresarFacturacionTab = () => {
                             })
                         }
                     })
+                    console.log(premios, "Premios")
+                    console.log(fullData, "FullData")
+                    console.log(fullData.find(nd => nd.codigo == "3456789012001"))
                     const newData = fullData.filter(f => !paquetesContext.map(pc => pc.id).includes(f.codigo))
                     const pedidos = [...new Set(newData.map(d => d.codigo))]
                     const newPremios: Record<string, Record<string, number>> = {}
-                    pedidos.forEach(p => {
+                    pedidos.forEach(paquete => {
+                        const p = paquete.slice(0, 10)
+                        console.log(p, premios[p])
                         if (premios[p])
                         newPremios[p] = premios[p]
                     })
+                    console.log(newPremios, "New Premios")
                     setPremios(newPremios)
                     ingresarData(newData);
                 } else {
@@ -163,6 +170,7 @@ const IngresarFacturacionTab = () => {
             };
             batch.set(docRef, object);
         }
+        console.log(Object.keys(premios).length)
         Object.keys(premios).forEach((k) => {
             batch.set(doc(db, "Premios", k), { premios: premios[k], transportista: "" })
         })
@@ -188,7 +196,8 @@ const IngresarFacturacionTab = () => {
         setLoadingState(true)
         const idsToCheck = data.map((item) => String(item.codigo));
         const encontrados = obtenerDocumentosExistentes(idsToCheck)
-        if (idsToCheck.length == encontrados.length) {
+        // if (idsToCheck.length == encontrados.length) {
+        if (idsToCheck.length == 0) {
             alert("Todos los paquetes ya han sido ingresados, se abortará la operacion")
         } else {
             await guardarEnFirebase(data.filter(p => !encontrados.includes(p.codigo)))
