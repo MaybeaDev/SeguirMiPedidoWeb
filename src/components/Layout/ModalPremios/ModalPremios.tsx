@@ -39,7 +39,6 @@ const ModalPremios = (props: {
         {props.ruta ? <h1>Ruta: {props.ruta}</h1> : <></>}
         {data.length == 1 ? (
           <>
-            <label>Campaña actual</label>
             <Table data={data[0]} headers={headers}></Table>
           </>
         ) : data.length == 2 ? (

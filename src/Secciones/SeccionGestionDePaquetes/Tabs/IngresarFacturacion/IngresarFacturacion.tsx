@@ -111,9 +111,6 @@ const IngresarFacturacionTab = () => {
                             })
                         }
                     })
-                    console.log(premios, "Premios")
-                    console.log(fullData, "FullData")
-                    console.log(fullData.find(nd => nd.codigo == "3456789012001"))
                     const newData = fullData.filter(f => !paquetesContext.map(pc => pc.id).includes(f.codigo))
                     const pedidos = [...new Set(newData.map(d => d.codigo))]
                     const newPremios: Record<string, Record<string, number>> = {}
