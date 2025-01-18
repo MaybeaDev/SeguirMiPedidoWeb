@@ -63,7 +63,10 @@ const Navbar = () => {
         <nav className={classes.container}>
             <div className={classes.left}>
                 {user && (
+                    <div style={{display:"flex", alignItems:"center"}}>
                     <CerrarSesionButton></CerrarSesionButton>
+                    <label style={{padding:0, margin:0, marginLeft:10, color:"white"}}>v1.0</label>
+                    </div>
                 )}
             </div>
             <div className={classes.center}>
