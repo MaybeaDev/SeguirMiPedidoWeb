@@ -53,7 +53,7 @@ const CrearTrabajador = () => {
             const trabajador = {
                 correo: formData.email,
                 nombre: formData.nombre,
-                rut: formData.rut.replace(/\D/g, ''),
+                rut: formData.rut.toLowerCase().replace(/[^0-9k]/g, ''),
                 telefono: formData.telefono,
                 tipo: 0
             };

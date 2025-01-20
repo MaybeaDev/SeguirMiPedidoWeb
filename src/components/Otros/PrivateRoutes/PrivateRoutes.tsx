@@ -48,6 +48,7 @@ export interface PaqueteContext {
 
 const PrivateRoute: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);
+    const [userType, setUserType] = useState<number | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [premiosContext, setPremiosContext] = useState<Record<string, { premios: Record<string, number>; transportista: string }>>({});
     const [paquetesContext, setPaquetes] = useState<PaqueteContext[]>([]);
@@ -56,7 +57,9 @@ const PrivateRoute: React.FC = () => {
 
     useEffect(() => {
         const auth = getAuth();
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            const tipoUsuario = localStorage.getItem('currentUser') ?? ""
+            setUserType(parseInt(tipoUsuario));
             setUser(user);
             setLoading(false);
         });
@@ -184,7 +187,7 @@ const PrivateRoute: React.FC = () => {
     if (!user) {
         return <Navigate to="/login" />;
     }
-    return <Outlet context={{ paquetesContext, premiosContext, rutasContext, transportistasContext }} />;
+    return <Outlet context={{ paquetesContext, premiosContext, rutasContext, transportistasContext, user , userType }} />;
 };
 
 export default PrivateRoute;

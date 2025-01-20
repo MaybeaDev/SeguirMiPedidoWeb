@@ -12,7 +12,6 @@ const SeccionLogin = () => {
     const auth = getAuth();
     const navigate = useNavigate();
 
-
     const getUsuariosTransportistas = async () => {
         const q = query(collection(db, "Usuarios"), where("tipo", "==", 0))
         const querySnapshot = await getDocs(q);
@@ -23,7 +22,6 @@ const SeccionLogin = () => {
                 [doc.id]: { id: doc.id, nombre: doc.data().nombre, email: doc.data().email, rut: doc.data().rut, telefono: doc.data().telefono }
             }
         });
-        console.log(transportistas);
     }
     const getRutas = async () => {
         const q = query(collection(db, "Rutas"))
@@ -47,7 +45,7 @@ const SeccionLogin = () => {
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError(""); // Resetear el error antes de intentar iniciar sesión
+        setError("");
 
         try {
             // Iniciar sesión con Firebase Authentication
@@ -62,13 +60,19 @@ const SeccionLogin = () => {
             if (userDoc.exists()) {
                 // Verificar si el tipo de usuario es "empresa"
                 const userData = userDoc.data();
-                if (userData?.tipo === 1) {
+                console.log(userData?.tipo, "[1, 2].includes(userData?.tipo) ??", [1, 2].includes(userData?.tipo))
+                if ([1, 2].includes(userData?.tipo)) {
                     updateDoc(userDocRef, { ultimaConexion: Timestamp.now() });
                     // Si es un usuario de tipo empresa, redirigir al panel de empresa
-                    localStorage.setItem('currentUser', "un gei")
+
+                    localStorage.setItem('currentUser', userData?.tipo+"")
                     await getRutas()
                     await getUsuariosTransportistas()
-                    navigate("/SeccionEmpresa");
+                    if (userData?.tipo == 1) {
+                        navigate("/SeccionEmpresa");
+                    } else {
+                        navigate("/SeccionEmpresa/GestionDePaquetes/arriboCarga");
+                    }
                     window.location.reload();
                 } else {
                     // Si no es un usuario de tipo empresa, mostrar error

@@ -195,7 +195,7 @@ const ArmadoRutasTab: React.FC = () => {
                 ruta={ruta}
                 onConfirm={() => { setModalPremiosData([]); setIsOpenModalPremios(false) }}
             />
-            <h2>Armado de rutas</h2>
+            <h2>Sacar a reparto</h2>
             {
                 <Table data={Object.entries(obtenerPremios()).map(([premio, cantidad]) => [
                     premio,
@@ -261,7 +261,7 @@ const ArmadoRutasTab: React.FC = () => {
 
                 </center>
                 <center style={{ width: "49%" }}>
-                    <h3 style={{ marginTop: "0" }}>Paquetes para asignar a una ruta ({paquetesParaAsignar.length})</h3>
+                    <h3 style={{ marginTop: "0" }}>Paquetes para sacar a reparto ({paquetesParaAsignar.length})</h3>
                     <div className={classes.tableContainer}>
                         <Table data={paquetesParaAsignar.map((p) => {
                             return [
@@ -286,7 +286,7 @@ const ArmadoRutasTab: React.FC = () => {
                     </div>
                 </center>
             </div>
-            <Button disabled={paquetesParaAsignar.length ? false : true} onClick={() => { setIsOpenModal(true) }}>Crear Ruta</Button>
+            <Button disabled={paquetesParaAsignar.length ? false : true} onClick={() => { setIsOpenModal(true) }}>Cargar Ruta</Button>
         </>
     );
 };

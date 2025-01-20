@@ -23,7 +23,7 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
     }, [props.initData])
 
     const handleChangeTransportista = async (value: string, rutaID: string) => {
-        updateDoc(doc(db, "Rutas", rutaID), { transportista: value, transportistaNombre: props.trabajadores.find(t => t.id == value)!.nombre })
+        updateDoc(doc(db, "Rutas", rutaID), { transportista: value, transportistaNombre: props.trabajadores.find(t => t.id == value)?.nombre ?? "" })
 
     };
     const handleChangeEstado = async (value: string, rutaID: string) => {
