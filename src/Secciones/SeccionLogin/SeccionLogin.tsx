@@ -9,6 +9,7 @@ const SeccionLogin = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState<string>("");
+    const [btnDisabled, setBtnDisabled] = useState(false);
     const auth = getAuth();
     const navigate = useNavigate();
 
@@ -46,7 +47,8 @@ const SeccionLogin = () => {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
-
+        setError("cargando...")
+        setBtnDisabled(true);
         try {
             // Iniciar sesión con Firebase Authentication
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -82,17 +84,19 @@ const SeccionLogin = () => {
                 }
             } else {
                 setError("El usuario no existe en la base de datos.");
+                await signOut(auth);
             }
         } catch (error) {
             if (error instanceof Error) {
                 setError(error.message); // Mostrar el mensaje de error de Firebase
                 if (error.message == "Firebase: Error (auth/invalid-credential).") {
-                    setError("El usuario no existe... Revisa el usuario y la contraseña");
+                    setError("Usuario no encontrado... Revisa el usuario y la contraseña");
                 }
             } else {
                 setError("Ocurrió un error inesperado");
             }
         }
+        setBtnDisabled(false);
     };
 
     return (
@@ -119,7 +123,7 @@ const SeccionLogin = () => {
                             required
                         />
                     </center>
-                    <button type="submit" className={classes.submitButton}>
+                    <button disabled={btnDisabled} type="submit" className={classes.submitButton} style={{backgroundColor: btnDisabled ? "#605454" : ""}}>
                         Iniciar sesión
                     </button>
                 </form>
