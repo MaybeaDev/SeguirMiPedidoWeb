@@ -10,10 +10,12 @@ import { auth } from "../../../firebaseConfig"
 // import Button from "../../UI/Button/Button";
 const Navbar = () => {
     const [user, setUser] = useState<string | null>(null);
+    const [userName, setUserName] = useState<string | null>(null);
     onAuthStateChanged(auth, (user) => {
         if (user) {
             if (localStorage.getItem("currentUser")) {
                 setUser(localStorage.getItem("currentUser"));
+                setUserName(user.displayName)
                 return
             } else {
                 setUser(null);
@@ -73,7 +75,7 @@ const Navbar = () => {
                         fontWeight: "bold",
                         letterSpacing: 1
                     }}>
-                        Gestion de pedidos de Rolando Transportes v1.2
+                        Bienvenido {userName?.split(" ").map(w => w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(" ")}, v1.2.1
                     </label> : 
                     <label style={{
                         color: "white",

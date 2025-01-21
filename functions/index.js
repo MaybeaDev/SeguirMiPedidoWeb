@@ -79,8 +79,7 @@ exports.sacarPaquetesAReparto = onDocumentUpdated("Rutas/{rutaId}", async (event
       const paquetesRef = getFirestore()
         .collection("Paquetes")
         .where("ruta", "==", doc.before.id)
-        .where("estado", "!=", 3)
-        .where("estado", "!=", 5);
+        .where("estado", "not-in", [3, 5])
       try {
         const snapshot = await paquetesRef.get();
         const batch = getFirestore().batch();
