@@ -17,7 +17,7 @@ const SeccionGestionDePaquetes = () => {
                 <Tab id="despachos" name={"Despachos"} to="despachos" />
                 <Tab id="verRutas" name={"Sacado a reparto"} to="armadoRutas" />
                 <Tab id="verPaquetes" name={"Consultar Paquetes"} to="verPaquetes" />
-                {(userType == 1) ? (<Tab id="gestionDeRutas" name={"Gestion de Rutas"} to="gestionDeRutas" />) : <></>}
+                <Tab id="gestionDeRutas" name={"Gestion de Rutas"} to="gestionDeRutas" />
             </NavBarTab>
             <div className={classes.content}>
                 <Card style={{ overflowX: "auto", marginTop: "0px", borderTopLeftRadius: 0, borderTopRightRadius: 0, marginInline: 20, border: "solid 2px #c70000", borderTop: "none" }}>
