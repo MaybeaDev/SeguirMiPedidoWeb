@@ -9,7 +9,7 @@ import { useOutletContext } from "react-router-dom";
 interface Data {
     id: string,
     alias: string,
-    paquetes: string,
+    paquetes: PaqueteContext[],
     estado: string,
     transportista: string
 }
@@ -46,7 +46,7 @@ const GestionRutas = () => {
                 alias: k.alias,
                 paquetes: paquetesContext.filter((p) => {
                     return p.ruta == k.id && [1, 2, 4].includes(p.estado)
-                }).length.toString(),
+                }),
                 estado: estado,
                 transportista: k.transportista
             })
@@ -68,7 +68,7 @@ const GestionRutas = () => {
                         </div>
                     ) :
                         data.length > 0 && (
-                            <TableRutas initData={data} trabajadores={trabajadores} />
+                            <TableRutas initData={data} trabajadores={trabajadores} paquetes={paquetesContext} rutas={rutasContext} />
                         )
                     }
                 </div>

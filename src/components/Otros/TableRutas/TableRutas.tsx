@@ -4,16 +4,17 @@ import { db } from "../../../firebaseConfig";
 import classes from "./TableRutas.module.css";
 import Button from "../../UI/Button/Button";
 import { useNavigate } from "react-router-dom";
+import { PaqueteContext, RutaContext } from "../PrivateRoutes/PrivateRoutes";
 
 interface Data {
     id: string,
     alias: string,
-    paquetes: string,
+    paquetes: PaqueteContext[],
     estado: string,
     transportista: string
 }
 
-const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombre: string }[] }) => {
+const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombre: string }[], paquetes : PaqueteContext[], rutas : Record<string, RutaContext> }) => {
     const [isSaved, setIsSaved] = useState(false)
     const navigate = useNavigate()
 
@@ -23,7 +24,11 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
     }, [props.initData])
 
     const handleChangeTransportista = async (value: string, rutaID: string) => {
+        const ruta = props.initData.filter((a) => a.id == rutaID)[0]
         updateDoc(doc(db, "Rutas", rutaID), { transportista: value, transportistaNombre: props.trabajadores.find(t => t.id == value)?.nombre ?? "" })
+        ruta.paquetes.forEach((p) =>{
+            updateDoc(doc(db, "Premios", p.id.slice(0, 10)), {transportista: value})
+        })
 
     };
     const handleChangeEstado = async (value: string, rutaID: string) => {
@@ -78,12 +83,12 @@ const TableRutas = (props: { initData: Data[], trabajadores: { id: string, nombr
                         <tr key={index} className={classes.tr}>
                             <td className={classes.td}>{ruta.alias}</td>
                             <td className={classes.td}>
-                                {parseInt(ruta.paquetes) ? (
+                                {ruta.paquetes.length ? (
                                     <Button
                                         onClick={() => { navigate(`/SeccionEmpresa/GestionDePaquetes/editarRutas/${ruta.id}`) }}>
-                                        {ruta.paquetes}
+                                        {ruta.paquetes.length.toString()}
                                     </Button>
-                                ) : (<p className={classes.p}>{ruta.paquetes}</p>)}
+                                ) : (<p className={classes.p}>{ruta.paquetes.length.toString()}</p>)}
                             </td>
                             <td className={classes.td}>
                                 {ruta.estado != "" ? (
