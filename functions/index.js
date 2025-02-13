@@ -104,3 +104,20 @@ exports.sacarPaquetesAReparto = onDocumentUpdated("Rutas/{rutaId}", async (event
       }
     }
 });
+
+exports.changePassword = onCall(async (request) => {
+  const { uid, newPassword } = request.data; // Recibe el uid y la nueva contraseña como parámetros
+
+  if (!uid || !newPassword) {
+    return { success: false, message: "El uid y la nueva contraseña son obligatorios." };
+  }
+
+  try {
+    await getAuth().updateUser(uid, { password: newPassword });
+    console.log(`Contraseña actualizada para el usuario: ${uid}`);
+    return { success: true, message: "Contraseña actualizada exitosamente." };
+  } catch (error) {
+    console.error("Error al actualizar la contraseña:", error);
+    return { success: false, message: "Error al actualizar la contraseña.", error: error.message };
+  }
+});

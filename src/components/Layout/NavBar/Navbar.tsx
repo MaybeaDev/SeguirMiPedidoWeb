@@ -5,6 +5,7 @@ import LinkButton from "../../UI/LinkButton/LinkButton";
 import classes from "./NavBar.module.css"
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../firebaseConfig"
+// import { httpsCallable } from "firebase/functions";
 // import { db } from "../../../firebaseConfig"
 // import { collection, doc, getDoc, getDocs, query, updateDoc, where, writeBatch } from "firebase/firestore";
 // import Button from "../../UI/Button/Button";
@@ -25,6 +26,23 @@ const Navbar = () => {
         }
     });
 
+    // const changePassword = httpsCallable(functions, "changePassword");
+    // async function updatePassword(uid : string, newPassword : string) {
+    //     try {
+    //         const response = await changePassword({ uid, newPassword });
+    //         if (response.data.success) {
+    //             console.log(response.data.message);
+    //         } else {
+    //             console.error(response.data.message);
+    //         }
+    //     } catch (error) {
+    //         console.error("Error al llamar la función:", error);
+    //     }
+    // }
+
+    // const handleFunction = async () => {
+    //     updatePassword("rYMLkIkDIqQaiVLrtjJ7YtZLaMw2", "@GestionesEsika123.,")
+    // }
     // const handleFunction = async () => {
     //     const batch = writeBatch(db)
 
@@ -75,8 +93,8 @@ const Navbar = () => {
                         fontWeight: "bold",
                         letterSpacing: 1
                     }}>
-                        Bienvenido {userName?.split(" ").map(w => w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(" ")}, v1.3
-                    </label> : 
+                        Bienvenido {userName?.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ")}, v1.3
+                    </label> :
                     <label style={{
                         color: "white",
                         wordSpacing: 5,
@@ -85,7 +103,7 @@ const Navbar = () => {
                         letterSpacing: 1
                     }}>
                         Rolando Transportes - consulta por tu pedido
-                    </label>                        
+                    </label>
                 }
                 {/* <Button onClick={handleFunction}>Boton solo para matias</Button> */}
             </div>

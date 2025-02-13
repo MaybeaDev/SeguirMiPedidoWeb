@@ -64,20 +64,24 @@ const PrivateRoute: React.FC = () => {
             setUser(user);
             setLoading(false);
         });
-        const clTransportistas = getTransportistas();
-        const clRutas = getRutas();
-        const clPaquetes = getPaquetes();
-        const clPremios = getPremios();
-        const cleanUp = () => {
-            clTransportistas()
-            clRutas()
-            clPaquetes()
-            clPremios()
-            unsubscribe()
+        if (userType != 3){
+            const clTransportistas = getTransportistas();
+            const clRutas = getRutas();
+            const clPaquetes = getPaquetes();
+            const clPremios = getPremios();
+            const cleanUp = () => {
+                clTransportistas()
+                clRutas()
+                clPaquetes()
+                clPremios()
+                unsubscribe()
+            }
+            return () => cleanUp();
+        } else {
+            return () => unsubscribe()
         }
-        return () => cleanUp();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [user]);
 
     const logSource = (metadata: SnapshotMetadata, context: string) => {
         if (metadata.fromCache) {
