@@ -74,6 +74,7 @@ const ReportesScreen = () => {
       Codigo: string,
       Fecha: string,
       Estado: string,
+      Recibe: string,
     }[] = []
     paq.forEach((p: PaqueteContext) => {
       if (data.find((d) => d.Codigo == p.id.slice(0, 10))) { return }
@@ -98,6 +99,7 @@ const ReportesScreen = () => {
               return "En Proceso";
           }
         })(),
+        Recibe: p.historial[p.historial.length - 1].detalles.split("entregado a")[1] ?? "No especificado",
       })
     })
     console.log(data, paq)
@@ -126,9 +128,11 @@ const ReportesScreen = () => {
                 :
                 <>
                   <label>Total: {paquetes.filter((p: PaqueteContext) => p.estado == 3).length}</label>
+                  {paquetes.filter((p: PaqueteContext) => p.estado == 3).length != 0 &&
                   <Button onClick={() => { descargarExcel(paquetes.filter((p: PaqueteContext) => p.estado == 3).sort((a, b) => {
                         return b.historial[b.historial.length - 1].fecha.toDate().getTime() - a.historial[a.historial.length - 1].fecha.toDate().getTime()
                       }), "entregados") }}>Descargar Excel</Button>
+                  }
                   <br />
                   <table style={{ width: "100%" }}>
                     <thead>
@@ -142,6 +146,7 @@ const ReportesScreen = () => {
                         return <tr key={p.id}>
                           <td>{p.id}</td>
                           <td>{p.historial[p.historial.length - 1].fecha.toDate().toLocaleString()}</td>
+                          <td onClick={()=>{navigation("/"+p.id+"001")}}>&#128269;</td>
                         </tr>
                       })}
                     </tbody>
@@ -158,9 +163,11 @@ const ReportesScreen = () => {
                 :
                 <>
                   <label>Total: {paquetes.filter((p: PaqueteContext) => p.estado == 5).length}</label>
+                  {paquetes.filter((p: PaqueteContext) => p.estado == 5).length != 0 &&
                   <Button onClick={() => { descargarExcel(paquetes.filter((p: PaqueteContext) => p.estado == 5).sort((a, b) => {
                         return b.historial[b.historial.length - 1].fecha.toDate().getTime() - a.historial[a.historial.length - 1].fecha.toDate().getTime()
                       }), "devoluciones") }}>Descargar Excel</Button>
+                  }
                   <br />
                   <table style={{ width: "100%" }}>
                     <thead>
@@ -174,6 +181,7 @@ const ReportesScreen = () => {
                         return <tr key={p.id}>
                           <td>{p.id}</td>
                           <td>{p.historial[p.historial.length - 1].fecha.toDate().toLocaleString()}</td>
+                          <td onClick={()=>{navigation("/"+p.id+"001")}}>&#128269;</td>
                         </tr>
                       })}
                     </tbody>
@@ -190,9 +198,11 @@ const ReportesScreen = () => {
                 :
                 <>
                   <label>Total: {paquetes.filter((p: PaqueteContext) => ![3, 5].includes(p.estado)).length}</label>
+                  {paquetes.filter((p: PaqueteContext) => ![3, 5].includes(p.estado)).length != 0 &&
                   <Button onClick={() => { descargarExcel(paquetes.filter((p: PaqueteContext) => ![3, 5].includes(p.estado)).sort((a, b) => {
                         return b.historial[b.historial.length - 1].fecha.toDate().getTime() - a.historial[a.historial.length - 1].fecha.toDate().getTime()
                       }), "En Proceso") }}>Descargar Excel</Button>
+                  }
                   <br />
                   <table style={{ width: "100%" }}>
                     <thead>
@@ -225,6 +235,7 @@ const ReportesScreen = () => {
                                 return "En Proceso";
                             }
                           })()}</td>
+                          <td onClick={()=>{navigation("/"+p.id+"001")}}>&#128269;</td>
                         </tr>
                       })}
                     </tbody>
