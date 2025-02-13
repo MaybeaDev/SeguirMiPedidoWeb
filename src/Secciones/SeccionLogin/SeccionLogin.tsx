@@ -63,7 +63,7 @@ const SeccionLogin = () => {
                 // Verificar si el tipo de usuario es "empresa"
                 const userData = userDoc.data();
                 console.log(userData?.tipo, "[1, 2].includes(userData?.tipo) ??", [1, 2].includes(userData?.tipo))
-                if ([1, 2].includes(userData?.tipo)) {
+                if ([1, 2, 3].includes(userData?.tipo)) {
                     updateDoc(userDocRef, { ultimaConexion: Timestamp.now() });
                     // Si es un usuario de tipo empresa, redirigir al panel de empresa
 
@@ -72,6 +72,8 @@ const SeccionLogin = () => {
                     await getUsuariosTransportistas()
                     if (userData?.tipo == 1) {
                         navigate("/SeccionEmpresa");
+                    } else if (userData?.tipo == 3) {
+                        navigate("/reportes");
                     } else {
                         navigate("/SeccionEmpresa/GestionDePaquetes/arriboCarga");
                     }

@@ -18,6 +18,7 @@ import IngresarFacturacionTab from './Secciones/SeccionGestionDePaquetes/Tabs/In
 import DespachosTab from './Secciones/SeccionGestionDePaquetes/Tabs/Despachos/Despachos'
 import EditarRutaTab from './Secciones/SeccionGestionDePaquetes/Tabs/EditarRuta/EditarRuta'
 import BarcodePage from './Secciones/BarcodePage/BarcodePage'
+import ReportesScreen from './Secciones/SeccionReportes/SeccionReportes'
 
 function App() {
 
@@ -33,6 +34,7 @@ function App() {
           <Route path="/" element={<Index />} /> 
 
           <Route element={<PrivateRoute />}>
+            <Route path="/reportes" element={<ReportesScreen />} /> 
             <Route path="/SeccionEmpresa" element={<SeccionPanelPrincipal />} />
             <Route path="/SeccionEmpresa/Usuarios" element={<SeccionEmpleados />} >
               <Route path="listado" element={<ListadoTab />} />

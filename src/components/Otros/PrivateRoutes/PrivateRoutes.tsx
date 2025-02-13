@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useNavigate } from 'react-router-dom';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { collection, onSnapshot, query, SnapshotMetadata, Timestamp } from 'firebase/firestore';
 import { db } from '../../../firebaseConfig';
@@ -54,6 +54,7 @@ const PrivateRoute: React.FC = () => {
     const [paquetesContext, setPaquetes] = useState<PaqueteContext[]>([]);
     const [rutasContext, setRutas] = useState<Record<string, RutaContext>>({});
     const [transportistasContext, setTransportistas] = useState<Record<string, TransportistaContext>>({});
+    const nav = useNavigate()
 
     useEffect(() => {
         const auth = getAuth();
@@ -186,6 +187,9 @@ const PrivateRoute: React.FC = () => {
     }
     if (!user) {
         return <Navigate to="/login" />;
+    }
+    if (userType == 3) {
+        nav("/reportes");
     }
     return <Outlet context={{ paquetesContext, premiosContext, rutasContext, transportistasContext, user , userType }} />;
 };

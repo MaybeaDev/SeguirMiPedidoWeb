@@ -75,7 +75,7 @@ const Navbar = () => {
                         fontWeight: "bold",
                         letterSpacing: 1
                     }}>
-                        Bienvenido {userName?.split(" ").map(w => w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(" ")}, v1.2.3
+                        Bienvenido {userName?.split(" ").map(w => w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(" ")}, v1.3
                     </label> : 
                     <label style={{
                         color: "white",
