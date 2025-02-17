@@ -106,8 +106,18 @@ const ReportesScreen = () => {
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Reporte");
-    XLSX.writeFile(workbook, "Reporte "+titulo+".xlsx");
+    XLSX.writeFile(workbook, "R. "+titulo+" C"+paq[0].campaña+" "+formatFecha(new Date())+".xlsx");
   }
+  const formatFecha = (d: Date) => {
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0'); // +1 porque los meses empiezan en 0
+    const year = d.getFullYear();
+    const hour = d.getHours().toString().padStart(2, '0');
+    const minute = d.getMinutes().toString().padStart(2, '0');
+    const sec = d.getSeconds().toString().padStart(2, '0');
+  
+    return `${day}-${month}-${year}, ${hour};${minute};${sec}`;
+  };
 
   return (
     <div className={classes.container}>
