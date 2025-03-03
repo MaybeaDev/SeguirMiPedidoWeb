@@ -5,9 +5,8 @@ import LinkButton from "../../UI/LinkButton/LinkButton";
 import classes from "./NavBar.module.css"
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../firebaseConfig"
-// import { httpsCallable } from "firebase/functions";
 // import { db } from "../../../firebaseConfig"
-// import { collection, doc, getDoc, getDocs, query, updateDoc, where, writeBatch } from "firebase/firestore";
+// import { collection, getDocs, query, where, writeBatch } from "firebase/firestore";
 // import Button from "../../UI/Button/Button";
 const Navbar = () => {
     const [user, setUser] = useState<string | null>(null);
@@ -26,47 +25,14 @@ const Navbar = () => {
         }
     });
 
-    // const changePassword = httpsCallable(functions, "changePassword");
-    // async function updatePassword(uid : string, newPassword : string) {
-    //     try {
-    //         const response = await changePassword({ uid, newPassword });
-    //         if (response.data.success) {
-    //             console.log(response.data.message);
-    //         } else {
-    //             console.error(response.data.message);
-    //         }
-    //     } catch (error) {
-    //         console.error("Error al llamar la función:", error);
-    //     }
-    // }
-
-    // const handleFunction = async () => {
-    //     updatePassword("rYMLkIkDIqQaiVLrtjJ7YtZLaMw2", "@GestionesEsika123.,")
-    // }
     // const handleFunction = async () => {
     //     const batch = writeBatch(db)
-
-    //     const q = query(collection(db, "Paquetes"), where("estado", "==", 2), where("ruta", "==", "O7u1sQZBvxMMUrPnVUir"))
-    //     const paquetes = (await getDocs(q)).docs.map(d => {
-    //         return {
-    //             id: d.id,
-    //             ruta: d.data().ruta,
-    //         }
+    //     const q = query(collection(db, "Paquetes"), where("facturacion", "==", "00-02-2025"))
+    //     const docs = await getDocs(q)
+    //     docs.forEach((doc) => {
+    //         batch.update(doc.ref, { facturacion: "31-01-2025" })
     //     })
-
-    //     console.log(paquetes)
-    //     paquetes.forEach(async p => {
-    //         const premioRef = doc(db, "Premios", p.id.slice(0, 10))
-    //         const premio = await getDoc(premioRef)
-    //         if (premio.exists()) {
-    //             console.log("existe")
-    //             await updateDoc(doc(db, "Premios", p.id.slice(0, 10)), { transportista: "hTnTPDzF7odTBS31RaJnyNGRS8l2", ruta: "O7u1sQZBvxMMUrPnVUir" })
-    //         }
-    //     })
-    // paquetes.forEach(p => {
-    //     batch.update(doc(db, "Paquetes", p.id), { ruta: "Sistema", rutaAlias:"Sistema", transportistaNombre:"Sistema" })
-    // })
-    // console.log("Guardando...")
+    // console.log("Guardando "+docs.size+" cambios...")
     // batch.commit().then(() => {
     //     console.log("Batch de actualización exitosa");
     // }).catch((error) => {
@@ -93,7 +59,7 @@ const Navbar = () => {
                         fontWeight: "bold",
                         letterSpacing: 1
                     }}>
-                        Bienvenido {userName?.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ")}, v1.3.2
+                        Bienvenido {userName?.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ")}, v1.3.3
                     </label> :
                     <label style={{
                         color: "white",

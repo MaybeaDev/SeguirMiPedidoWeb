@@ -8,7 +8,7 @@ import FileDropzone from "../../../../components/UI/DropZone/FileDropZone";
 import Table from "../../../../components/UI/Table/Table";
 import { doc, getDoc, Timestamp, writeBatch } from "firebase/firestore";
 import { db } from "../../../../firebaseConfig";
-import { obtenerCoordenadas } from "../../../../mapbox";
+// import { obtenerCoordenadas } from "../../../../mapbox";
 import { PaqueteContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
 import { useOutletContext } from "react-router-dom";
 
@@ -38,10 +38,10 @@ const IngresarFacturacionTab = () => {
 
     const excelDateToJSDate = (serial: number): string => {
         const excelEpoch = new Date(Date.UTC(1900, 0, 1));
-        const daysOffset = serial - 1;
+        const daysOffset = serial - 2;
         const jsDate = new Date(excelEpoch.getTime() + daysOffset * 24 * 60 * 60 * 1000);
 
-        const day = String(jsDate.getUTCDate() - 1).padStart(2, '0');
+        const day = String(jsDate.getUTCDate()).padStart(2, '0');
         const month = String(jsDate.getUTCMonth() + 1).padStart(2, '0');
         const year = jsDate.getUTCFullYear();
 
@@ -141,7 +141,6 @@ const IngresarFacturacionTab = () => {
         for (const item of data) {
             const docRef = doc(db, "Paquetes", String(item.codigo));
             contador++
-            const coordenadas = await obtenerCoordenadas(item.direccion);
             setAvanceCarga(contador)
             const direccion = item.direccion.split("REFERENCIA")[0] ?? item.direccion;
             const referencia = item.direccion.split("REFERENCIA")[1] ?? "";
@@ -156,7 +155,6 @@ const IngresarFacturacionTab = () => {
                 receptor: item.nombreConsultora,
                 referencia: referencia.trim(),
                 ruta: "",
-                coordenadas: coordenadas,
                 historial: [
                     {
                         detalles: "Pronto recibiremos tu pedido",
