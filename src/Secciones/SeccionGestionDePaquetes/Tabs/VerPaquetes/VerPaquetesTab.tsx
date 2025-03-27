@@ -5,6 +5,8 @@ import Table from "../../../../components/UI/Table/Table";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { PaqueteContext, RutaContext, TransportistaContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
 import Button from "../../../../components/UI/Button/Button";
+import * as XLSX from "xlsx";
+
 function formatDate(date: Date) {
     const day = String(date.getDate()).padStart(2, '0'); // Asegura que el día tiene 2 dígitos
     const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses van de 0 (enero) a 11 (diciembre), por eso sumamos 1
@@ -158,6 +160,48 @@ const VerPaquetesTab = () => {
         sessionStorage.setItem("codesBarcodes", JSON.stringify(codes))
         window.open(`/barcode-page`, "_blank");
     };
+    const handleDescargarExcel = () => {
+        const data: {
+            Campaña: string,
+            Facturacion: string,
+            Codigo: string,
+            Estado: string,
+            Fecha: string,
+            Consultora: string,
+            NombreConsultora: string,
+            Telefono: string,
+            Direccion: string,
+            Referencia: string,
+            Ruta: string,
+            Transportista: string,
+            Detalles: string,
+        }[] = []
+        tableData.forEach(row => {
+            const paquete = paquetesContext.find((p) => p.id == row[1])
+            if (paquete) {
+                const detalles = paquete.historial[paquete.historial.length - 1].detalles
+                data.push({
+                    Campaña: row[0].split(" <br/> F:")[0],
+                    Facturacion: row[0].split(" <br/> F:")[1],
+                    Codigo: row[1],
+                    Estado: row[3],
+                    Fecha: row[4],
+                    Consultora: row[2],
+                    NombreConsultora: row[5],
+                    Telefono: row[6],
+                    Direccion: row[7],
+                    Referencia: row[8],
+                    Ruta: row[9],
+                    Transportista: row[10],
+                    Detalles: detalles,
+                })
+            }
+        })
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Resumen");
+        XLSX.writeFile(workbook, "Resumen" + formatDate(new Date()) + ".xlsx");
+    }
 
     return (
         <>
@@ -169,17 +213,22 @@ const VerPaquetesTab = () => {
                 onChange={handleSearch}
             />
             <Button onClick={() => { setCoincidirTodos(!coincidirTodos); filtrarTabla(searchQuery, undefined, !coincidirTodos) }}>{coincidirTodos ? "Coincidir todos" : "Busqueda parcial"}</Button>
-            {tableData.length > 300 ? (
-                <div style={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "center" }}>
-                    <h3 style={{ marginRight: "10px" }}>{`Mostrando los primeros 300 de ${tableData.length} resultados`}</h3>
+
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%", justifyContent: "center" }}>
+                <h3>
+                    {tableData.length <= 300 ?
+                        `Mostrando ${tableData.length} resultados`
+                        :
+                        `Mostrando los primeros 300 de ${tableData.length} resultados`
+                    }
+                </h3>
+                <div>
                     <Button onClick={handleVerCodigosDeBarra}>Ver codigos de barra (Maximo 500)</Button>
+                    <Button onClick={handleDescargarExcel}>Descargar Excel con los reultados</Button>
                 </div>
-            ) : (
-                <div style={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "center" }}>
-                    <h3>{`Mostrando ${tableData.length} resultados`}</h3>
-                    <Button onClick={handleVerCodigosDeBarra}>Ver codigos de barra (Maximo 500)</Button>
-                </div>
-            )}
+                <br />
+            </div>
+
 
             {isLoading ? (
                 <div className={classes.spinnerContainer}>
@@ -189,7 +238,7 @@ const VerPaquetesTab = () => {
             ) : (
                 <>
                     <Table
-                    indexCol={1}
+                        indexCol={1}
                         max={200}
                         headers={[
                             "Campaña / Facturacion",
@@ -209,16 +258,16 @@ const VerPaquetesTab = () => {
                     >
                         {(rowIndex: string) => {
                             return (
-                                <div onClick={() => {console.log(rowIndex); navigate(`/${rowIndex}`)}
-                        }>
-                        <label>&#128269;</label>
-                    </div>
-                    )
+                                <div onClick={() => { console.log(rowIndex); navigate(`/${rowIndex}`) }
+                                }>
+                                    <label>&#128269;</label>
+                                </div>
+                            )
                         }}
-                </Table>
-        </>
-    )
-}
+                    </Table>
+                </>
+            )
+            }
         </>
     );
 };

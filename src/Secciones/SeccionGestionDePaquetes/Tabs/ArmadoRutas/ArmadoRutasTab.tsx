@@ -19,7 +19,7 @@ type Paquete = {
 
 
 const ArmadoRutasTab: React.FC = () => {
-    const { paquetesContext, rutasContext, premiosContext } = useOutletContext<{ paquetesContext: PaqueteContext[], rutasContext: Record<string, RutaContext>, premiosContext: Record<string, { premios: Record<string, number>; transportista: string, entregado:boolean }> }>();
+    const { paquetesContext, rutasContext, premiosContext } = useOutletContext<{ paquetesContext: PaqueteContext[], rutasContext: Record<string, RutaContext>, premiosContext: Record<string, { premios: Record<string, number>; transportista: string, entregado: boolean }> }>();
     const [paquetesNoAsignados, setPaquetesNoAsignados] = useState<Paquete[]>([]);
     const [paquetesParaAsignar, setPaquetesParaAsignar] = useState<Paquete[]>([]);
     const [noEncontrados, setNoEncontrados] = useState<string[]>([])

@@ -28,7 +28,7 @@ const ListadoTab = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [modalData, setModalData] = useState<Record<string, number>[]>([]);
-  console.log(paquetesContext);
+  const [modalPaquetesData, setModalPaquetesData] = useState<[number, number]>([0, 0]);
 
   const getUsers = async () => {
     const users: string[][] = [];
@@ -102,9 +102,15 @@ const ListadoTab = () => {
 
       const campañas = [...campañasMetadata.data().campañas];
       const premios: { [key: string]: Record<string, number> } = {
-        [campañas[0]]: {},
+        [campañas[campañas.length - 2]]: {},
         [campañas[campañas.length - 1]]: {},
       };
+      const pqts : [number, number] = [
+        paquetesContext.filter((p) => p.campaña == campañas[campañas.length - 2] && p.estado == 3 && p.transportistaNombre?.toLowerCase() == trabajador.nombre.toLowerCase()).length,
+        paquetesContext.filter((p) => p.campaña == campañas[campañas.length - 1] && p.estado == 3 && p.transportistaNombre?.toLowerCase() == trabajador.nombre.toLowerCase()).length
+      ]
+      console.log(pqts)
+      console.log(trabajador)
 
       Object.keys(premiosContext).forEach((p) => {
         const premio = premiosContext[p];
@@ -126,6 +132,7 @@ const ListadoTab = () => {
           });
         }
       });
+      setModalPaquetesData(pqts)
       setModalData(
         Object.values(premios)
       );
@@ -141,6 +148,7 @@ const ListadoTab = () => {
         isOpen={isOpenModal}
         transportista={""}
         premios={modalData}
+        paquetes={modalPaquetesData}
         onConfirm={() => {
           setIsOpenModal(false);
         }}

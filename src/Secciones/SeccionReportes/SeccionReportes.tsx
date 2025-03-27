@@ -23,6 +23,7 @@ const ReportesScreen = () => {
     } else {
       navigation("/")
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const obtenerCampañas = async () => {

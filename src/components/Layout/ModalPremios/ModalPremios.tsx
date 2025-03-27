@@ -10,11 +10,11 @@ const ModalPremios = (props: {
   titulo?: string;
   subtitulo?: string;
   premios: Record<string, number>[];
+  paquetes?: number[];
   onConfirm: () => void;
 }) => {
   if (!props.isOpen) return null;
 
-  // Transformar los premios en formato para la tabla
   const headers = ["Premio", "Cantidad"];
   const data = props.premios.map((campaña) => {
     return Object.entries(campaña).map(([premio, cantidad]) => [
@@ -43,9 +43,9 @@ const ModalPremios = (props: {
           </>
         ) : data.length == 2 ? (
           <>
-            <label>Campaña anterior</label>
+            <label>Campaña anterior {props.paquetes != undefined && `(${props.paquetes[0]} paquetes entregados)` }</label>
             <Table data={data[0]} headers={headers}></Table>
-            <label>Campaña actual</label>
+            <label>Campaña actual {props.paquetes != undefined && `(${props.paquetes[1]} paquetes entregados)` }</label>
             <Table data={data[1]} headers={headers}></Table>
           </>
         ) : (
