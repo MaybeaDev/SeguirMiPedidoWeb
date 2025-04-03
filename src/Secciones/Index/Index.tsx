@@ -76,10 +76,11 @@ const Index = () => {
         const docRef = doc(db, "Paquetes", code ?? orderCode)
         const paquete = await getDoc(docRef)
         if (paquete.exists()) {
-            const datos = paquete.data().historial.map((d: { estado: number, fecha: Timestamp, detalles: string }) => ({
+            const datos = paquete.data().historial.map((d: { estado: number, fecha: Timestamp, detalles: string, imagelink?: string }) => ({
                 estado: verEstado(d.estado),
                 fecha: d.fecha.toDate().toLocaleString(),
-                detalles: d.detalles.toString()
+                detalles: d.detalles.toString(),
+                imagelink: d.imagelink
             }))
             setSearchResult({ codigo: paquete.id, ultimaModif: datos[datos.length - 1].fecha, historial: datos.reverse() })
         } else {
