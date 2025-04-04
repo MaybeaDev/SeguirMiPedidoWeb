@@ -70,7 +70,7 @@ const PanelPrincipal = () => {
                     } else {
                         p.enProceso++
                     }
-                } else if (camp.includes(paquete.campaña)) {
+                } else if (camp[camp.length - 2] == (paquete.campaña)) {
                     p2.total++
                     if (paquete.estado == 0) {
                         p2.noArribado++
