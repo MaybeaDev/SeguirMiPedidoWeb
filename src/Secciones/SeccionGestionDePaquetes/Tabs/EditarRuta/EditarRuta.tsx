@@ -23,8 +23,8 @@ const EditarRutaTab = () => {
     const { rutaID } = useParams()
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { getPaquetes(rutaID!); console.log("datos actualizados") }, [paquetesContext])
-    useEffect(()=> {
-        if (!isOpenModal){
+    useEffect(() => {
+        if (!isOpenModal) {
             setEntregaMasivaRut("")
             setEntregaMasivaNombre("")
         }
@@ -235,9 +235,12 @@ const EditarRutaTab = () => {
                 onChange={handleSearch}
             />
             <br />
-            <Button onClick={handleEntregaMasiva}>
-                <label>Entrega Masiva</label>
-            </Button>
+            {
+                ruta.split(" ").map((p) => p.toLowerCase()).includes("despachos") &&
+                <Button onClick={handleEntregaMasiva}>
+                    <label>Entrega Masiva</label>
+                </Button>
+            }
             <Table
                 data={paquetes}
                 headers={[
