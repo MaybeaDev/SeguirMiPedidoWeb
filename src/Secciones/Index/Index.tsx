@@ -72,6 +72,7 @@ const Index = () => {
     const searchOrder = async (code?: string) => {
         setBuscandoOrden(true)
         setOrdenBuscada(false)
+        setSearchResult({})
         console.log(code, orderCode)
         const docRef = doc(db, "Paquetes", code ?? orderCode)
         const paquete = await getDoc(docRef)
@@ -84,7 +85,6 @@ const Index = () => {
             }))
             setSearchResult({ codigo: paquete.id, ultimaModif: datos[datos.length - 1].fecha, historial: datos.reverse() })
         } else {
-            setSearchResult({})
             console.log(searchResultCons)
         }
         setOrdenBuscada(true)
