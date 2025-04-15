@@ -51,6 +51,7 @@ const ReportesScreen = () => {
       if (paquetesTemp.find(p => p.id == doc.id.slice(0, 10))) { return }
       return paquetesTemp.push({
         id: doc.id.slice(0, 10),
+        zona: d.zona ?? "No registrada",
         campaña: d.campania,
         consultora: d.consultora,
         contacto: d.contacto,

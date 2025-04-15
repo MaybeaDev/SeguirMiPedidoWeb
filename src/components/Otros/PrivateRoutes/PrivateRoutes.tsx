@@ -29,6 +29,7 @@ export interface TransportistaContext {
 export interface PaqueteContext {
     id: string;
     campaña: string;
+    zona: string;
     consultora: string;
     contacto: string;
     direccion: string;
@@ -100,6 +101,7 @@ const PrivateRoute: React.FC = () => {
                 const paquete: PaqueteContext = {
                     id: doc.id,
                     campaña: doc.data().campania ?? null,
+                    zona: doc.data().zona ?? null,
                     consultora: doc.data().consultora ?? null,
                     contacto: doc.data().contacto ?? null,
                     direccion: doc.data().direccion ?? null,

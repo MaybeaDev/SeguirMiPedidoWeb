@@ -14,6 +14,7 @@ import { useOutletContext } from "react-router-dom";
 
 interface Paquete {
     codigo: string,
+    zona: string,
     consultora: string,
     nombreConsultora: string,
     facturacion: string,
@@ -59,16 +60,18 @@ const IngresarFacturacionTab = () => {
                 const worksheet = workbook.Sheets["Facturacion Total"];
                 const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as string[][];
                 setIsLoading(false);
-                const parsedHeaders = data.map((row) => ([row[0] as string, row[5] as string, row[15] as string, row[9] as string, row[10] as string, row[11] as string, row[12] as string, row[26] as string, row[17] as string, row[18] as string]))
+                const parsedHeaders = data.map((row) => ([row[0] as string, row[5] as string, row[15] as string, row[9] as string, row[10] as string, row[11] as string, row[12] as string, row[26] as string, row[17] as string, row[18] as string, row[6] as string]))
                 const comienzoTabla = parsedHeaders.findIndex((headers) => {
-                    if (JSON.stringify(headers) === JSON.stringify(["PEDIDO", "Fecha", "CAJAS", "CONSULTORA", "NOMBRE CONSULTORA", "DIRECCION", "TELEFONO", "CAMPAÑA FACTURACION", "NOMBRE AFP", "CANTIDAD"])) {
+                    if (JSON.stringify(headers) === JSON.stringify(["PEDIDO", "Fecha", "CAJAS", "CONSULTORA", "NOMBRE CONSULTORA", "DIRECCION", "TELEFONO", "CAMPAÑA FACTURACION", "NOMBRE AFP", "CANTIDAD", "ZONA"])) {
                         return true
                     }
                 })
+                console.log(parsedHeaders)
                 if (comienzoTabla >= 0) {
                     const parsedData = data.slice(comienzoTabla + 1).map((row) => {
                         return {
                             codigo: row[0] ? row[0].toString().trim() : "",
+                            zona: row[6]? row[6].toString().trim() : "",
                             cajas: row[15] ? parseInt(row[15]) : 0,
                             consultora: row[9] ? row[9].toString().trim() : "",
                             nombreConsultora: row[10] ? row[10].toString().trim() : "",
@@ -101,6 +104,7 @@ const IngresarFacturacionTab = () => {
                             const referencia = pedido.direccion.split("REFERENCIA")[1] ?? "";
                             fullData.push({
                                 codigo: pedido.codigo + "00" + i,
+                                zona: pedido.zona,
                                 consultora: pedido.consultora,
                                 nombreConsultora: pedido.nombreConsultora,
                                 direccion: direccion,
@@ -147,6 +151,7 @@ const IngresarFacturacionTab = () => {
             if (!campanias.has(item.campaña)) campanias.add(item.campaña)
             const object = {
                 contacto: String(item.telefono),
+                zona: item.zona,
                 consultora: item.consultora,
                 campania: item.campaña,
                 direccion: direccion.trim(),
@@ -244,8 +249,8 @@ const IngresarFacturacionTab = () => {
                         <div style={{ display: "flex", flexDirection: "column" }}>
                             <label>Facturaciones encontradas</label><br />
                             <div style={{ display: "flex", flexDirection: "row" }}>
-                                {facturaciones.filter(f => data.map(d => d.facturacion).includes(f)).map(p => (
-                                    <label>{p}, </label>
+                                {facturaciones.filter(f => data.map(d => d.facturacion).includes(f)).map((p, index) => (
+                                    <label key={index}>{p}, </label>
                                 ))
                                 }
                             </div>
