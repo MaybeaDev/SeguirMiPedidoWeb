@@ -7,11 +7,9 @@ import Button from "../../../../components/UI/Button/Button";
 import { doc, getDoc, Timestamp, updateDoc, writeBatch } from "firebase/firestore";
 import { db } from "../../../../firebaseConfig";
 import JsBarcode from "jsbarcode";
-import { Document, Packer, Paragraph, Table as TableDocx, TableRow, TableCell, ImageRun, TextRun } from "docx";
 import { obtenerCoordenadas } from "../../../../mapbox";
 
 const DespachosTab = () => {
-
     const [data, setData] = useState<string[][]>([])
     const [descargado, setDescargado] = useState(false)
     const formRef = useRef<HTMLFormElement>(null)
@@ -145,6 +143,7 @@ const DespachosTab = () => {
         return bytes.buffer;
     };
     const handleDescargarListado = async () => {
+        const { Document, Packer, Paragraph, Table: TableDocx, TableRow, TableCell, ImageRun, TextRun } = await import("docx")
         setDescargado(true)
         const paragraphs = data.map((row) => {
             const barcodeData = generateBarcode(row[0]); // Primer elemento de cada lista

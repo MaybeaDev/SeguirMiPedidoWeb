@@ -3,14 +3,13 @@ import classes from "./IngresarFacturacion.module.css"
 
 import { useState } from "react";
 import Button from "../../../../components/UI/Button/Button";
-import * as XLSX from "xlsx";
 import FileDropzone from "../../../../components/UI/DropZone/FileDropZone";
 import Table from "../../../../components/UI/Table/Table";
 import { doc, getDoc, Timestamp, writeBatch } from "firebase/firestore";
 import { db } from "../../../../firebaseConfig";
-// import { obtenerCoordenadas } from "../../../../mapbox";
 import { PaqueteContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
 import { useOutletContext } from "react-router-dom";
+import { read, utils } from "xlsx";
 
 interface Paquete {
     codigo: string,
@@ -48,7 +47,8 @@ const IngresarFacturacionTab = () => {
 
         return `${day}-${month}-${year}`;
     }
-    const handleFileSelect = (file: File) => {
+    const handleFileSelect = async (file: File) => {
+
         setData([]);
         setIsLoading(true);
         setErrorFile(null);
@@ -56,9 +56,9 @@ const IngresarFacturacionTab = () => {
         reader.onload = (e) => {
             const fileContent = e.target?.result;
             if (fileContent) {
-                const workbook = XLSX.read(fileContent, { type: "array" });
+                const workbook = read(fileContent, { type: "array" });
                 const worksheet = workbook.Sheets["Facturacion Total"];
-                const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as string[][];
+                const data = utils.sheet_to_json(worksheet, { header: 1 }) as string[][];
                 setIsLoading(false);
                 const parsedHeaders = data.map((row) => ([row[0] as string, row[5] as string, row[15] as string, row[9] as string, row[10] as string, row[11] as string, row[12] as string, row[26] as string, row[17] as string, row[18] as string, row[6] as string]))
                 const comienzoTabla = parsedHeaders.findIndex((headers) => {
@@ -71,7 +71,7 @@ const IngresarFacturacionTab = () => {
                     const parsedData = data.slice(comienzoTabla + 1).map((row) => {
                         return {
                             codigo: row[0] ? row[0].toString().trim() : "",
-                            zona: row[6]? row[6].toString().trim() : "",
+                            zona: row[6] ? row[6].toString().trim() : "",
                             cajas: row[15] ? parseInt(row[15]) : 0,
                             consultora: row[9] ? row[9].toString().trim() : "",
                             nombreConsultora: row[10] ? row[10].toString().trim() : "",
@@ -122,7 +122,7 @@ const IngresarFacturacionTab = () => {
                         const p = paquete.slice(0, 10)
                         console.log(p, premios[p])
                         if (premios[p])
-                        newPremios[p] = premios[p]
+                            newPremios[p] = premios[p]
                     })
                     console.log(newPremios, "New Premios")
                     setPremios(newPremios)

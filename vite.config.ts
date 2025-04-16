@@ -11,9 +11,9 @@ export default defineConfig({
       output: {
         manualChunks: {
           firebase: ['firebase/app', 'firebase/firestore'],
+          xlsx: ['xlsx']
         },
       },
     },
-    chunkSizeWarningLimit: 1000, // opcional: sube el límite si ya sabés que todo está bien
   },
 });
