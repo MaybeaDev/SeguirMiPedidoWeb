@@ -106,8 +106,8 @@ const ListadoTab = () => {
         [campañas[campañas.length - 1]]: {},
       };
       const pqts : [number, number] = [
-        paquetesContext.filter((p) => p.campaña == campañas[campañas.length - 2] && p.estado == 3 && p.transportistaNombre?.toLowerCase() == trabajador.nombre.toLowerCase()).length,
-        paquetesContext.filter((p) => p.campaña == campañas[campañas.length - 1] && p.estado == 3 && p.transportistaNombre?.toLowerCase() == trabajador.nombre.toLowerCase()).length
+        paquetesContext.filter((p) => p.campaña == campañas[campañas.length - 2] && p.estado == 3 && p.transportistaNombre?.toLowerCase() == trabajador.nombre.toLowerCase() && !p.id.startsWith("DESP")).length,
+        paquetesContext.filter((p) => p.campaña == campañas[campañas.length - 1] && p.estado == 3 && p.transportistaNombre?.toLowerCase() == trabajador.nombre.toLowerCase() && !p.id.startsWith("DESP")).length
       ]
       console.log(pqts)
       console.log(trabajador)
