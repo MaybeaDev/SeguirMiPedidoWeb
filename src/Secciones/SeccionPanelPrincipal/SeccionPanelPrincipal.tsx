@@ -53,7 +53,7 @@ const PanelPrincipal = () => {
     })
     const isFirstRender = useRef(true);
     useEffect(() => {
-        const paquetes = paquetesContext.filter(p => p.campaña?.includes(campañaActual[campañaActual.length - 1]))
+        const paquetes = paquetesContext.filter(p => p.campaña?.includes(campañaActual[campañaActual.length - 1]) && p.id.endsWith("001"))
         const premios: Record<string, number> = {}
         paquetes.forEach(p => {
             const pedido = p.id.slice(0, 10)
