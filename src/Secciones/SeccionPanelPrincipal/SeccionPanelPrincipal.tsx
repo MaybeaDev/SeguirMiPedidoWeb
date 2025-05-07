@@ -192,9 +192,9 @@ const PanelPrincipal = () => {
                     <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", padding: "0 20px" }}>
                         <Card titulo="Total" style={{ width: "100%" }}>
                             {Object.keys(paq.zonas).map(zona => (
-                                <>
+                                <div key={zona}>
                                     <b>{zona}:</b> {paq.zonas[zona]}<br />
-                                </>
+                                </div>
                             ))}
                             <b>Total: </b>{paq.total}
                             <br /><Button onClick={() => { setIsOpenModal(true) }}>Ver total premios</Button>

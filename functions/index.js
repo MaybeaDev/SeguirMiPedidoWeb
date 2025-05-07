@@ -170,3 +170,19 @@ exports.eliminarDatosAntiguos = onSchedule(
     }
   }
 );
+
+exports.setRange = onCall(async (r) => {
+  const { uid, range } = r.data;
+
+  if (uid == null || range == null) {
+    throw new Error("Faltan parámetros requeridos: uid y range");
+  }
+
+  try {
+    await getAuth().setCustomUserClaims(uid, { range });
+    return { success: true, message: `Claim "range" establecido en ${range} para el usuario ${uid}` };
+  } catch (error) {
+    console.error("Error al establecer custom claims:", error);
+    throw new Error("No se pudieron establecer los custom claims");
+  }
+});

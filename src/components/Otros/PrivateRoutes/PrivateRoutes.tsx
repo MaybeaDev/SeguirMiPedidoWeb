@@ -60,7 +60,7 @@ const PrivateRoute: React.FC = () => {
     useEffect(() => {
         const auth = getAuth();
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            const tipoUsuario = localStorage.getItem('currentUser') ?? ""
+            const tipoUsuario = (await user?.getIdTokenResult(true))?.claims.range as string
             setUserType(parseInt(tipoUsuario));
             setUser(user);
             setLoading(false);

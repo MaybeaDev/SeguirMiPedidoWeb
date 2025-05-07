@@ -1,5 +1,15 @@
 {
   "projects": {
-    "default": "seguirmipedido"
-  }
+    "default": "private-1"
+  },
+  "targets": {
+    "seguirmipedido": {
+      "hosting": {
+        "private": [
+          "private-1"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

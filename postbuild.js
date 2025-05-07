@@ -5,7 +5,7 @@ const commitMessage = process.argv[2] || "Actualización después de build";
 
 try {
     // Ejecuta los comandos necesarios
-    execSync('firebase deploy --only "hosting"', { stdio: "inherit" });
+    execSync('firebase deploy --only hosting:private', { stdio: "inherit" });
     execSync("git add .", { stdio: "inherit" });
     execSync(`git commit -m "${commitMessage}"`, { stdio: "inherit" });
     execSync("git push", { stdio: "inherit" });

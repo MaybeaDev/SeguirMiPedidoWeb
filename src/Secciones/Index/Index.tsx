@@ -54,7 +54,7 @@ const Index = () => {
     function verEstado(estadoNumerico: number): string {
         switch (estadoNumerico) {
             case 0:
-                return 'Enviado de bodega central a Puerto Montt';
+                return 'Enviado desde Santiago a Puerto Montt';
             case 1:
                 return 'Recibido en Bodega';
             case 2:
@@ -215,6 +215,8 @@ const Index = () => {
                                                     return 4;
                                                 case "Enviado de bodega central a Puerto Montt":
                                                     return 5;
+                                                case "Enviado desde Santiago a Puerto Montt":
+                                                    return 5;
                                                 case "Entregado":
                                                     return 6; // Menos prioritario
                                                 default:
@@ -227,6 +229,9 @@ const Index = () => {
                                         let estado = 0;
                                         switch (c.historial![c.historial!.length - 1].estado ?? "") {
                                             case "Enviado de bodega central a Puerto Montt":
+                                                estado = 0;
+                                                break;
+                                            case "Enviado desde Santiago a Puerto Montt":
                                                 estado = 0;
                                                 break;
                                             case "Recibido en Bodega":
