@@ -126,11 +126,6 @@ const PanelPrincipal = () => {
                     }
                 } else if (camp[camp.length - 2] == (paquete.campaña)) {
                     p2.total++
-                    if (p.zonas[paquete.zona]) {
-                        p.zonas[paquete.zona]++
-                    } else if (paquete.zona != null) {
-                        p.zonas[paquete.zona] = 1
-                    }
                     if (paquete.estado == 0) {
                         p2.noArribado++
                     } else if (paquete.estado == 1) {
