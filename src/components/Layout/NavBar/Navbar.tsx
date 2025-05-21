@@ -61,6 +61,7 @@ const Navbar = () => {
         {user ?
           user == "1" ? (
             <>
+              <LinkButton direccion="/SeccionEmpresa/mensaje" nombre="Mensaje publico" />
               <LinkButton direccion="/SeccionEmpresa" nombre="Panel principal" />
               <LinkButton direccion="/SeccionEmpresa/GestionDePaquetes/ingresarFacturacion" nombre="Gestion de Paquetes" />
               <LinkButton direccion="/SeccionEmpresa/Usuarios/listado" nombre="Gestion de transportistas" />

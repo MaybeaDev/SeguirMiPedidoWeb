@@ -1,0 +1,67 @@
+/* LoginPage.module.css */
+
+.loginContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #fde1e1; /* Color de fondo suave */
+}
+
+.loginBox {
+  background-color: #fdeeee;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333333; /* Título en color oscuro */
+}
+
+.error {
+  color: red;
+  margin-bottom: 10px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.input {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #e62222; /* Naranja */
+}
+
+.submitButton {
+  background-color: #e62222; /* Naranja */
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.submitButton:hover {
+  background-color: #cf1a1a; /* Naranja más oscuro */
+}
+
+.submitButton:active {
+  background-color: #9e1212; /* Naranja aún más oscuro */
+}

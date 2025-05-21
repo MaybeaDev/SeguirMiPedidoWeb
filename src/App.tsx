@@ -20,6 +20,7 @@ import EditarRutaTab from './Secciones/SeccionGestionDePaquetes/Tabs/EditarRuta/
 import BarcodePage from './Secciones/BarcodePage/BarcodePage'
 import ReportesScreen from './Secciones/SeccionReportes/SeccionReportes'
 import { Debug } from './Debug'
+import SeccionMensaje from './Secciones/Mensaje/Mensaje'
 
 function App() {
 
@@ -53,6 +54,7 @@ function App() {
               <Route path="editarRutas/:rutaID" element={<EditarRutaTab />} />
               <Route path="editarRutas" element={<Navigate to="/SeccionEmpresa/GestionDePaquetes/gestionDeRutas" />} />
             </Route>
+            <Route path='/SeccionEmpresa/mensaje' element={<SeccionMensaje/>}/>
           </Route>
 
           <Route path="*" element={<Navigate to="/" />} />
