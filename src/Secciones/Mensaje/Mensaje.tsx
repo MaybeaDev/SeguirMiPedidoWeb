@@ -1,12 +1,24 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import classes from "./Mensaje.module.css"; // Importamos el módulo CSS
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 
 const SeccionMensaje = () => {
   const [message, setMessage] = useState("")
   const [error, setError] = useState<string>("");
   const [btnDisabled, setBtnDisabled] = useState(false);
+  const [mensajeActual, setMensajeActual] = useState("")
+
+  useEffect(()=>{
+    const docRef = doc(db, "/Mensaje", "mensaje")
+    const uns = onSnapshot(docRef, snap=>{
+      console.log(snap.data())
+      if (snap.exists()) setMensajeActual(snap.data().text)
+      else setMensajeActual("")
+    })
+
+    return uns
+  }, [])
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -26,6 +38,7 @@ const SeccionMensaje = () => {
     <div className={classes.loginContainer}>
       <div className={classes.loginBox}>
         <h2 className={classes.title}>Cambiar el mensaje publico</h2>
+        <h3 className={classes.subtitle}>Mensaje actual: <br/> {mensajeActual}</h3>
         {error && <p className={classes.error}>{error}</p>}
         <form onSubmit={e => handleSubmit(e)} className={classes.form}>
           <center>

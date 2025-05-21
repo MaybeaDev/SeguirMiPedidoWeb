@@ -2,11 +2,13 @@ import classes from "./VerPaquetesTab.module.css"
 
 import { useEffect, useRef, useState } from "react";
 import Table from "../../../../components/UI/Table/Table";
-import { useNavigate, useOutletContext, useParams } from "react-router-dom";
+import { useOutletContext, useParams } from "react-router-dom";
 import { PaqueteContext, RutaContext, TransportistaContext } from "../../../../components/Otros/PrivateRoutes/PrivateRoutes";
 import Button from "../../../../components/UI/Button/Button";
 import * as XLSX from "xlsx";
 
+
+const PUBLIC_URL = "https://rolandotransportes.cl/paquete"
 function formatDate(date: Date) {
     const day = String(date.getDate()).padStart(2, '0'); // Asegura que el día tiene 2 dígitos
     const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses van de 0 (enero) a 11 (diciembre), por eso sumamos 1
@@ -20,7 +22,6 @@ function formatDate(date: Date) {
 }
 
 const VerPaquetesTab = () => {
-    const navigate = useNavigate()
     const { paquetesContext, rutasContext, transportistasContext } = useOutletContext<{ paquetesContext: PaqueteContext[], rutasContext: Record<string, RutaContext>, transportistasContext: Record<string, TransportistaContext> }>();
     const [paquetes, setPaquetes] = useState<string[][]>([]);
     const [tableData, setTableData] = useState<string[][]>([]);
@@ -258,7 +259,7 @@ const VerPaquetesTab = () => {
                     >
                         {(rowIndex: string) => {
                             return (
-                                <div onClick={() => { console.log(rowIndex); navigate(`/${rowIndex}`) }
+                                <div onClick={() => { console.log(rowIndex); window.open(`${PUBLIC_URL}/${rowIndex}`, "_blank") }
                                 }>
                                     <label>&#128269;</label>
                                 </div>

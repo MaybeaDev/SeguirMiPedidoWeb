@@ -24,6 +24,12 @@
   margin-bottom: 20px;
   color: #333333; /* Título en color oscuro */
 }
+.subtitle {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333333; /* Título en color oscuro */
+}
 
 .error {
   color: red;
