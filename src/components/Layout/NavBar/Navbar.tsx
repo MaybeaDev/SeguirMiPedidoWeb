@@ -5,6 +5,8 @@ import LinkButton from "../../UI/LinkButton/LinkButton";
 import classes from "./NavBar.module.css"
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../firebaseConfig"
+// import { functions } from "../../../firebaseConfig"
+// import { httpsCallable } from "firebase/functions";
 const Navbar = () => {
   const [user, setUser] = useState<string | null>();
   const [userName, setUserName] = useState<string | null>(null);
@@ -25,9 +27,15 @@ const Navbar = () => {
     return uns
   }, [])
 
+  // const handleButtonMatias = async () => {
+  //   const result = await httpsCallable(functions, 'cleanStorageBefore')({ date: "2025-04-05T19:35:00.566Z", maxFilesPerBatch: 40 });
+  //   console.log(result)
+  // }
+
 
   return (
     <nav className={classes.container}>
+        {/* <button onClick={handleButtonMatias}>-_-</button> */}
       <div className={classes.left}>
         {user && (
           <div style={{ display: "flex", alignItems: "center" }}>

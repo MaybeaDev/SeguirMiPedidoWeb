@@ -115,7 +115,7 @@ const obtenerPaquetesNoArribados = () => {
         const dateA = new Date(añoA, mesA - 1, diaA); // Crear objeto Date
         const dateB = new Date(añoB, mesB - 1, diaB);
 
-        return dateB.getTime() - dateA.getTime(); // Ordenar de más reciente a más antigua
+        return dateA.getTime() - dateB.getTime(); // Ordenar de más reciente a más antigua
     });
     filtradosOrdenados.forEach((paquete) => {
         if (!paquetes[paquete.facturacion]) {
@@ -143,7 +143,7 @@ return (
         <br />
         <div className={classes.content}>
             <div className={classes.leftContent}>
-                <h3>Escanear codigos</h3>
+                <h3>Escanear codigos (Restantes: {Object.values(data).reduce((total, d) => total + d.length,0 )})</h3>
                 {ultimoValidado != "" && (
                     <>
                         <label>Ultimo escaneado: </label>
