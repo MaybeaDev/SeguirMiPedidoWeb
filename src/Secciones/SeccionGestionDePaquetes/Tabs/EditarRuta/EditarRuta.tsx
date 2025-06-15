@@ -24,6 +24,7 @@ const EditarRutaTab = () => {
   const [isOpenModalEntrega, setIsOpenModalEntrega] = useState(false);
   const [entregaRut, setEntregaRut] = useState("");
   const [entregaNombre, setEntregaNombre] = useState("");
+  const [entregaFecha, setEntregaFecha] = useState(getLocalDateTimeValue());
   const [pedidoSeleccionado, setPedidoSeleccionado] = useState<string | null>(null);
 
   const { rutaID } = useParams()
@@ -125,10 +126,12 @@ const EditarRutaTab = () => {
   const marcarEntregado = async () => {
     if (!pedidoSeleccionado) return;
 
-    if (entregaNombre.trim() === "" || entregaRut.trim() === "") {
-        alert("Debe ingresar el nombre y RUT de la persona a la que se entregarán los pedidos.");
+    if (entregaNombre.trim() === "" || entregaRut.trim() === "" || entregaFecha.trim() === "") {
+        alert("Debe ingresar el nombre y RUT de la persona a la que se entregarán los pedidos, y la fecha y hora de la entrega.");
         return;
     }
+
+
 
     const key = pedidoSeleccionado.split(" ")[0];
     const paquetes = paquetesContext.filter(p => p.id.slice(0, 10) === key);
@@ -138,7 +141,7 @@ const EditarRutaTab = () => {
             estado: 3,
             historial: arrayUnion({
                 estado: 3,
-                fecha: new Date(),
+                fecha: new Date(entregaFecha),
                 detalles: `Pedido entregado a ${entregaNombre} Rut: ${entregaRut}`
             })
         });
@@ -248,6 +251,7 @@ const EditarRutaTab = () => {
     setPedidoSeleccionado(key);
     setEntregaNombre("");
     setEntregaRut("");
+    setEntregaFecha(getLocalDateTimeValue());
     setIsOpenModalEntrega(true);
 };
 
@@ -286,6 +290,15 @@ const EditarRutaTab = () => {
             placeholder="Ingrese el nombre"
             value={entregaNombre}
             onInput={(e) => setEntregaNombre((e.target as HTMLInputElement).value)}
+            />
+        </div>
+        <div>
+          <label>Fecha y hora</label>
+          <input
+            type="datetime-local"
+            placeholder="Ingrese la fecha"
+            value={entregaFecha}
+            onChange={(e) => setEntregaFecha((e.target as HTMLInputElement).value)}
           />
         </div>
         <div style={{ display: "flex", justifyContent: "space-around", width: "100%" }}>
@@ -342,3 +355,17 @@ const EditarRutaTab = () => {
 }
 
 export default EditarRutaTab;
+
+
+
+function getLocalDateTimeValue(date = new Date()) {
+  const pad = (n: number) => String(n).padStart(2, '0');
+
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
