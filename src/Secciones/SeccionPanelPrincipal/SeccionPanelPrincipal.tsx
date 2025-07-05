@@ -232,6 +232,7 @@ const PanelPrincipal = () => {
                   <label> Entregados el primer dia: {fd_camp_act} ({(fd_camp_act * 100 / paq.total).toFixed(3)}%)</label><br />
                   <label> Entregados el segundo dia: {sd_camp_act} ({(sd_camp_act * 100 / paq.total).toFixed(3)}%)</label><br />
                   <label> Entregados el tercer dia: {td_camp_act} ({(td_camp_act * 100 / paq.total).toFixed(3)}%)</label><br />
+                  <label> Total 3 dias: {ttd_camp_act} ({(ttd_camp_act * 100 / paq.total).toFixed(3)}%)</label><br />
                   <label> No entregado / Entregado después: {paq.total - ttd_camp_act} ({((paq.total - ttd_camp_act) * 100 / paq.total).toFixed(3)}%)</label><br />
                 </div>
               </div>
