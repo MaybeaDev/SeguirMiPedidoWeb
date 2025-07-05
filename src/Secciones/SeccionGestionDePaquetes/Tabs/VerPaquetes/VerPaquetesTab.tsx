@@ -57,6 +57,7 @@ const VerPaquetesTab = () => {
       const t = p.transportistaNombre
       const paquete = [
         `${p.campaña ?? "C. no disponible"} <br/> F:${p.facturacion ?? "No especificada"}`,
+        `Arr:${p.historial[1]?.fecha.toDate().toLocaleDateString() ?? "No arribado"}`,
         p.id,
         p.consultora,
         (() => {
@@ -81,7 +82,6 @@ const VerPaquetesTab = () => {
         p.receptor,
         p.contacto ?? "No disponible",
         p.direccion,
-        p.referencia ?? "No disponible",
         r ? r : (ruta != undefined ? ruta.alias : ""),
         t ? t : (ruta != undefined ? ruta.transportistaNombre : "")
 
@@ -243,6 +243,7 @@ const VerPaquetesTab = () => {
             max={200}
             headers={[
               "Campaña / Facturacion",
+              "Fecha Arribo",
               "Codigo",
               "Codigo consu.",
               "Estado",
@@ -250,7 +251,6 @@ const VerPaquetesTab = () => {
               "Consultora",
               "Telefono",
               "Direccion",
-              "Referencia",
               "Ruta",
               "Transportista",
             ]}
