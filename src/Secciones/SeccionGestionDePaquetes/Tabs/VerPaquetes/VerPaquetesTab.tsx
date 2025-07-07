@@ -172,33 +172,34 @@ const VerPaquetesTab = () => {
       NombreConsultora: string,
       Telefono: string,
       Direccion: string,
-      Referencia: string,
       Ruta: string,
       Transportista: string,
       Detalles: string,
     }[] = []
     tableData.forEach(row => {
-      const paquete = paquetesContext.find((p) => p.id == row[1])
+      const paquete = paquetesContext.find((p) => p.id == row[2])
       if (paquete) {
         const detalles = paquete.historial[paquete.historial.length - 1].detalles
-        data.push({
+        const p = {
           Campaña: row[0].split(" <br/> F:")[0],
           Facturacion: row[0].split(" <br/> F:")[1],
-          Codigo: row[1],
-          Estado: row[3],
-          Fecha: row[4],
-          Consultora: row[2],
-          NombreConsultora: row[5],
-          Telefono: row[6],
-          Direccion: row[7],
-          Referencia: row[8],
+          Codigo: row[2],
+          Estado: row[4],
+          Fecha: row[5],
+          Consultora: row[3],
+          NombreConsultora: row[6],
+          Telefono: row[7],
+          Direccion: row[8],
           Ruta: row[9],
           Transportista: row[10],
           Detalles: detalles,
-        })
+        }
+        console.log(p)
+        data.push(p)
       }
     })
     const worksheet = XLSX.utils.json_to_sheet(data);
+    console.log(data, tableData, worksheet)
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Resumen");
     XLSX.writeFile(workbook, "Resumen" + formatDate(new Date()) + ".xlsx");
