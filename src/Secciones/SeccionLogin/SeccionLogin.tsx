@@ -41,7 +41,7 @@ const SeccionLogin = () => {
         },
       };
     });
-    console.log(rutas);
+    if (import.meta.env.DEV) console.log(rutas);
   }
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -58,7 +58,7 @@ const SeccionLogin = () => {
 
 
       // Verificar si el tipo de usuario es "empresa"
-      console.log(rango)
+      if (import.meta.env.DEV) console.log(rango)
       if ([1, 2, 3].includes(rango)) {
         updateDoc(userDocRef, { ultimaConexion: Timestamp.now() });
         // Si es un usuario de tipo empresa, redirigir al panel de empresa

@@ -16,9 +16,9 @@ export const Debug = () => {
       const uid = d.id
       const tipo = d.data().tipo as number
       const data = { uid, range: tipo }
-      console.log(data)
+      if (import.meta.env.DEV) console.log(data)
       const r = await setRangeFn(data)
-      console.log(r)
+      if (import.meta.env.DEV) console.log(r)
       setMessage((r.data as { status: number, message: string }).message)
     })
   };

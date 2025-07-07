@@ -194,12 +194,10 @@ const VerPaquetesTab = () => {
           Transportista: row[10],
           Detalles: detalles,
         }
-        console.log(p)
         data.push(p)
       }
     })
     const worksheet = XLSX.utils.json_to_sheet(data);
-    console.log(data, tableData, worksheet)
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Resumen");
     XLSX.writeFile(workbook, "Resumen" + formatDate(new Date()) + ".xlsx");
@@ -260,7 +258,7 @@ const VerPaquetesTab = () => {
           >
             {(rowIndex: string) => {
               return (
-                <div onClick={() => { console.log(rowIndex); window.open(`${PUBLIC_URL}/${rowIndex}`, "_blank") }
+                <div onClick={() => { window.open(`${PUBLIC_URL}/${rowIndex}`, "_blank") }
                 }>
                   <label>&#128269;</label>
                 </div>

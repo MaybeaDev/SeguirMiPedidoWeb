@@ -66,7 +66,7 @@ const IngresarFacturacionTab = () => {
                         return true
                     }
                 })
-                console.log(parsedHeaders)
+                if (import.meta.env.DEV) console.log(parsedHeaders)
                 if (comienzoTabla >= 0) {
                     const parsedData = data.slice(comienzoTabla + 1).map((row) => {
                         return {
@@ -88,7 +88,7 @@ const IngresarFacturacionTab = () => {
                     setIsLoading(false);
                     const fullData: Paquete[] = []
                     const premios: Record<string, Record<string, number>> = {}
-                    console.log(premios)
+                    if (import.meta.env.DEV) console.log(premios)
                     validData.forEach((pedido) => {
                         if (pedido.nombreAFP != "") {
                             if (!premios[pedido.codigo]) {
@@ -120,11 +120,11 @@ const IngresarFacturacionTab = () => {
                     const newPremios: Record<string, Record<string, number>> = {}
                     pedidos.forEach(paquete => {
                         const p = paquete.slice(0, 10)
-                        console.log(p, premios[p])
+                        if (import.meta.env.DEV) console.log(p, premios[p])
                         if (premios[p])
                             newPremios[p] = premios[p]
                     })
-                    console.log(newPremios, "New Premios")
+                    if (import.meta.env.DEV) console.log(newPremios, "New Premios")
                     setPremios(newPremios)
                     ingresarData(newData);
                 } else {
@@ -170,7 +170,7 @@ const IngresarFacturacionTab = () => {
             };
             batch.set(docRef, object);
         }
-        console.log(Object.keys(premios).length)
+        if (import.meta.env.DEV) console.log(Object.keys(premios).length)
         Object.keys(premios).forEach((k) => {
             batch.set(doc(db, "Premios", k), { premios: premios[k], transportista: "" })
         })
@@ -189,7 +189,7 @@ const IngresarFacturacionTab = () => {
         await batch.commit();
         setData([])
         window.location.reload()
-        console.log("Batch commit exitoso");
+        if (import.meta.env.DEV) console.log("Batch commit exitoso");
         return
     };
     const handleConfirmarCarga = async () => {
@@ -209,7 +209,7 @@ const IngresarFacturacionTab = () => {
         return encontrados.map(p => p.id)
     };
     const ingresarData = (d: Paquete[]) => {
-        console.log(d)
+        if (import.meta.env.DEV) console.log(d)
         if (d.length > 0) {
             setData(d);
         }

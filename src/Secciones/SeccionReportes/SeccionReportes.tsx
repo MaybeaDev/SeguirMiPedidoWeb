@@ -32,8 +32,8 @@ const ReportesScreen = () => {
     if (snap.exists()) {
       const temp: string[] = []
       snap.data().campañas.forEach((campaña: string) => { temp.push(campaña) })
-      console.log(snap.data().campañas)
-      console.log(temp)
+      if (import.meta.env.DEV) console.log(snap.data().campañas)
+      if (import.meta.env.DEV) console.log(temp)
       setCampañas(temp)
       onCampañaChange(temp[0])
     }
@@ -41,10 +41,10 @@ const ReportesScreen = () => {
 
   const onCampañaChange = async (campaña: string) => {
     setLoading(true)
-    console.log("Cambio Campaña a ", campaña)
+    if (import.meta.env.DEV) console.log("Cambio Campaña a ", campaña)
     const q = query(collection(db, "Paquetes"), where("campania", "==", campaña))
     const docs = await getDocs(q)
-    console.log(docs.size)
+    if (import.meta.env.DEV) console.log(docs.size)
     const paquetesTemp: PaqueteContext[] = []
     docs.forEach((doc) => {
       const d = doc.data()
@@ -66,7 +66,7 @@ const ReportesScreen = () => {
         transportistaNombre: d.transportistaNombre,
       });
     })
-    console.log(paquetesTemp)
+    if (import.meta.env.DEV) console.log(paquetesTemp)
     setPaquetes(paquetesTemp)
     setLoading(false)
   }
@@ -104,7 +104,7 @@ const ReportesScreen = () => {
         Recibe: p.historial[p.historial.length - 1].detalles.split("entregado a")[1] ?? "No especificado",
       })
     })
-    console.log(data, paq)
+    if (import.meta.env.DEV) console.log(data, paq)
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Reporte");

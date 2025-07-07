@@ -44,7 +44,7 @@ const ArriboCargaTab = () => {
     }, [paquetesContext])
 
     const processQueue = async () => {
-        console.log("Processing queue...", isProcessing.current);
+        if (import.meta.env.DEV) console.log("Processing queue...", isProcessing.current);
         if (isProcessing.current) return;
         isProcessing.current = true;
         while (codigoQueue.current.length > 0) {
@@ -59,9 +59,9 @@ const ArriboCargaTab = () => {
     };
     const keyDownHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key == "Enter") {
-            console.log(inputValue, "Enter")
+            if (import.meta.env.DEV) console.log(inputValue, "Enter")
             if (inputValue.trim().split(" ").length >= 2) {
-                console.log(inputValue.split(" "))
+                if (import.meta.env.DEV) console.log(inputValue.split(" "))
                 inputValue.split(" ").forEach((c) => {
                     enqueueCodigo(c.trim())
                 })
@@ -70,7 +70,7 @@ const ArriboCargaTab = () => {
                     enqueueCodigo(inputValue.trim())
                 }
             }
-            console.log("Limpiado")
+            if (import.meta.env.DEV) console.log("Limpiado")
             setInputValue("");
         }
     }
@@ -79,7 +79,7 @@ const ArriboCargaTab = () => {
     }
     const validarCodigo = async (codigo: string) => {
         const p = paquetesContext.find(p => p.id == codigo)
-        console.log(codigo)
+        if (import.meta.env.DEV) console.log(codigo)
         setUltimoValidado(codigo)
         if (p) {
             setCodigoValido(true)
@@ -94,14 +94,14 @@ const ArriboCargaTab = () => {
                         detalles: "Recibido por Rolando Transportes!"
                     })
                 })
-console.log(`Codigo ${codigo} arribado`)
+if (import.meta.env.DEV) console.log(`Codigo ${codigo} arribado`)
             } else {
-    console.log("El paquete ya está arribado")
+    if (import.meta.env.DEV) console.log("El paquete ya está arribado")
 }
         } else {
     setCodigoValido(false);
     setNoEncontrados((prev) => [...prev, codigo]);
-    console.log(`Código ${codigo} no encontrado`);
+    if (import.meta.env.DEV) console.log(`Código ${codigo} no encontrado`);
 }
     }
 

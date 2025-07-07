@@ -40,7 +40,7 @@ const Index = () => {
     const targetRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        console.log(id)
+        if (import.meta.env.DEV) console.log(id)
         if (id === undefined || isNaN(Number(id))) {
             navigate("/")
         }
@@ -73,7 +73,7 @@ const Index = () => {
         setBuscandoOrden(true)
         setOrdenBuscada(false)
         setSearchResult({})
-        console.log(code, orderCode)
+        if (import.meta.env.DEV) console.log(code, orderCode)
         const docRef = doc(db, "Paquetes", code ?? orderCode)
         const paquete = await getDoc(docRef)
         if (paquete.exists()) {
@@ -85,7 +85,7 @@ const Index = () => {
             }))
             setSearchResult({ codigo: paquete.id, ultimaModif: datos[datos.length - 1].fecha, historial: datos.reverse() })
         } else {
-            console.log(searchResultCons)
+            if (import.meta.env.DEV) console.log(searchResultCons)
         }
         setOrdenBuscada(true)
     }

@@ -94,7 +94,7 @@ const PanelPrincipal = () => {
       zonas: {}
     }
     const p2 = { ...p }
-    console.log("UseEffect")
+    if (import.meta.env.DEV) console.log("UseEffect")
     getDoc(doc(db, "metadatos/campanias")).then(r => {
       const camp: string[] = r.data()!.campañas
       paquetesContext.forEach((paquete) => {
@@ -129,7 +129,7 @@ const PanelPrincipal = () => {
           if (paquete.estado == 0) {
             p2.noArribado++
           } else if (paquete.estado == 1) {
-            console.log(paquete)
+            if (import.meta.env.DEV) console.log(paquete)
             p2.enBodega++
           } else if (paquete.estado == 3) {
             p2.entregado++

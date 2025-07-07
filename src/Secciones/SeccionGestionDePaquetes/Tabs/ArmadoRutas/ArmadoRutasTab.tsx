@@ -97,7 +97,7 @@ const ArmadoRutasTab: React.FC = () => {
                     paquetes.forEach(
                         p => {
                             if (premiosContext[p]) {
-                                console.log({
+                                if (import.meta.env.DEV) console.log({
                                     "transportista": rutasContext[rutaObjetivo.rutaId!].transportista,
                                     "ruta": rutasContext[rutaObjetivo.rutaId!].id
                                 })
@@ -159,14 +159,14 @@ const ArmadoRutasTab: React.FC = () => {
             let paquetesMover = paquetesParaAsignar.filter((p) => filtroDerecha == p.codigo);
             if (filtroDerecha.length == 10) {
                 paquetesMover = paquetesParaAsignar.filter((p) => filtroDerecha == p.codigo.slice(0, 10));
-                console.log("PM=10", paquetesMover)
+                if (import.meta.env.DEV) console.log("PM=10", paquetesMover)
             } else if (filtroDerecha.length == 13) {
                 if (paquetesMover.length > 0) {
                     paquetesMover = paquetesParaAsignar.filter((p) => filtroDerecha.slice(0, 10) == p.codigo.slice(0, 10));
-                    console.log("PM=13", paquetesMover)
+                    if (import.meta.env.DEV) console.log("PM=13", paquetesMover)
                 }
             }
-            console.log("PaquetesMover", paquetesMover)
+            if (import.meta.env.DEV) console.log("PaquetesMover", paquetesMover)
             setPaquetesParaAsignar(paquetesParaAsignar.filter((p) => !paquetesMover.map((paquete) => paquete.codigo).includes(p.codigo)));
             setPaquetesNoAsignados([...paquetesNoAsignados, ...paquetesMover]);
             setFiltroDerecha("")

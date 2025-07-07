@@ -29,7 +29,7 @@ const EditarRutaTab = () => {
 
   const { rutaID } = useParams()
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { getPaquetes(rutaID!); console.log("datos actualizados") }, [paquetesContext])
+  useEffect(() => { getPaquetes(rutaID!); if (import.meta.env.DEV) console.log("datos actualizados") }, [paquetesContext])
   useEffect(() => {
     if (!isOpenModal) {
       setEntregaMasivaRut("")
@@ -83,9 +83,9 @@ const EditarRutaTab = () => {
     setPaquetes(paquetesUnicos);
   }
   const devolverABodega = async (key: string) => {
-    console.log(key.split(" ")[0].split(" ")[0])
+    if (import.meta.env.DEV) console.log(key.split(" ")[0].split(" ")[0])
     const paquetes = paquetesContext.filter(p => p.id.slice(0, p.id.length - 3) == key.split(" ")[0])
-    console.log(paquetes.length)
+    if (import.meta.env.DEV) console.log(paquetes.length)
     const batch = writeBatch(db)
     if (premiosContext[key.split(" ")[0]]) {
       batch.update(doc(db, "Premios", key.split(" ")[0]), { transportista: "", ruta: deleteField() })
@@ -225,7 +225,7 @@ const EditarRutaTab = () => {
       }
     })
     batch.commit()
-    console.log(pedidos)
+    if (import.meta.env.DEV) console.log(pedidos)
     setIsOpenModal(false)
   }
   const formatRut = (value: string) => {

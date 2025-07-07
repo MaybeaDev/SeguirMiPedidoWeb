@@ -14,7 +14,7 @@ const EstadoPaquete = (props: { historial: { estado: string, fecha: string, deta
         getDownloadURL(imageRef).then((downloadURL) => {
           imageRefCache.current.set(index, downloadURL);  // Guardamos la URL en el cache
           setImageURL(prevState => ({ ...prevState, [index]: downloadURL }));  // Actualizamos el estado
-          console.log('Image downloaded successfully: ', downloadURL);
+          if (import.meta.env.DEV) console.log('Image downloaded successfully: ', downloadURL);
         });
       }
     });

@@ -81,10 +81,10 @@ export const obtenerCoordenadas = async (
     if (data.features && data.features.length > 0) {
       const lugar = data.features[0]; // El primer resultado más relevante
       const coordenadas = lugar.geometry.coordinates; // [longitud, latitud]
-      console.log(`Coordenadas de ${direccion}:`, coordenadas);
+      if (import.meta.env.DEV) console.log(`Coordenadas de ${direccion}:`, coordenadas);
       return coordenadas; // Devuelve las coordenadas
     } else {
-      console.log("No se encontraron resultados.");
+      if (import.meta.env.DEV) console.log("No se encontraron resultados.");
       return [0, 0]; // Devuelve un valor predeterminado en caso de no encontrar coordenadas
     }
   } catch (error) {

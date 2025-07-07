@@ -21,7 +21,7 @@ const DespachosTab = () => {
 
     const handleOnKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === "Enter") {
-            console.log("Enter")
+            if (import.meta.env.DEV) console.log("Enter")
             handleAgregarDespacho()
         }
     }
@@ -34,7 +34,7 @@ const DespachosTab = () => {
             const direccion = formRef.current.Direccion
             const bultos = formRef.current.Bultos
             if (nombre.value == "") {
-                console.log(nombre)
+                if (import.meta.env.DEV) console.log(nombre)
                 nombre.focus()
             } else if (destinatario.value == "") {
                 destinatario.focus()
@@ -58,7 +58,7 @@ const DespachosTab = () => {
                 updateDoc(docRef, { ultimoDespacho: parseInt(ultimoDespacho) + 1 })
                 const newData: string[][] = []
                 for (let i = 0; i < parseInt(bultos.value); i++) {
-                    console.log(i)
+                    if (import.meta.env.DEV) console.log(i)
                     const codigo = "DESP" + ultimoDespacho.toString().padStart(6, "0") + i.toString().padStart(3, "0")
                     const date = new Date();
                     const day = String(date.getDate()).padStart(2, '0');

@@ -13,7 +13,7 @@ const FileDropzone = (props: { onFileSelect: (data: File) => void, errorString?:
         setError(props.errorString);
     }
     const validateFile = (file: File) => {
-        console.log(file)
+        if (import.meta.env.DEV) console.log(file)
         if (
             file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
             file.type == "application/vnd.ms-excel"
@@ -47,7 +47,7 @@ const FileDropzone = (props: { onFileSelect: (data: File) => void, errorString?:
     };
 
     const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        console.log("input event")
+        if (import.meta.env.DEV) console.log("input event")
         if (event.target.files && event.target.files.length > 0) {
             const file = event.target.files[0];
             validateFile(file)

@@ -86,9 +86,9 @@ const PrivateRoute: React.FC = () => {
 
     const logSource = (metadata: SnapshotMetadata, context: string) => {
         if (metadata.fromCache) {
-            console.log(`[${context}] Datos obtenidos desde la caché.`);
+            if (import.meta.env.DEV) console.log(`[${context}] Datos obtenidos desde la caché.`);
         } else {
-            console.log(`[${context}] Datos obtenidos desde Firestore.`);
+            if (import.meta.env.DEV) console.log(`[${context}] Datos obtenidos desde Firestore.`);
         }
     };
 

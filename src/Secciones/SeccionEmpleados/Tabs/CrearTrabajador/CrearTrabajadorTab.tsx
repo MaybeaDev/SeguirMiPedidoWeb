@@ -58,7 +58,7 @@ const CrearTrabajador = () => {
                 tipo: 0
             };
             await createUser(trabajador).then((response) => {
-                console.log(response)
+                if (import.meta.env.DEV) console.log(response)
                 setFormData({ nombre: "", rut: "", email: "", telefono: "", })
                 sendPasswordResetEmail(auth, normalizeString(data.email))
             }).then(() => {

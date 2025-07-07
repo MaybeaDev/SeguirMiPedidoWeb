@@ -12,7 +12,7 @@ const SeccionMensaje = () => {
   useEffect(()=>{
     const docRef = doc(db, "/Mensaje", "mensaje")
     const uns = onSnapshot(docRef, snap=>{
-      console.log(snap.data())
+      if (import.meta.env.DEV) console.log(snap.data())
       if (snap.exists()) setMensajeActual(snap.data().text)
       else setMensajeActual("")
     })

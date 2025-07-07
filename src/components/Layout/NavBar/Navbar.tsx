@@ -29,7 +29,7 @@ const Navbar = () => {
 
   // const handleButtonMatias = async () => {
   //   const result = await httpsCallable(functions, 'cleanStorageBefore')({ date: "2025-04-05T19:35:00.566Z", maxFilesPerBatch: 40 });
-  //   console.log(result)
+  //   if (import.meta.env.DEV) console.log(result)
   // }
 
 

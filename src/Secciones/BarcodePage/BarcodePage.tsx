@@ -17,7 +17,7 @@ const BarcodePage = () => {
 
   if (codes) {
     const data = JSON.parse(codes).map((c: string) => { return [c] })
-    console.log(data)
+    if (import.meta.env.DEV) console.log(data)
     return (
       <div>
         <Table data={data} headers={["Codigo", "Codigo de barras"]}>
