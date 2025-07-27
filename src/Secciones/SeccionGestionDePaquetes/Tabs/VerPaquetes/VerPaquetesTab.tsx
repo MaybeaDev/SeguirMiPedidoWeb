@@ -157,7 +157,7 @@ const VerPaquetesTab = () => {
       .toLowerCase(); // Convierte a minúsculas
   };
   const handleVerCodigosDeBarra = () => {
-    const codes = [...tableData.map(d => d[1]).slice(0, 500)];
+    const codes = [...tableData.map(d => d[2]).slice(0, 500)];
     sessionStorage.setItem("codesBarcodes", JSON.stringify(codes))
     window.open(`/barcode-page`, "_blank");
   };
