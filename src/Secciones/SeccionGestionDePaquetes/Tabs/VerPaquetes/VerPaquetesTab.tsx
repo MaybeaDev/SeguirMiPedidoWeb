@@ -238,7 +238,7 @@ const VerPaquetesTab = () => {
       ) : (
         <>
           <Table
-            indexCol={1}
+            indexCol={2}
             max={200}
             headers={[
               "Campaña / Facturacion",

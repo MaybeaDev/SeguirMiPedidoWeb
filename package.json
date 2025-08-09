@@ -13,6 +13,7 @@
   "dependencies": {
     "canvas": "^3.0.0",
     "docx": "^9.1.0",
+    "firebase": "^12.1.0",
     "jsbarcode": "^3.11.6",
     "mapbox-gl": "^3.8.0",
     "react": "^18.3.1",
