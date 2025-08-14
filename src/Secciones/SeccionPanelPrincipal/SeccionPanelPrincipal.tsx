@@ -151,8 +151,10 @@ const PanelPrincipal = () => {
 
   const campaña_actual = campañaActual[campañaActual.length - 1]
   const p_campaña_actual = paquetesContext.filter(p => p.campaña === campaña_actual)
+  const p_campaña_actual_arr = p_campaña_actual.filter(p => p.historial.length > 1).length
   const campaña_anterior = campañaActual[campañaActual.length - 2]
   const p_campaña_anterior = paquetesContext.filter(p => p.campaña === campaña_anterior)
+  const p_campaña_anterior_arr = p_campaña_anterior.filter(p => p.historial.length > 1).length
 
   const entregados_en = (paquetes: PaqueteContext[], dias: number = 0) => {
     return paquetes.filter(p => {
@@ -171,6 +173,7 @@ const PanelPrincipal = () => {
   const sd_camp_act = entregados_en(p_campaña_actual, 1)
   const td_camp_act = entregados_en(p_campaña_actual, 2)
   const ttd_camp_act = fd_camp_act + sd_camp_act + td_camp_act
+  const ent_camp_act = p_campaña_actual.filter(p => p.estado === 3).length
 
   const fd_camp_ant = entregados_en(p_campaña_anterior, 0)
   const sd_camp_ant = entregados_en(p_campaña_anterior, 1)
@@ -219,26 +222,48 @@ const PanelPrincipal = () => {
             <Card onClick={() => { navigate(`/SeccionEmpresa/GestionDePaquetes/verPaquetes/Entregado;${campañaActual[campañaActual.length - 1]}`) }} titulo="Entregado" style={{ width: "100%" }}>{paq.entregado}</Card>
           </div>
           <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", padding: "0 20px" }}>
-            <Card titulo="Total" style={{ width: "100%" }}>
-              <div style={{ display: "flex", justifyContent: "center", gap: 20, textAlign: "left" }}>
-                <div>
-                  {Object.keys(paq.zonas).map(zona => (
-                    <div key={zona}>
-                      <b>{zona}:</b> {paq.zonas[zona]}<br />
-                    </div>
-                  ))}
+            <Card titulo="Totales" style={{ width: "100%" }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "center" }}>
+
+                {/* Zonas */}
+                <div style={{ flex: 1, minWidth: 200 }}>
+                  <h4 style={{ margin: 0 }}>Zonas</h4>
+                  <ul style={{ listStyle: "none", padding: 0 }}>
+                    {Object.keys(paq.zonas).map(zona => (
+                      <li key={zona}>
+                        <b>{zona}:</b> {paq.zonas[zona]}
+                      </li>
+                    ))}
+                    <li><b>Total paquetes: {paq.total}</b></li>
+                    <li><Button onClick={() => setIsOpenModal(true)}>Ver premios</Button></li>
+                  </ul>
                 </div>
-                <div>
-                  <label> Entregados el primer dia: {fd_camp_act} ({(fd_camp_act * 100 / paq.total).toFixed(3)}%)</label><br />
-                  <label> Entregados el segundo dia: {sd_camp_act} ({(sd_camp_act * 100 / paq.total).toFixed(3)}%)</label><br />
-                  <label> Entregados el tercer dia: {td_camp_act} ({(td_camp_act * 100 / paq.total).toFixed(3)}%)</label><br />
-                  <label> Total 3 dias: {ttd_camp_act} ({(ttd_camp_act * 100 / paq.total).toFixed(3)}%)</label><br />
-                  <label> No entregado / Entregado después: {paq.total - ttd_camp_act} ({((paq.total - ttd_camp_act) * 100 / paq.total).toFixed(3)}%)</label><br />
+
+                {/* Estadísticas de entrega */}
+                <div style={{ flex: 1, minWidth: 300 }}>
+                  <h4 style={{ margin: 0 }}>Entregas</h4>
+                  <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: "0.2rem",
+                    alignItems: "center",
+                    marginBlock: 10,
+                  }}>
+                    <div>Primer día: {fd_camp_act} ({(fd_camp_act / p_campaña_actual_arr * 100).toFixed(2)}%)</div>
+                    <div>Total 3 días: {ttd_camp_act} ({(ttd_camp_act / p_campaña_actual_arr * 100).toFixed(2)}%)</div>
+
+                    <div>Segundo día: {sd_camp_act} ({(sd_camp_act / p_campaña_actual_arr * 100).toFixed(2)}%)</div>
+                    <div>Más de 3 días: {ent_camp_act - ttd_camp_act} ({((ent_camp_act - ttd_camp_act) / p_campaña_actual_arr * 100).toFixed(2)}%)</div>
+
+                    <div>Tercer día: {td_camp_act} ({(td_camp_act / p_campaña_actual_arr * 100).toFixed(2)}%)</div>
+                    <div>No entregados: {p_campaña_actual_arr - ent_camp_act} ({((p_campaña_actual_arr - ent_camp_act) / p_campaña_actual_arr * 100).toFixed(2)}%)</div>
+
+                  </div>
                 </div>
+
               </div>
-              <b>Total: </b>{paq.total}
-              <br /><Button onClick={() => { setIsOpenModal(true) }}>Ver total premios</Button>
             </Card>
+
           </div>
           <br />
           <br />
@@ -246,10 +271,11 @@ const PanelPrincipal = () => {
 
           <h3>{`Campaña anterior (${campaña_anterior})`}</h3>
           <div>
-            <label> Entregados el primer dia: {fd_camp_ant} ({(fd_camp_ant * 100 / paq2.total).toFixed(3)}%)</label><br />
-            <label> Entregados el segundo dia: {sd_camp_ant} ({(sd_camp_ant * 100 / paq2.total).toFixed(3)}%)</label><br />
-            <label> Entregados el tercer dia: {td_camp_ant} ({(td_camp_ant * 100 / paq2.total).toFixed(3)}%)</label><br />
-            <label> No entregado / Entregado después: {paq2.total - ttd_camp_ant} ({((paq2.total - ttd_camp_ant) * 100 / paq2.total).toFixed(3)}%)</label><br />
+            <label> Entregados el primer dia: {fd_camp_ant} ({(fd_camp_ant * 100 / p_campaña_anterior_arr).toFixed(3)}%)</label><br />
+            <label> Entregados el segundo dia: {sd_camp_ant} ({(sd_camp_ant * 100 / p_campaña_anterior_arr).toFixed(3)}%)</label><br />
+            <label> Entregados el tercer dia: {td_camp_ant} ({(td_camp_ant * 100 / p_campaña_anterior_arr).toFixed(3)}%)</label><br />
+            <label> Total 3 dias: {ttd_camp_ant} ({(ttd_camp_ant * 100 / p_campaña_anterior_arr).toFixed(3)}%)</label><br />
+            <label> Mas de 3 dias: {paq2.total - ttd_camp_ant} ({((paq2.total - ttd_camp_ant) * 100 / p_campaña_anterior_arr).toFixed(3)}%)</label><br />
           </div>
           <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", padding: "0 20px" }}>
             <Card onClick={() => { navigate(`/SeccionEmpresa/GestionDePaquetes/verPaquetes/Enviado%20desde%20Santiago;${campañaActual[campañaActual.length - 2]}`) }} titulo="No arribados" style={{ width: "100%" }}>{paq2.noArribado}</Card>
