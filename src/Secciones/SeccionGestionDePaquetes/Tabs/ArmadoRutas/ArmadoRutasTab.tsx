@@ -111,12 +111,8 @@ const ArmadoRutasTab: React.FC = () => {
             })
         }
       }
-      const p = {
-        hola: 2,
-        "premio 2": 3
-      }
       const premios = obtenerPremios()
-      downloadManifest(p, rutaObjetivo.alias!)
+      downloadManifest(premios, rutaObjetivo.alias!)
       batch.commit();
       setModalPremiosData([premios]);
       setIsOpenModalPremios(true)
