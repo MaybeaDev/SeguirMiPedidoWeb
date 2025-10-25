@@ -253,7 +253,7 @@ const VerPaquetesTab = () => {
               "Ruta",
               "Transportista",
             ]}
-            data={tableData}
+            data={tableData.map(row => row.map((val, index) => index === 7 ? <a href={`https://wa.me/${formatWhatsapp(val)}`}>{val}</a> : val))}
             searchTerms={searchQuery.split(";").map((term) => normalizeString(term))}
           >
             {(rowIndex: string) => {
@@ -275,3 +275,4 @@ const VerPaquetesTab = () => {
 export default VerPaquetesTab;
 
 
+const  formatWhatsapp = (str: string) => str.length === 8 ? `569${str}` : str.length === 9 ? `56${str}` : str
